@@ -826,26 +826,7 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                       </size>
                      </property>
                      <property name="text">
-                      <string>Solar Voltage</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="3" alignment="Qt::AlignHCenter">
-                    <widget class="QLabel" name="label_28">
-                     <property name="minimumSize">
-                      <size>
-                       <width>50</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>50</width>
-                       <height>40</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>V</string>
+                      <string>Lightsensor Signal</string>
                      </property>
                     </widget>
                    </item>
@@ -853,13 +834,13 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                     <widget class="QLCDNumber" name="solarLCD">
                      <property name="minimumSize">
                       <size>
-                       <width>50</width>
+                       <width>150</width>
                        <height>40</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>50</width>
+                       <width>150</width>
                        <height>40</height>
                       </size>
                      </property>
@@ -878,7 +859,7 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                      </property>
                     </spacer>
                    </item>
-                   <item row="0" column="4">
+                   <item row="0" column="3">
                     <widget class="QPushButton" name="sunFinderButton">
                      <property name="maximumSize">
                       <size>
@@ -891,7 +872,7 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                      </property>
                     </widget>
                    </item>
-                   <item row="0" column="5">
+                   <item row="0" column="4">
                     <spacer name="horizontalSpacer_3">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>

@@ -23,7 +23,7 @@ Groundstation::Groundstation(QWidget *parent) :
     currentPitch = 0;
     currentYaw = 0;
     currentWz = 0;
-    currentSolarVoltage = 0;
+    currentLight = 0;
 
     telemetryActive = 1;
     sunFinderActive = 0;
@@ -75,7 +75,7 @@ void Groundstation::readoutConnection(){
     PayloadSatellite payload = link.read();
     switch(payload.topic){
     case PayloadSensorIMUType:{
-//        console("Package of type \"IMU\".");
+//        console("Package of type \"IMU\" received.");
         PayloadSensorIMU psimu(payload);        
         currentRoll = 360*(psimu.roll/(2*M_PI));
         currentPitch = 360*(psimu.pitch/(2*M_PI));
@@ -85,15 +85,15 @@ void Groundstation::readoutConnection(){
         break;
     }
     case PayloadCounterType:{
-//        console("Package of type \"Counter\".");
+//        console("Package of type \"Counter\" received.");
         PayloadCounter pscount(payload);
         ui->counterLCD->display(pscount.counter);
         break;
     }
     case PayloadLightType:{
-//        console("Package of type \"Lightsensor\".");
+//        console("Package of type \"Lightsensor\" received.");
         PayloadLight plight(payload);
-        currentSolarVoltage = plight.light;
+        currentLight = plight.light;
         break;
     }
     default:
@@ -222,7 +222,7 @@ void Groundstation::fastUpdate(){
         double key2 = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
         static double lastPointKey2 = 0;
         if (key-lastPointKey2 > 0.01){ // at most add point every 10 ms
-            ui->sunFinderWidget->graph(0)->addData(key2, currentSolarVoltage);
+            ui->sunFinderWidget->graph(0)->addData(key2, currentLight);
             ui->sunFinderWidget->graph(0)->removeDataBefore(key2-30);
             ui->sunFinderWidget->graph(0)->rescaleValueAxis();
             lastPointKey2 = key2;
@@ -247,7 +247,7 @@ void Groundstation::slowUpdate(){
         ui->orientationLCD->display(currentYaw);
         ui->pitchLCD->display(currentPitch);
         ui->rollLCD->display(currentRoll);
-        ui->solarLCD->display(currentSolarVoltage);
+        ui->solarLCD->display(currentLight);
 //        ui->debrisFoundLCD->display(ui->debrisMapWidget->debrisFound->length()+ui->debrisMapWidget->debrisCleaned->length());
 //        ui->debrisCleanedLCD->display(ui->debrisMapWidget->debrisCleaned->length());
     }

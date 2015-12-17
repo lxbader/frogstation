@@ -35,7 +35,7 @@ private:
     float currentPitch;
     float currentYaw;
     float currentWz;
-    float currentSolarVoltage;
+    int16_t currentLight;
 
     bool sunFinderActive;
     bool telemetryActive;

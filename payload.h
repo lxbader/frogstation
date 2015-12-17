@@ -2,11 +2,12 @@
 #define PAYLOAD_H
 
 #include <QtGlobal>
+#include "stdint.h"
 
 enum PayloadType{
     PayloadCounterType = 5001,
     PayloadSensorIMUType = 5002,
-    PayloadLightType = 5003, //sure?
+    PayloadLightType = 5003,
 };
 
 struct PayloadSensorIMU;
@@ -42,7 +43,8 @@ struct PayloadCounter{
 };
 
 struct PayloadLight{
-    float light;
+    int16_t light;
+    bool on;
     PayloadLight(const PayloadSatellite payload);
 };
 

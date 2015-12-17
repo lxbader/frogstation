@@ -1,6 +1,7 @@
 #include <QByteArray>
 #include <QtEndian>
 #include "payload.h"
+#include "stdint.h"
 
 PayloadSatellite::PayloadSatellite() : checksum(0), senderNode(0), timestamp(0), senderThread(0), topic(0), ttl(0), userDataLen(0){
     userData[0] = 0;
@@ -37,8 +38,9 @@ PayloadCounter::PayloadCounter(const PayloadSatellite payload): counter(0){
     counter = *(int*)(payload.userData);
 }
 
-PayloadLight::PayloadLight(const PayloadSatellite payload): light(0){
+PayloadLight::PayloadLight(const PayloadSatellite payload): light(0), on(0){
     if(payload.userDataLen != sizeof(PayloadLight) || payload.topic != PayloadLightType)
         return;
-    light = *(float*)(payload.userData);
+    light = *(int16_t*)(payload.userData);
+    on = *(bool*)(payload.userData + 1 * sizeof(int16_t));
 }
