@@ -36,3 +36,9 @@ PayloadCounter::PayloadCounter(const PayloadSatellite payload): counter(0){
         return;
     counter = *(int*)(payload.userData);
 }
+
+PayloadLight::PayloadLight(const PayloadSatellite payload): light(0){
+    if(payload.userDataLen != sizeof(PayloadLight) || payload.topic != PayloadLightType)
+        return;
+    light = *(float*)(payload.userData);
+}

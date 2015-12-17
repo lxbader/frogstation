@@ -15,6 +15,7 @@ Groundstation::Groundstation(QWidget *parent) :
     link.bind();
     link.addTopic(PayloadSensorIMUType);
     link.addTopic(PayloadCounterType);
+    link.addTopic(PayloadLightType);
 
     connect(&link, SIGNAL(readReady()), this, SLOT(readoutConnection()));
 
@@ -87,6 +88,12 @@ void Groundstation::readoutConnection(){
 //        console("Package of type \"Counter\".");
         PayloadCounter pscount(payload);
         ui->counterLCD->display(pscount.counter);
+        break;
+    }
+    case PayloadLightType:{
+//        console("Package of type \"Lightsensor\".");
+        PayloadLight plight(payload);
+        currentSolarVoltage = plight.light;
         break;
     }
     default:
@@ -210,6 +217,18 @@ void Groundstation::fastUpdate(){
         }
         ui->rotationVelocityWidget->xAxis->setRange(key+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
         ui->rotationVelocityWidget->replot();
+
+        //sunFinderWidget update time-dependent
+        double key2 = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+        static double lastPointKey2 = 0;
+        if (key-lastPointKey2 > 0.01){ // at most add point every 10 ms
+            ui->sunFinderWidget->graph(0)->addData(key2, currentSolarVoltage);
+            ui->sunFinderWidget->graph(0)->removeDataBefore(key2-30);
+            ui->sunFinderWidget->graph(0)->rescaleValueAxis();
+            lastPointKey2 = key2;
+        }
+        ui->sunFinderWidget->xAxis->setRange(key2+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
+        ui->sunFinderWidget->replot();
     }
 //    if(sunFinderActive){
 //        //sunFinderWidget Update
@@ -265,6 +284,20 @@ void Groundstation::setupGraphs(){
 //    // make left and bottom axes transfer their ranges to right and top axes:
 //    connect(ui->sunFinderWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->xAxis2, SLOT(setRange(QCPRange)));
 //    connect(ui->sunFinderWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->yAxis2, SLOT(setRange(QCPRange)));
+
+    //Set up sunFinderWidget time-dependent
+    ui->sunFinderWidget->xAxis->setLabel("Current Time");
+    ui->sunFinderWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+    ui->sunFinderWidget->xAxis->setDateTimeFormat("hh:mm:ss");
+    ui->sunFinderWidget->xAxis->setAutoTickStep(false);
+    ui->sunFinderWidget->xAxis->setTickStep(5);
+    ui->sunFinderWidget->yAxis->setLabel("Solar Voltage");
+    ui->sunFinderWidget->axisRect()->setupFullAxesBox();
+    ui->sunFinderWidget->addGraph();
+    ui->sunFinderWidget->graph(0)->setPen(QPen(Qt::blue));
+    // make left and bottom axes transfer their ranges to right and top axes:
+    connect(ui->sunFinderWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->sunFinderWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->yAxis2, SLOT(setRange(QCPRange)));
 }
 
 

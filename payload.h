@@ -6,10 +6,12 @@
 enum PayloadType{
     PayloadCounterType = 5001,
     PayloadSensorIMUType = 5002,
+    PayloadLightType = 5003, //sure?
 };
 
 struct PayloadSensorIMU;
 struct PayloadCounter;
+struct PayloadLight;
 
 struct PayloadSatellite{
     quint16 checksum;
@@ -36,7 +38,12 @@ struct PayloadSensorIMU{
 
 struct PayloadCounter{
     int counter;
-    PayloadCounter (const PayloadSatellite payload);
+    PayloadCounter(const PayloadSatellite payload);
+};
+
+struct PayloadLight{
+    float light;
+    PayloadLight(const PayloadSatellite payload);
 };
 
 #endif // PAYLOAD_H
