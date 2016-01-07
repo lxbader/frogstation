@@ -15,7 +15,7 @@ Groundstation::Groundstation(QWidget *parent) :
     link.bind();
     link.addTopic(PayloadSensorIMUType);
     link.addTopic(PayloadCounterType);
-    link.addTopic(PayloadLightType);
+    link.addTopic(PayloadElectricalType);
 
     connect(&link, SIGNAL(readReady()), this, SLOT(readoutConnection()));
 
@@ -27,6 +27,9 @@ Groundstation::Groundstation(QWidget *parent) :
 
     telemetryActive = 1;
     sunFinderActive = 0;
+    electromagnetActive = 0;
+    thermalKnifeActive = 0;
+    lightsensorActive = 0;
 
     //Set up timer + update
     QTimer *fastTimer = new QTimer(this);
@@ -39,17 +42,46 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(slowTimer, SIGNAL(timeout()), this, SLOT(slowUpdate()));
     slowTimer->start();
 
+    //---------------
     //Connect Buttons
+    //---------------
+
+    //Top Row
     connect(ui->connectionSendButton, SIGNAL(clicked()), this, SLOT(onConnectionSendButtonClicked()));
     connect(ui->activateTelemetryButton, SIGNAL(clicked()), this, SLOT(onActivateTelemetryButtonClicked()));
     connect(ui->deactivateTelemetryButton, SIGNAL(clicked()), this, SLOT(onDeactivateTelemetryButtonClicked()));
+
+    //General Tab
+    connect(ui->calibrateMagnetometerButton, SIGNAL(clicked()), this, SLOT(onCalibrateMagnetometerButtonClicked()));
+    connect(ui->calibrateAccelerometerButton, SIGNAL(clicked()), this, SLOT(onCalibrateAccelerometerButtonClicked()));
+    connect(ui->calibrateGyroscopeButton, SIGNAL(clicked()), this, SLOT(onCalibrateGyroscopeButtonClicked()));
+
+    connect(ui->setHBAButton, SIGNAL(clicked()), this, SLOT(onSetHBAButtonClicked()));
+    connect(ui->setHBBButton, SIGNAL(clicked()), this, SLOT(onSetHBBButtonClicked()));
+    connect(ui->setHBCButton, SIGNAL(clicked()), this, SLOT(onSetHBCButtonClicked()));
+
+    connect(ui->activateThermalKnifeButton, SIGNAL(clicked()), this, SLOT(onActivateThermalKnifeButtonClicked()));
+    connect(ui->deactivateThermalKnifeButton, SIGNAL(clicked()), this, SLOT(onDeactivateThermalKnifeButtonClicked()));
+    connect(ui->activateElectromagnetButton, SIGNAL(clicked()), this, SLOT(onActivateElectromagnetButtonClicked()));
+    connect(ui->deactivateElectromagnetButton, SIGNAL(clicked()), this, SLOT(onDeactivateElectromagnetButtonClicked()));
+    connect(ui->activateLightsensorButton, SIGNAL(clicked()), this, SLOT(onActivateLightsensorButtonClicked()));
+    connect(ui->deactivateLightsensorButton, SIGNAL(clicked()), this, SLOT(onDeactivateLightsensorButtonClicked()));
+
+    //Rotation Tab
     connect(ui->rotationVelocityButton, SIGNAL(clicked()), this, SLOT(onRotationVelocityButtonClicked()));
-    connect(ui->motorSpeedButton, SIGNAL(clicked()), this, SLOT(onMotorSpeedButtonClicked()));
+
+    //OrientationTab
     connect(ui->orientationSetButton, SIGNAL(clicked()), this, SLOT(onOrientationSetButtonClicked()));
     connect(ui->orientationResetButton, SIGNAL(clicked()), this, SLOT(onOrientationResetButtonClicked()));
+
+    //Sun Finder Tab
     connect(ui->sunFinderButton, SIGNAL(clicked()), this, SLOT(onSunFinderButtonClicked()));
+
+    //Mission Tab
     connect(ui->missionStartButton, SIGNAL(clicked()), this, SLOT(onMissionStartButtonClicked()));
     connect(ui->missionAbortButton, SIGNAL(clicked()), this, SLOT(onMissionAbortButtonClicked()));
+
+
 
     //Set up graph widgets
     setupGraphs();
@@ -90,10 +122,13 @@ void Groundstation::readoutConnection(){
         ui->counterLCD->display(pscount.counter);
         break;
     }
-    case PayloadLightType:{
-//        console("Package of type \"Lightsensor\" received.");
-        PayloadLight plight(payload);
-        currentLight = plight.light;
+    case PayloadElectricalType:{
+//        console("Package of type \"Electrical\" received.");
+        PayloadElectrical pelec(payload);
+        electromagnetActive = pelec.electromagnetOn;
+        thermalKnifeActive = pelec.thermalKnifeOn;
+        lightsensorActive = pelec.lightsensorOn;
+        currentLight = pelec.light;
         break;
     }
     default:
@@ -107,11 +142,7 @@ void Groundstation::readoutConnection(){
 //BUTTONS/TELECOMMANDS
 //--------------------
 
-void Groundstation::onConnectionSendButtonClicked(){
-    QString message = ui->connectionLineEdit->text();
-    link.connectionSendCommand(message);
-}
-
+//Telecommands
 void Groundstation::telecommand(int ID, QString msg, int value){
     QString command;
     command = QString("$%1%2%3#").arg(QString::number(ID), msg, QString::number(value));
@@ -125,6 +156,12 @@ void Groundstation::telecommand(int ID, QString msg, QString sign, int value){
     command.append(sign);
     command.append(QString("%1#").arg(QString::number(value)));
     link.connectionSendCommand(command);
+}
+
+//Top Row
+void Groundstation::onConnectionSendButtonClicked(){
+    QString message = ui->connectionLineEdit->text();
+    link.connectionSendCommand(message);
 }
 
 void Groundstation::onActivateTelemetryButtonClicked(){
@@ -147,26 +184,130 @@ void Groundstation::onDeactivateTelemetryButtonClicked(){
         console("Telemetry already inactive.");
 }
 
-void Groundstation::onRotationVelocityButtonClicked(){
-
+//General Tab
+void Groundstation::onCalibrateMagnetometerButtonClicked(){
+    console("Magnetometer calibration started.");
+    telecommand(1, "CMA", 1);
 }
 
-void Groundstation::onMotorSpeedButtonClicked(){
+void Groundstation::onCalibrateAccelerometerButtonClicked(){
+    console("Accelerometer calibration started.");
+    telecommand(1, "CAC", 1);
+}
+
+void Groundstation::onCalibrateGyroscopeButtonClicked(){
+    console("Gyroscope calibration started.");
+    telecommand(1, "CGY", 1);
+}
+
+void Groundstation::onSetHBAButtonClicked(){
     int speedPercent;
     bool ok;
-    speedPercent = ui->motorSpeedLineEdit->text().toInt(&ok, 10);
+    speedPercent = ui->HBALineEdit->text().toInt(&ok, 10);
     if(ok && (100 >= speedPercent) && (speedPercent >= 0)){
-        console(QString("Setting motor speed to %1 percent.").arg(speedPercent));
-        telecommand(3, "SSP", "+", abs(speedPercent));
+        console(QString("Setting HBridge A motor speed to %1 percent.").arg(speedPercent));
+        telecommand(3, "SPA", "+", abs(speedPercent));
     }
     else if(ok && (0 > speedPercent) && (speedPercent >= -100)){
-        console(QString("Setting motor speed to %1 percent.").arg(speedPercent));
-        telecommand(3, "SSP", "-", abs(speedPercent));
+        console(QString("Setting HBridge A motor speed to %1 percent.").arg(speedPercent));
+        telecommand(3, "SPA", "-", abs(speedPercent));
     }
     else
         console("Given motor speed percentage invalid.");
 }
 
+void Groundstation::onSetHBBButtonClicked(){
+    int speedPercent;
+    bool ok;
+    speedPercent = ui->HBBLineEdit->text().toInt(&ok, 10);
+    if(ok && (100 >= speedPercent) && (speedPercent >= 0)){
+        console(QString("Setting HBridge B motor speed to %1 percent.").arg(speedPercent));
+        telecommand(3, "SPB", "+", abs(speedPercent));
+    }
+    else if(ok && (0 > speedPercent) && (speedPercent >= -100)){
+        console(QString("Setting HBridge B motor speed to %1 percent.").arg(speedPercent));
+        telecommand(3, "SPB", "-", abs(speedPercent));
+    }
+    else
+        console("Given motor speed percentage invalid.");
+}
+
+void Groundstation::onSetHBCButtonClicked(){
+    int speedPercent;
+    bool ok;
+    speedPercent = ui->HBCLineEdit->text().toInt(&ok, 10);
+    if(ok && (100 >= speedPercent) && (speedPercent >= 0)){
+        console(QString("Setting HBridge C motor speed to %1 percent.").arg(speedPercent));
+        telecommand(3, "SPC", "+", abs(speedPercent));
+    }
+    else if(ok && (0 > speedPercent) && (speedPercent >= -100)){
+        console(QString("Setting HBridge C motor speed to %1 percent.").arg(speedPercent));
+        telecommand(3, "SPC", "-", abs(speedPercent));
+    }
+    else
+        console("Given motor speed percentage invalid.");
+}
+
+void Groundstation::onActivateThermalKnifeButtonClicked(){
+    if(!thermalKnifeActive){
+        console("Activating thermal knife.");
+        telecommand(3, "AKN", 1);
+    }
+    else
+        console("Thermal knife already active.");
+}
+
+void Groundstation::onDeactivateThermalKnifeButtonClicked(){
+    if(thermalKnifeActive){
+        console("Deactivating thermal knife.");
+        telecommand(3, "AKN", 0);
+    }
+    else
+        console("Thermal knife already inactive.");
+}
+
+void Groundstation::onActivateElectromagnetButtonClicked(){
+    if(!electromagnetActive){
+        console("Activating electromagnet.");
+        telecommand(3, "AMA", 1);
+    }
+    else
+        console("Electromagnet already active.");
+}
+
+void Groundstation::onDeactivateElectromagnetButtonClicked(){
+    if(electromagnetActive){
+        console("Deactivating electromagnet.");
+        telecommand(3, "AMA", 0);
+    }
+    else
+        console("Electromagnet already inactive.");
+}
+
+void Groundstation::onActivateLightsensorButtonClicked(){
+    if(!lightsensorActive){
+        console("Activating lightsensor.");
+        telecommand(3, "ALS", 1);
+    }
+    else
+        console("Lightsensor already active.");
+}
+
+void Groundstation::onDeactivateLightsensorButtonClicked(){
+    if(lightsensorActive){
+        console("Deactivating lightsensor.");
+        telecommand(3, "ALS", 0);
+    }
+    else
+        console("Lightsensor already inactive.");
+}
+
+//Rotation Tab
+void Groundstation::onRotationVelocityButtonClicked(){
+
+}
+
+//Orientation Tab
 void Groundstation::onOrientationSetButtonClicked(){
     int angle;
     bool ok;
@@ -184,10 +325,12 @@ void Groundstation::onOrientationResetButtonClicked(){
     telecommand(3, "STE", 0);
 }
 
+//Sun Finder Tab
 void Groundstation::onSunFinderButtonClicked(){
 
 }
 
+//Mission Tab
 void Groundstation::onMissionStartButtonClicked(){
 
 }
@@ -197,9 +340,9 @@ void Groundstation::onMissionAbortButtonClicked(){
 }
 
 
-//---------------
-//UPDATE FUNCTION
-//---------------
+//----------------
+//UPDATE FUNCTIONS
+//----------------
 void Groundstation::fastUpdate(){
     if(telemetryActive){
         //Compass and debris map update

@@ -39,14 +39,31 @@ private:
 
     bool sunFinderActive;
     bool telemetryActive;
+    bool thermalKnifeActive;
+    bool electromagnetActive;
+    bool lightsensorActive;
 
     void telecommand(int ID, QString msg, int value);
     void telecommand(int ID, QString msg, QString sign, int value);
     void setupGraphs();
 
 private slots:
+    void onCalibrateMagnetometerButtonClicked();
+    void onCalibrateAccelerometerButtonClicked();
+    void onCalibrateGyroscopeButtonClicked();
+
+    void onSetHBAButtonClicked();
+    void onSetHBBButtonClicked();
+    void onSetHBCButtonClicked();
+
+    void onActivateThermalKnifeButtonClicked();
+    void onDeactivateThermalKnifeButtonClicked();
+    void onActivateElectromagnetButtonClicked();
+    void onDeactivateElectromagnetButtonClicked();
+    void onActivateLightsensorButtonClicked();
+    void onDeactivateLightsensorButtonClicked();
+
     void onRotationVelocityButtonClicked();
-    void onMotorSpeedButtonClicked();
 
     void onOrientationSetButtonClicked();
     void onOrientationResetButtonClicked();

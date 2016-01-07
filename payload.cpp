@@ -38,9 +38,11 @@ PayloadCounter::PayloadCounter(const PayloadSatellite payload): counter(0){
     counter = *(int*)(payload.userData);
 }
 
-PayloadLight::PayloadLight(const PayloadSatellite payload): light(0), on(0){
-    if(payload.userDataLen != sizeof(PayloadLight) || payload.topic != PayloadLightType)
+PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsensorOn(0), electromagnetOn(0), thermalKnifeOn(0), light(0){
+    if(payload.userDataLen != sizeof(PayloadElectrical) || payload.topic != PayloadElectricalType)
         return;
-    light = *(int16_t*)(payload.userData);
-    on = *(bool*)(payload.userData + 1 * sizeof(int16_t));
+    lightsensorOn = *(bool*)(payload.userData);
+    electromagnetOn = *(bool*)(payload.userData + 1 * sizeof(bool));
+    thermalKnifeOn = *(bool*)(payload.userData + 2 * sizeof(bool));
+    light = *(int16_t*)(payload.userData + 3 * sizeof(bool));
 }

@@ -323,8 +323,180 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
               </size>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>1</number>
              </property>
+             <widget class="QWidget" name="generalTab">
+              <attribute name="title">
+               <string>General</string>
+              </attribute>
+              <widget class="QGroupBox" name="groupBox">
+               <property name="geometry">
+                <rect>
+                 <x>70</x>
+                 <y>50</y>
+                 <width>481</width>
+                 <height>81</height>
+                </rect>
+               </property>
+               <property name="title">
+                <string>Calibrations</string>
+               </property>
+               <widget class="QWidget" name="">
+                <property name="geometry">
+                 <rect>
+                  <x>10</x>
+                  <y>30</y>
+                  <width>461</width>
+                  <height>25</height>
+                 </rect>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_13">
+                 <item>
+                  <widget class="QPushButton" name="calibrateMagnetometerButton">
+                   <property name="text">
+                    <string>Calibrate Magnetometer</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="calibrateAccelerometerButton">
+                   <property name="text">
+                    <string>Calibrate Accelerometer</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="calibrateGyroscopeButton">
+                   <property name="text">
+                    <string>Calibrate Gyroscope</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+              <widget class="QGroupBox" name="groupBox_3">
+               <property name="geometry">
+                <rect>
+                 <x>70</x>
+                 <y>170</y>
+                 <width>491</width>
+                 <height>241</height>
+                </rect>
+               </property>
+               <property name="title">
+                <string>Electrical</string>
+               </property>
+               <widget class="QWidget" name="">
+                <property name="geometry">
+                 <rect>
+                  <x>102</x>
+                  <y>22</y>
+                  <width>248</width>
+                  <height>83</height>
+                 </rect>
+                </property>
+                <layout class="QFormLayout" name="formLayout">
+                 <item row="0" column="0">
+                  <widget class="QLineEdit" name="HBALineEdit"/>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QPushButton" name="setHBAButton">
+                   <property name="text">
+                    <string>Set Speed HBridge A</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLineEdit" name="HBBLineEdit"/>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QPushButton" name="setHBBButton">
+                   <property name="text">
+                    <string>Set Speed HBridge B</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLineEdit" name="HBCLineEdit"/>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QPushButton" name="setHBCButton">
+                   <property name="text">
+                    <string>Set Speed HBridge C</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="">
+                <property name="geometry">
+                 <rect>
+                  <x>100</x>
+                  <y>120</y>
+                  <width>262</width>
+                  <height>89</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_18">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_12">
+                   <item>
+                    <widget class="QPushButton" name="activateThermalKnifeButton">
+                     <property name="text">
+                      <string>Activate Thermal Knife</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="deactivateThermalKnifeButton">
+                     <property name="text">
+                      <string>Deactivate Thermal Knife</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_14">
+                   <item>
+                    <widget class="QPushButton" name="activateElectromagnetButton">
+                     <property name="text">
+                      <string>Activate Electromagnet</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="deactivateElectromagnetButton">
+                     <property name="text">
+                      <string>Deactivate Electromagnet</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_15">
+                   <item>
+                    <widget class="QPushButton" name="activateLightsensorButton">
+                     <property name="text">
+                      <string>Activate Lightsensor</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="deactivateLightsensorButton">
+                     <property name="text">
+                      <string>Deactivate Lightsensor</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+             </widget>
              <widget class="QWidget" name="rotationTab">
               <attribute name="title">
                <string>Rotation</string>
@@ -429,56 +601,6 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                    </item>
                    <item row="1" column="0">
                     <spacer name="horizontalSpacer_12">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item row="2" column="1">
-                    <widget class="QLabel" name="label_2">
-                     <property name="text">
-                      <string>Set Motor Speed</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="2">
-                    <widget class="QLineEdit" name="motorSpeedLineEdit"/>
-                   </item>
-                   <item row="2" column="3">
-                    <widget class="QLabel" name="label_6">
-                     <property name="text">
-                      <string>%</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="4">
-                    <widget class="QPushButton" name="motorSpeedButton">
-                     <property name="text">
-                      <string>Set</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="0">
-                    <spacer name="horizontalSpacer_13">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item row="2" column="5">
-                    <spacer name="horizontalSpacer_14">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
