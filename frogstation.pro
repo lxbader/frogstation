@@ -20,7 +20,8 @@ SOURCES += main.cpp \
     qcustomplot.cpp \
     console.cpp \
     connection.cpp \
-    payload.cpp
+    payload.cpp \
+    qledindicator.cpp
 
 HEADERS  += groundstation.h \
     compass.h \
@@ -28,6 +29,7 @@ HEADERS  += groundstation.h \
     qcustomplot.h \
     console.h \
     connection.h \
-    payload.h
+    payload.h \
+    qledindicator.h
 
 FORMS    += groundstation.ui

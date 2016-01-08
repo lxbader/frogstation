@@ -26,7 +26,6 @@ Groundstation::Groundstation(QWidget *parent) :
     currentLight = 0;
 
     telemetryActive = 1;
-    sunFinderActive = 0;
     electromagnetActive = 0;
     thermalKnifeActive = 0;
     lightsensorActive = 0;
@@ -344,7 +343,6 @@ void Groundstation::onMissionAbortButtonClicked(){
 //UPDATE FUNCTIONS
 //----------------
 void Groundstation::fastUpdate(){
-    if(telemetryActive){
         //Compass and debris map update
         ui->compassWidget->angle = currentYaw;
         ui->debrisMapWidget->angle = currentYaw;
@@ -372,15 +370,12 @@ void Groundstation::fastUpdate(){
         }
         ui->sunFinderWidget->xAxis->setRange(key2+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
         ui->sunFinderWidget->replot();
-    }
-//    if(sunFinderActive){
-//        //sunFinderWidget Update
-//        int key2 = (int) round(currentYaw);
-//        currentSolarVoltage = key2*key2/1000;
-//        ui->sunFinderWidget->graph(0)->addData(key2, currentSolarVoltage);
-//        ui->sunFinderWidget->graph(0)->rescaleValueAxis();
-//        ui->sunFinderWidget->replot();
-//    }
+
+        //LED Updates
+        ui->lightsensorLED->setChecked(lightsensorActive);
+        ui->electromagnetLED->setChecked(electromagnetActive);
+        ui->thermalKnifeLED->setChecked(thermalKnifeActive);
+        ui->telemetryLED->setChecked(telemetryActive);
 }
 
 void Groundstation::slowUpdate(){
@@ -393,6 +388,7 @@ void Groundstation::slowUpdate(){
         ui->solarLCD->display(currentLight);
 //        ui->debrisFoundLCD->display(ui->debrisMapWidget->debrisFound->length()+ui->debrisMapWidget->debrisCleaned->length());
 //        ui->debrisCleanedLCD->display(ui->debrisMapWidget->debrisCleaned->length());
+
     }
 }
 

@@ -37,7 +37,6 @@ private:
     float currentWz;
     int16_t currentLight;
 
-    bool sunFinderActive;
     bool telemetryActive;
     bool thermalKnifeActive;
     bool electromagnetActive;
