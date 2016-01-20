@@ -8,11 +8,13 @@ enum PayloadType{
     PayloadCounterType = 5001,
     PayloadSensorIMUType = 5002,
     PayloadElectricalType = 5003,
+    PayloadImageType = 5004,
 };
 
-struct PayloadSensorIMU;
 struct PayloadCounter;
+struct PayloadSensorIMU;
 struct PayloadElectrical;
+struct PayloadImage;
 
 struct PayloadSatellite{
     quint16 checksum;
@@ -25,8 +27,11 @@ struct PayloadSatellite{
     quint8 userData[998];
     PayloadSatellite();
     PayloadSatellite(const QByteArray &buffer);
-    PayloadSatellite(const PayloadSensorIMU payload);
-    PayloadSatellite(const PayloadCounter payload);
+};
+
+struct PayloadCounter{
+    int counter;
+    PayloadCounter(const PayloadSatellite payload);
 };
 
 struct PayloadSensorIMU{
@@ -37,17 +42,17 @@ struct PayloadSensorIMU{
     PayloadSensorIMU(const PayloadSatellite payload);
 };
 
-struct PayloadCounter{
-    int counter;
-    PayloadCounter(const PayloadSatellite payload);
-};
-
 struct PayloadElectrical{
     bool lightsensorOn;
     bool electromagnetOn;
     bool thermalKnifeOn;
     int16_t light;
     PayloadElectrical(const PayloadSatellite payload);
+};
+
+struct PayloadImage{
+    float yaw;
+    PayloadImage(const PayloadSatellite payload);
 };
 
 #endif // PAYLOAD_H

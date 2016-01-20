@@ -23,6 +23,12 @@ PayloadSatellite::PayloadSatellite(const QByteArray &buffer) : checksum(0), send
     userData[userDataLen] = 0x00;
 }
 
+PayloadCounter::PayloadCounter(const PayloadSatellite payload): counter(0){
+    if(payload.userDataLen != sizeof(PayloadCounter) || payload.topic != PayloadCounterType)
+        return;
+    counter = *(int*)(payload.userData);
+}
+
 PayloadSensorIMU::PayloadSensorIMU(const PayloadSatellite payload):wz(0), roll(0), pitch(0), yaw(0){
     if(payload.userDataLen != sizeof(PayloadSensorIMU) || payload.topic != PayloadSensorIMUType)
         return;
@@ -32,12 +38,6 @@ PayloadSensorIMU::PayloadSensorIMU(const PayloadSatellite payload):wz(0), roll(0
     yaw = *(float*)(payload.userData + 3 * sizeof(float));
 }
 
-PayloadCounter::PayloadCounter(const PayloadSatellite payload): counter(0){
-    if(payload.userDataLen != sizeof(PayloadCounter) || payload.topic != PayloadCounterType)
-        return;
-    counter = *(int*)(payload.userData);
-}
-
 PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsensorOn(0), electromagnetOn(0), thermalKnifeOn(0), light(0){
     if(payload.userDataLen != sizeof(PayloadElectrical) || payload.topic != PayloadElectricalType)
         return;
@@ -45,4 +45,8 @@ PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsenso
     electromagnetOn = *(bool*)(payload.userData + 1 * sizeof(bool));
     thermalKnifeOn = *(bool*)(payload.userData + 2 * sizeof(bool));
     light = *(int16_t*)(payload.userData + 3 * sizeof(bool));
+}
+
+PayloadImage::PayloadImage(const PayloadSatellite payload){
+    yaw = *(float*)(payload.userData);
 }

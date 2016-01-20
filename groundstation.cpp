@@ -16,6 +16,7 @@ Groundstation::Groundstation(QWidget *parent) :
     link.addTopic(PayloadSensorIMUType);
     link.addTopic(PayloadCounterType);
     link.addTopic(PayloadElectricalType);
+    link.addTopic(PayloadImageType);
 
     connect(&link, SIGNAL(readReady()), this, SLOT(readoutConnection()));
 
@@ -133,6 +134,11 @@ void Groundstation::readoutConnection(){
         thermalKnifeActive = pelec.thermalKnifeOn;
         lightsensorActive = pelec.lightsensorOn;
         currentLight = pelec.light;
+        break;
+    }
+    case PayloadImageType:{
+        console("Package of type \"Image\" received.");
+        PayloadImage pimage(payload);
         break;
     }
     default:
