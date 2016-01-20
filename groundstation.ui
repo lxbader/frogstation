@@ -227,13 +227,13 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
          <widget class="QGroupBox" name="powerBox">
           <property name="minimumSize">
            <size>
-            <width>300</width>
+            <width>220</width>
             <height>120</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>300</width>
+            <width>220</width>
             <height>120</height>
            </size>
           </property>
@@ -397,6 +397,72 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="groupBox_5">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>120</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>120</height>
+           </size>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_23">
+           <item>
+            <spacer name="horizontalSpacer_14">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="emergencyOffButton">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>60</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>60</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Emergency Off</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_15">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_13">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -446,11 +512,11 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
               </size>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="generalTab">
               <attribute name="title">
-               <string>General</string>
+               <string>Manual Control</string>
               </attribute>
               <widget class="QGroupBox" name="groupBox">
                <property name="geometry">
@@ -501,8 +567,8 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
               <widget class="QGroupBox" name="groupBox_3">
                <property name="geometry">
                 <rect>
-                 <x>70</x>
-                 <y>170</y>
+                 <x>80</x>
+                 <y>150</y>
                  <width>491</width>
                  <height>241</height>
                 </rect>
@@ -510,53 +576,11 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                <property name="title">
                 <string>Electrical</string>
                </property>
-               <widget class="QWidget" name="layoutWidget2">
-                <property name="geometry">
-                 <rect>
-                  <x>102</x>
-                  <y>22</y>
-                  <width>248</width>
-                  <height>83</height>
-                 </rect>
-                </property>
-                <layout class="QFormLayout" name="formLayout">
-                 <item row="0" column="0">
-                  <widget class="QLineEdit" name="HBALineEdit"/>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QPushButton" name="setHBAButton">
-                   <property name="text">
-                    <string>Set Speed HBridge A</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLineEdit" name="HBBLineEdit"/>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QPushButton" name="setHBBButton">
-                   <property name="text">
-                    <string>Set Speed HBridge B</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLineEdit" name="HBCLineEdit"/>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QPushButton" name="setHBCButton">
-                   <property name="text">
-                    <string>Set Speed HBridge C</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
                <widget class="QWidget" name="layoutWidget3">
                 <property name="geometry">
                  <rect>
                   <x>100</x>
-                  <y>120</y>
+                  <y>140</y>
                   <width>262</width>
                   <height>89</height>
                  </rect>
@@ -611,6 +635,91 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                     <widget class="QPushButton" name="deactivateLightsensorButton">
                      <property name="text">
                       <string>Deactivate Lightsensor</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QLineEdit" name="HBALineEdit">
+                <property name="geometry">
+                 <rect>
+                  <x>100</x>
+                  <y>30</y>
+                  <width>133</width>
+                  <height>20</height>
+                 </rect>
+                </property>
+               </widget>
+               <widget class="QPushButton" name="setHBAButton">
+                <property name="geometry">
+                 <rect>
+                  <x>240</x>
+                  <y>30</y>
+                  <width>107</width>
+                  <height>23</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Set Speed HBridge A</string>
+                </property>
+               </widget>
+               <widget class="QWidget" name="">
+                <property name="geometry">
+                 <rect>
+                  <x>100</x>
+                  <y>70</y>
+                  <width>245</width>
+                  <height>58</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_22">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_21">
+                   <item>
+                    <widget class="QPushButton" name="deployMRackButton">
+                     <property name="text">
+                      <string>Deploy M-Rack</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="pullMRackButton">
+                     <property name="text">
+                      <string>Pull in M-Rack</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="stopMRackButton">
+                     <property name="text">
+                      <string>Stop M-Rack</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_22">
+                   <item>
+                    <widget class="QPushButton" name="deployCRackButton">
+                     <property name="text">
+                      <string>Deploy C-Rack</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="pullCRackButton">
+                     <property name="text">
+                      <string>Pull in C-Rack</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="stopCRackButton">
+                     <property name="text">
+                      <string>Stop C-Rack</string>
                      </property>
                     </widget>
                    </item>

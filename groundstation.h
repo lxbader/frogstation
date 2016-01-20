@@ -52,8 +52,12 @@ private slots:
     void onCalibrateGyroscopeButtonClicked();
 
     void onSetHBAButtonClicked();
-    void onSetHBBButtonClicked();
-    void onSetHBCButtonClicked();
+    void onDeployMRackButtonClicked();
+    void onPullMRackButtonClicked();
+    void onStopMRackButtonClicked();
+    void onDeployCRackButtonClicked();
+    void onPullCRackButtonClicked();
+    void onStopCRackButtonClicked();
 
     void onActivateThermalKnifeButtonClicked();
     void onDeactivateThermalKnifeButtonClicked();
@@ -75,6 +79,7 @@ private slots:
     void onConnectionSendButtonClicked();
     void onActivateTelemetryButtonClicked();
     void onDeactivateTelemetryButtonClicked();
+    void onEmergencyOffButtonClicked();
 
     void fastUpdate();
     void slowUpdate();

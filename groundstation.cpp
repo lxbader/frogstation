@@ -49,6 +49,7 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(ui->connectionSendButton, SIGNAL(clicked()), this, SLOT(onConnectionSendButtonClicked()));
     connect(ui->activateTelemetryButton, SIGNAL(clicked()), this, SLOT(onActivateTelemetryButtonClicked()));
     connect(ui->deactivateTelemetryButton, SIGNAL(clicked()), this, SLOT(onDeactivateTelemetryButtonClicked()));
+    connect(ui->emergencyOffButton, SIGNAL(clicked()), this, SLOT(onEmergencyOffButtonClicked()));
 
     //General Tab
     connect(ui->calibrateMagnetometerButton, SIGNAL(clicked()), this, SLOT(onCalibrateMagnetometerButtonClicked()));
@@ -56,8 +57,12 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(ui->calibrateGyroscopeButton, SIGNAL(clicked()), this, SLOT(onCalibrateGyroscopeButtonClicked()));
 
     connect(ui->setHBAButton, SIGNAL(clicked()), this, SLOT(onSetHBAButtonClicked()));
-    connect(ui->setHBBButton, SIGNAL(clicked()), this, SLOT(onSetHBBButtonClicked()));
-    connect(ui->setHBCButton, SIGNAL(clicked()), this, SLOT(onSetHBCButtonClicked()));
+    connect(ui->deployMRackButton, SIGNAL(clicked()), this, SLOT(onDeployMRackButtonClicked()));
+    connect(ui->pullMRackButton, SIGNAL(clicked()), this, SLOT(onPullMRackButtonClicked()));
+    connect(ui->stopMRackButton, SIGNAL(clicked()), this, SLOT(onStopMRackButtonClicked()));
+    connect(ui->deployCRackButton, SIGNAL(clicked()), this, SLOT(onDeployCRackButtonClicked()));
+    connect(ui->pullCRackButton, SIGNAL(clicked()), this, SLOT(onPullCRackButtonClicked()));
+    connect(ui->stopCRackButton, SIGNAL(clicked()), this, SLOT(onStopCRackButtonClicked()));
 
     connect(ui->activateThermalKnifeButton, SIGNAL(clicked()), this, SLOT(onActivateThermalKnifeButtonClicked()));
     connect(ui->deactivateThermalKnifeButton, SIGNAL(clicked()), this, SLOT(onDeactivateThermalKnifeButtonClicked()));
@@ -183,6 +188,10 @@ void Groundstation::onDeactivateTelemetryButtonClicked(){
         console("Telemetry already inactive.");
 }
 
+void Groundstation::onEmergencyOffButtonClicked(){
+
+}
+
 //General Tab
 void Groundstation::onCalibrateMagnetometerButtonClicked(){
     console("Magnetometer calibration started.");
@@ -215,36 +224,34 @@ void Groundstation::onSetHBAButtonClicked(){
         console("Given motor speed percentage invalid.");
 }
 
-void Groundstation::onSetHBBButtonClicked(){
-    int speedPercent;
-    bool ok;
-    speedPercent = ui->HBBLineEdit->text().toInt(&ok, 10);
-    if(ok && (100 >= speedPercent) && (speedPercent >= 0)){
-        console(QString("Setting HBridge B motor speed to %1 percent.").arg(speedPercent));
-        telecommand(3, "SPB", "+", abs(speedPercent));
-    }
-    else if(ok && (0 > speedPercent) && (speedPercent >= -100)){
-        console(QString("Setting HBridge B motor speed to %1 percent.").arg(speedPercent));
-        telecommand(3, "SPB", "-", abs(speedPercent));
-    }
-    else
-        console("Given motor speed percentage invalid.");
+void Groundstation::onDeployMRackButtonClicked(){
+    telecommand(3, "SPB", "+", 50);
+    console(QString("Setting magnet rack actuator speed to +50 percent."));
 }
 
-void Groundstation::onSetHBCButtonClicked(){
-    int speedPercent;
-    bool ok;
-    speedPercent = ui->HBCLineEdit->text().toInt(&ok, 10);
-    if(ok && (100 >= speedPercent) && (speedPercent >= 0)){
-        console(QString("Setting HBridge C motor speed to %1 percent.").arg(speedPercent));
-        telecommand(3, "SPC", "+", abs(speedPercent));
-    }
-    else if(ok && (0 > speedPercent) && (speedPercent >= -100)){
-        console(QString("Setting HBridge C motor speed to %1 percent.").arg(speedPercent));
-        telecommand(3, "SPC", "-", abs(speedPercent));
-    }
-    else
-        console("Given motor speed percentage invalid.");
+void Groundstation::onPullMRackButtonClicked(){
+    telecommand(3, "SPB", "-", 50);
+    console(QString("Setting magnet rack actuator speed to -50 percent."));
+}
+
+void Groundstation::onStopMRackButtonClicked(){
+    telecommand(3, "SPB", "+", 0);
+    console(QString("Stopping magnet rack actuator."));
+}
+
+void Groundstation::onDeployCRackButtonClicked(){
+    telecommand(3, "SPC", "+", 50);
+    console(QString("Setting counterweight rack actuator speed to +50 percent."));
+}
+
+void Groundstation::onPullCRackButtonClicked(){
+    telecommand(3, "SPC", "-", 50);
+    console(QString("Setting counterweight rack actuator speed to -50 percent."));
+}
+
+void Groundstation::onStopCRackButtonClicked(){
+    telecommand(3, "SPC", "+", 0);
+    console(QString("Stopping counterweight rack actuator."));
 }
 
 void Groundstation::onActivateThermalKnifeButtonClicked(){
