@@ -21,22 +21,10 @@ void Connection::bind(){
 }
 
 void Connection::connectionReceive(){
-//    console("Package received.");
     QByteArray buffer(1023, 0x00);
     udpSocket.readDatagram(buffer.data(), buffer.size());
 
     PayloadSatellite payload(buffer);
-
-//    console("---------------------------------------");
-//    console("Datagram header information:");
-//    console("---------------------------------------");
-//    console(QString("Checksum: %1").arg(payload.checksum));
-//    console(QString("SenderNode: %1").arg(payload.senderNode));
-//    console(QString("Timestamp: %1").arg(payload.timestamp));
-//    console(QString("SenderThread: %1").arg(payload.senderThread));
-//    console(QString("TopicID: %1").arg(payload.topic));
-//    console(QString("TTL: %1").arg(payload.ttl));
-//    console(QString("UserDataLen: %1").arg(payload.userDataLen));
 
     quint16 checksum = 0;
     for(int i = 2; i < 26 + payload.userDataLen; ++i){
@@ -49,51 +37,46 @@ void Connection::connectionReceive(){
     }
 
     if((!checkChecksum || checksum == payload.checksum) && topics.contains(payload.topic)){
-//        console("Enqueuing package");
         payloads.enqueue(payload);
         emit readReady();
     }
-//    else
-//        console("ERROR: Package damaged");
 }
 
 int Connection::connectionSendData(quint32 topicId, const QByteArray &data){
     QByteArray buffer(1023, 0x00);
 
-    *((quint32*)(buffer.data() + 2)) = qToBigEndian(0);                                                             // TODO payload.senderNode;
-    *((quint64*)(buffer.data() + 6)) = qToBigEndian(QDateTime::currentDateTime().toMSecsSinceEpoch() * 1000000);    //sendedTime
-    *((quint32*)(buffer.data() + 14)) = qToBigEndian(0);                                                            //senderThreadID
-    *((quint32*)(buffer.data() + 18)) = qToBigEndian(topicId);                                                      //topicID
-    *((quint16*)(buffer.data() + 22)) = qToBigEndian(64);                                                           //maxStepsToForward
-    *((quint16*)(buffer.data() + 24)) = qToBigEndian(data.length());                                                //len
-    memcpy(buffer.data() + 26, data.constData(), data.length());                                                    //userData
+    *((quint32*)(buffer.data() + 2)) = qToBigEndian((quint32)1);
+    *((quint64*)(buffer.data() + 6)) = qToBigEndian((quint64)QDateTime::currentDateTime().toMSecsSinceEpoch() * 1000000);
+    *((quint32*)(buffer.data() + 14)) = qToBigEndian((quint32)1);
+    *((quint32*)(buffer.data() + 18)) = qToBigEndian((quint32)topicId);
+    *((quint16*)(buffer.data() + 22)) = qToBigEndian((quint16)10);
+    *((quint16*)(buffer.data() + 24)) = qToBigEndian((quint16)data.length());
+    memcpy(buffer.data() + 26, data.constData(), data.length());
     *(buffer.data() + 26 + data.length()) = 0x00;
 
-    quint16 checksum = 0;
+    quint32 checksum = 0;
     for(int i = 2; i < 26 + data.length(); ++i){
-        bool lowestBit = checksum & 1;
-        checksum >>= 1;
-        if(lowestBit)
-            checksum |= 0x8000;
+        if (checksum & 01)
+            checksum = checksum >> 1 | 0x8000;
+        else
+            checksum >>= 1;
 
-        checksum += buffer[i];
+        checksum += (quint8)buffer[i];
+        checksum &= 0xFFFF;
     }
-    *((quint16*)(buffer.data() + 0)) = checksum;                                                                    //checksum
+    *((quint16*)(buffer.data() + 0)) = qToBigEndian((quint16)checksum);
 
-    int i = udpSocket.writeDatagram(buffer.constData(), remoteAddress, port);
-    console(QString("Number of sent bytes: %1").arg(i));
-    QString transmit = QString::fromLocal8Bit(buffer);
-    console(QString("Sent datagram: \"%1\"").arg(transmit));
-    return i;
+    //console(QString("%1").arg(buffer));
+    //console(buffer);
+
+    return udpSocket.writeDatagram(buffer.constData(), buffer.size(), remoteAddress, port);
 }
 
 void Connection::connectionSendCommand(QString command){
-    console(QString("Sending command \"%1\"").arg(command));
-    int i = udpSocket.writeDatagram(command.toLocal8Bit(), remoteAddress, port);
-    if(i == command.toLocal8Bit().size())
-        console("Transmission successful.");
-    else
-        console("Transmission failed.");
+    QByteArray data = command.toLocal8Bit();
+    console(QString("Sending telecommand \"%1\".").arg(command));
+    connectionSendData(TELECOMMAND_TOPIC_ID, data);
+    return;
 }
 
 void Connection::addTopic(PayloadType topicId){

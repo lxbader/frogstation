@@ -87,6 +87,24 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(ui->missionAbortButton, SIGNAL(clicked()), this, SLOT(onMissionAbortButtonClicked()));
 
 
+    //DEMO IMAGE
+    uint8_t test[121*160*2];
+    for(int i=0; i<(121*20); i++){
+        test[4*i] = 128;
+        test[4*i+1] = 0;
+        test[4*i+2] = 128;
+        test[4*i+3] = 0;
+    }
+    for(int i=(121*20); i<(121*80); i++){
+        test[4*i] = 128;
+        test[4*i+1] = 255;
+        test[4*i+2] = 128;
+        test[4*i+3] = 255;
+    }
+    displayImage(test, ui->missionOutputLabel);
+
+
+
 
     //Set up graph widgets
     setupGraphs();
@@ -139,6 +157,7 @@ void Groundstation::readoutConnection(){
     case PayloadImageType:{
         console("Package of type \"Image\" received.");
         PayloadImage pimage(payload);
+        displayImage(pimage.image, ui->missionInputLabel);
         break;
     }
     default:
@@ -463,4 +482,40 @@ void Groundstation::console(QString msg){
 
 void Groundstation::connectionUpdateConsole(){
     ui->consoleWidget->writeString(link.consoleText);
+}
+
+//------------------------
+//DISPLAY IMAGE IN A LABEL
+//------------------------
+
+int Groundstation::displayImage(uint8_t orig[121*160*2], QLabel* label){
+
+    QImage rgb(160, 121, QImage::Format_RGB32);
+    uint8_t y = 0;
+    uint8_t cb = 0;
+    uint8_t cr = 0;
+
+    for(int line = 0; line < 121; line++){
+        for(int column = 0; column < 80; column++){
+            y   = orig[320*line + 4*column + 1];
+            cb  = orig[320*line + 4*column + 0];
+            cr  = orig[320*line + 4*column + 2];
+            rgb.setPixel(2*column, line, getRgbValue(y, cb, cr));
+            y   = orig[320*line + 4*column + 3];
+            rgb.setPixel(2*column+1, line, getRgbValue(y,cb,cr));
+        }
+    }
+
+    //Display image in a label
+    QImage scaled = rgb.scaled(label->width(),label->height(),Qt::KeepAspectRatio);
+    label->setPixmap(QPixmap::fromImage(scaled));
+
+    return 0;
+}
+
+QRgb Groundstation::getRgbValue(uint8_t y, uint8_t cb, uint8_t cr){
+    uint32_t r = (uint32_t) y + 1.402 * ((uint32_t) cr - 128);
+    uint32_t g = (uint32_t) y - 0.34414 * ((uint32_t) cb - 128) - 0.71414 * ((uint32_t) cr - 128);
+    uint32_t b = (uint32_t) y + 1.772 * ((uint32_t) cb - 128);
+    return qRgb(r, g, b);
 }

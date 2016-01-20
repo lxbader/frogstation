@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QTimer>
 #include <QtNetwork>
+#include <QImage>
 
 #include <stdio.h>
 #include <math.h>
@@ -45,6 +46,8 @@ private:
     void telecommand(int ID, QString msg, int value);
     void telecommand(int ID, QString msg, QString sign, int value);
     void setupGraphs();
+    int displayImage(uint8_t orig[121*160*2], QLabel* label);
+    QRgb getRgbValue(uint8_t y, uint8_t cb, uint8_t cr);
 
 private slots:
     void onCalibrateMagnetometerButtonClicked();

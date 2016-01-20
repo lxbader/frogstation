@@ -48,5 +48,7 @@ PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsenso
 }
 
 PayloadImage::PayloadImage(const PayloadSatellite payload){
-    yaw = *(float*)(payload.userData);
+    for(int i = 0; i<(121*160*2); i++){
+        image[i] = *(uint8_t*)(payload.userData + 1 * sizeof(uint8_t));
+    }
 }

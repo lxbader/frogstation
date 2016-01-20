@@ -51,7 +51,7 @@ struct PayloadElectrical{
 };
 
 struct PayloadImage{
-    float yaw;
+    uint8_t image[121*160*2];
     PayloadImage(const PayloadSatellite payload);
 };
 

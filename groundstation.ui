@@ -512,7 +512,7 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
               </size>
              </property>
              <property name="currentIndex">
-              <number>0</number>
+              <number>4</number>
              </property>
              <widget class="QWidget" name="generalTab">
               <attribute name="title">
@@ -665,7 +665,7 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                  <string>Set Speed HBridge A</string>
                 </property>
                </widget>
-               <widget class="QWidget" name="">
+               <widget class="QWidget" name="layoutWidget">
                 <property name="geometry">
                  <rect>
                   <x>100</x>
