@@ -21,16 +21,29 @@ Groundstation::Groundstation(QWidget *parent) :
 
     connect(&link, SIGNAL(readReady()), this, SLOT(readoutConnection()));
 
+    //IMU Payload Contents
+    currentax = 0;
+    currentay = 0;
+    currentaz = 0;
+    currentmx = 0;
+    currentmy = 0;
+    currentmz = 0;
+    currentwx = 0;
+    currentwy = 0;
+    currentwz = 0;
     currentRoll = 0;
     currentPitch = 0;
     currentYaw = 0;
-    currentWz = 0;
-    currentLight = 0;
 
-    telemetryActive = 1;
+    //Electrical Payload Contents
+    currentLight = 0;
     electromagnetActive = 0;
     thermalKnifeActive = 0;
     lightsensorActive = 0;
+
+    //Other
+    telemetryActive = 1;
+
 
     //Set up timer + update
     QTimer *fastTimer = new QTimer(this);
@@ -72,12 +85,11 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(ui->activateLightsensorButton, SIGNAL(clicked()), this, SLOT(onActivateLightsensorButtonClicked()));
     connect(ui->deactivateLightsensorButton, SIGNAL(clicked()), this, SLOT(onDeactivateLightsensorButtonClicked()));
 
-    //Rotation Tab
-    connect(ui->rotationVelocityButton, SIGNAL(clicked()), this, SLOT(onRotationVelocityButtonClicked()));
-
-    //OrientationTab
+    //Attitude Tab
     connect(ui->orientationSetButton, SIGNAL(clicked()), this, SLOT(onOrientationSetButtonClicked()));
     connect(ui->orientationResetButton, SIGNAL(clicked()), this, SLOT(onOrientationResetButtonClicked()));
+    connect(ui->setRotationButton, SIGNAL(clicked()), this, SLOT(onSetRotationButtonClicked()));
+    connect(ui->stopRotationButton, SIGNAL(clicked()), this, SLOT(onStopRotationButtonClicked()));
 
     //Sun Finder Tab
     connect(ui->sunFinderButton, SIGNAL(clicked()), this, SLOT(onSunFinderButtonClicked()));
@@ -103,9 +115,6 @@ Groundstation::Groundstation(QWidget *parent) :
     }
     displayImage(test, ui->missionOutputLabel);
 
-
-
-
     //Set up graph widgets
     setupGraphs();
 
@@ -130,11 +139,19 @@ void Groundstation::readoutConnection(){
     switch(payload.topic){
     case PayloadSensorIMUType:{
         console("Package of type \"IMU\" received.");
-        PayloadSensorIMU psimu(payload);        
+        PayloadSensorIMU psimu(payload);
+        currentax = 360*(psimu.wz/(2*M_PI));
+        currentay = 360*(psimu.wz/(2*M_PI));
+        currentaz = 360*(psimu.wz/(2*M_PI));
+        currentmx = 360*(psimu.wz/(2*M_PI));
+        currentmy = 360*(psimu.wz/(2*M_PI));
+        currentmz = 360*(psimu.wz/(2*M_PI));
+        currentwx = 360*(psimu.wz/(2*M_PI));
+        currentwy = 360*(psimu.wz/(2*M_PI));
+        currentwz = 360*(psimu.wz/(2*M_PI));
         currentRoll = 360*(psimu.roll/(2*M_PI));
         currentPitch = 360*(psimu.pitch/(2*M_PI));
         currentYaw = 360-360*(psimu.yaw/(2*M_PI));
-        currentWz = 360*(psimu.wz/(2*M_PI));
         break;
     }
     case PayloadCounterType:{
@@ -325,12 +342,7 @@ void Groundstation::onDeactivateLightsensorButtonClicked(){
         console("Lightsensor already inactive.");
 }
 
-//Rotation Tab
-void Groundstation::onRotationVelocityButtonClicked(){
-
-}
-
-//Orientation Tab
+//Attitude Tab
 void Groundstation::onOrientationSetButtonClicked(){
     int angle;
     bool ok;
@@ -346,6 +358,14 @@ void Groundstation::onOrientationSetButtonClicked(){
 void Groundstation::onOrientationResetButtonClicked(){
     console("Resetting to N-S-orientation.");
     telecommand(3, "STE", 0);
+}
+
+void Groundstation::onSetRotationButtonClicked(){
+
+}
+
+void Groundstation::onStopRotationButtonClicked(){
+
 }
 
 //Sun Finder Tab
@@ -371,28 +391,46 @@ void Groundstation::fastUpdate(){
         ui->compassWidget->angle = currentYaw;
         ui->debrisMapWidget->angle = currentYaw;
 
-        //rotationVelocityWidget update
-        double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
-        static double lastPointKey = 0;
-        if (key-lastPointKey > 0.01){ // at most add point every 10 ms
-            ui->rotationVelocityWidget->graph(0)->addData(key, currentWz);
-            ui->rotationVelocityWidget->graph(0)->removeDataBefore(key-30);
-            ui->rotationVelocityWidget->graph(0)->rescaleValueAxis();
-            lastPointKey = key;
+        //rotationWidget update
+        double keyRot = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+        static double lastPointKeyRot = 0;
+        if (keyRot-lastPointKeyRot > 0.01){ // at most add point every 10 ms
+            ui->rotationWidget->graph(0)->addData(keyRot, currentwz);
+            ui->rotationWidget->graph(0)->removeDataBefore(keyRot-30);
+            ui->rotationWidget->graph(0)->rescaleValueAxis();
+            lastPointKeyRot = keyRot;
         }
-        ui->rotationVelocityWidget->xAxis->setRange(key+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
-        ui->rotationVelocityWidget->replot();
+        ui->rotationWidget->xAxis->setRange(keyRot+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
+        ui->rotationWidget->replot();
+
+        //orientationWidget update
+        double keyOri = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+        static double lastPointKeyOri = 0;
+        if (keyOri-lastPointKeyOri > 0.01){ // at most add point every 10 ms
+            ui->orientationWidget->graph(0)->addData(keyOri, currentYaw);
+            ui->orientationWidget->graph(0)->removeDataBefore(keyOri-30);
+            ui->orientationWidget->graph(0)->rescaleValueAxis();
+            ui->orientationWidget->graph(1)->addData(keyOri, currentmz);
+            ui->orientationWidget->graph(1)->removeDataBefore(keyOri-30);
+            ui->orientationWidget->graph(1)->rescaleValueAxis();
+            ui->orientationWidget->graph(2)->addData(keyOri, currentaz);
+            ui->orientationWidget->graph(2)->removeDataBefore(keyOri-30);
+            ui->orientationWidget->graph(2)->rescaleValueAxis();
+            lastPointKeyOri = keyOri;
+        }
+        ui->orientationWidget->xAxis->setRange(keyOri+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
+        ui->orientationWidget->replot();
 
         //sunFinderWidget update time-dependent
-        double key2 = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
-        static double lastPointKey2 = 0;
-        if (key-lastPointKey2 > 0.01){ // at most add point every 10 ms
-            ui->sunFinderWidget->graph(0)->addData(key2, currentLight);
-            ui->sunFinderWidget->graph(0)->removeDataBefore(key2-30);
+        double keySun = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+        static double lastPointKeySun = 0;
+        if (keySun-lastPointKeySun > 0.01){ // at most add point every 10 ms
+            ui->sunFinderWidget->graph(0)->addData(keySun, currentLight);
+            ui->sunFinderWidget->graph(0)->removeDataBefore(keySun-30);
             ui->sunFinderWidget->graph(0)->rescaleValueAxis();
-            lastPointKey2 = key2;
+            lastPointKeySun = keySun;
         }
-        ui->sunFinderWidget->xAxis->setRange(key2+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
+        ui->sunFinderWidget->xAxis->setRange(keySun+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
         ui->sunFinderWidget->replot();
 
         //LED Updates
@@ -405,7 +443,7 @@ void Groundstation::fastUpdate(){
 void Groundstation::slowUpdate(){
     //LCD updates
     if(telemetryActive){
-        ui->rotationVelocityLCD->display(currentWz);
+        ui->rotationLCD->display(currentwz);
         ui->orientationLCD->display(currentYaw);
         ui->pitchLCD->display(currentPitch);
         ui->rollLCD->display(currentRoll);
@@ -421,19 +459,55 @@ void Groundstation::slowUpdate(){
 //GRAPH SETUPS
 //------------
 void Groundstation::setupGraphs(){
-    //Set up rotationVelocityWidget
-    ui->rotationVelocityWidget->xAxis->setLabel("Current Time");
-    ui->rotationVelocityWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
-    ui->rotationVelocityWidget->xAxis->setDateTimeFormat("hh:mm:ss");
-    ui->rotationVelocityWidget->xAxis->setAutoTickStep(false);
-    ui->rotationVelocityWidget->xAxis->setTickStep(5);
-    ui->rotationVelocityWidget->yAxis->setLabel("Rotation Velocity");
-    ui->rotationVelocityWidget->axisRect()->setupFullAxesBox();
-    ui->rotationVelocityWidget->addGraph();
-    ui->rotationVelocityWidget->graph(0)->setPen(QPen(Qt::blue));
+    QFont legendFont = font();  // start out with MainWindow's font..
+    legendFont.setPointSize(7); // and make a bit smaller for legend
+
+    //Set up rotationWidget
+    ui->rotationWidget->xAxis->setLabel("Current Time");
+    ui->rotationWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+    ui->rotationWidget->xAxis->setDateTimeFormat("hh:mm:ss");
+    ui->rotationWidget->xAxis->setAutoTickStep(false);
+    ui->rotationWidget->xAxis->setTickStep(10);
+    ui->rotationWidget->yAxis->setLabel("Rotation Velocity (deg/sec)");
+    ui->rotationWidget->axisRect()->setupFullAxesBox();
+//    ui->rotationWidget->legend->setVisible(true);
+//    ui->rotationWidget->legend->setFont(legendFont);
+//    ui->rotationWidget->legend->setBrush(QBrush(QColor(255,255,255,230)));
+//    ui->rotationWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
+
+    ui->rotationWidget->addGraph();
+    ui->rotationWidget->graph(0)->setPen(QPen(Qt::blue));
+//    ui->rotationWidget->graph(0)->setName("Combined");
+    ui->rotationWidget->addGraph();
     // make left and bottom axes transfer their ranges to right and top axes:
-    connect(ui->rotationVelocityWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->rotationVelocityWidget->xAxis2, SLOT(setRange(QCPRange)));
-    connect(ui->rotationVelocityWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->rotationVelocityWidget->yAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->rotationWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->rotationWidget->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->rotationWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->rotationWidget->yAxis2, SLOT(setRange(QCPRange)));
+
+    //Set up orientationWidget
+    ui->orientationWidget->xAxis->setLabel("Current Time");
+    ui->orientationWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+    ui->orientationWidget->xAxis->setDateTimeFormat("hh:mm:ss");
+    ui->orientationWidget->xAxis->setAutoTickStep(false);
+    ui->orientationWidget->xAxis->setTickStep(10);
+    ui->orientationWidget->yAxis->setLabel("Heading (deg)");
+    ui->orientationWidget->axisRect()->setupFullAxesBox();
+    ui->orientationWidget->legend->setVisible(true);
+    ui->orientationWidget->legend->setFont(legendFont);
+    ui->orientationWidget->legend->setBrush(QBrush(QColor(255,255,255,230)));
+    ui->orientationWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
+
+    ui->orientationWidget->addGraph();
+    ui->orientationWidget->graph(0)->setPen(QPen(Qt::blue));
+    ui->orientationWidget->graph(0)->setName("Combined");
+    ui->orientationWidget->addGraph();
+    ui->orientationWidget->graph(1)->setPen(QPen(Qt::red));
+    ui->orientationWidget->graph(1)->setName("Magnetometer");
+    ui->orientationWidget->addGraph();
+    ui->orientationWidget->graph(2)->setPen(QPen(Qt::green));
+    ui->orientationWidget->graph(2)->setName("Accelerometer");
+    // make left and bottom axes transfer their ranges to right and top axes:
+    connect(ui->orientationWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->orientationWidget->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->orientationWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->orientationWidget->yAxis2, SLOT(setRange(QCPRange)));
 
 //    //Set up sunFinderWidget
 //    ui->sunFinderWidget->xAxis->setLabel("Angle");

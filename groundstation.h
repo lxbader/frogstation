@@ -32,10 +32,18 @@ public:
 private:
     Ui::Groundstation *ui;
 
+    float currentax;
+    float currentay;
+    float currentaz;
+    float currentmx;
+    float currentmy;
+    float currentmz;
+    float currentwx;
+    float currentwy;
+    float currentwz;
     float currentRoll;
     float currentPitch;
     float currentYaw;
-    float currentWz;
     int16_t currentLight;
 
     bool telemetryActive;
@@ -46,10 +54,24 @@ private:
     void telecommand(int ID, QString msg, int value);
     void telecommand(int ID, QString msg, QString sign, int value);
     void setupGraphs();
+
     int displayImage(uint8_t orig[121*160*2], QLabel* label);
     QRgb getRgbValue(uint8_t y, uint8_t cb, uint8_t cr);
 
 private slots:
+    //Connection
+    void readoutConnection();
+    void connectionUpdateConsole();
+
+    //Bluetooth
+    void onBluetoothConnectButtonClicked();
+
+    //Top Row
+    void onActivateTelemetryButtonClicked();
+    void onDeactivateTelemetryButtonClicked();
+    void onEmergencyOffButtonClicked();
+
+    //General Tab
     void onCalibrateMagnetometerButtonClicked();
     void onCalibrateAccelerometerButtonClicked();
     void onCalibrateGyroscopeButtonClicked();
@@ -69,25 +91,22 @@ private slots:
     void onActivateLightsensorButtonClicked();
     void onDeactivateLightsensorButtonClicked();
 
-    void onRotationVelocityButtonClicked();
-
+    //Attitude Tab
     void onOrientationSetButtonClicked();
     void onOrientationResetButtonClicked();
+    void onSetRotationButtonClicked();
+    void onStopRotationButtonClicked();
 
+    //Sun Finder Tab
     void onSunFinderButtonClicked();
 
+    //Mission Tab
     void onMissionStartButtonClicked();
     void onMissionAbortButtonClicked();
 
-    void onActivateTelemetryButtonClicked();
-    void onDeactivateTelemetryButtonClicked();
-    void onEmergencyOffButtonClicked();
-
+    //Timed Updates
     void fastUpdate();
     void slowUpdate();
-
-    void readoutConnection();
-    void connectionUpdateConsole();
 };
 
 #endif // GROUNDSTATION_H
