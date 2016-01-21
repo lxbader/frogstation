@@ -1,5 +1,3 @@
-#include <QByteArray>
-#include <QtEndian>
 #include "payload.h"
 #include "stdint.h"
 
@@ -55,8 +53,8 @@ PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsenso
     light = *(int16_t*)(payload.userData + 3 * sizeof(bool));
 }
 
-PayloadImage::PayloadImage(const PayloadSatellite payload){
-    for(int i = 0; i<(121*160*2); i++){
-        image[i] = *(uint8_t*)(payload.userData + i * sizeof(uint8_t));
-    }
-}
+//PayloadImage::PayloadImage(const PayloadSatellite payload){
+//    for(int i = 0; i<(121*160*2); i++){
+//        image[i] = *(uint8_t*)(payload.userData + i * sizeof(uint8_t));
+//    }
+//}

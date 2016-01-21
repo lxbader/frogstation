@@ -11,6 +11,7 @@
 #include <math.h>
 
 #include "connection.h"
+#include "imagelink.h"
 
 using namespace std;
 
@@ -22,12 +23,14 @@ class Groundstation : public QMainWindow
 {
     Q_OBJECT
     Connection link;
+    Imagelink imager;
+
 
 public:
     explicit Groundstation(QWidget *parent = 0);
     ~Groundstation();
 
-    void console(QString msg);
+
 
 private:
     Ui::Groundstation *ui;
@@ -54,9 +57,9 @@ private:
     void telecommand(int ID, QString msg, int value);
     void telecommand(int ID, QString msg, QString sign, int value);
     void setupGraphs();
+    void console(QString msg);
 
     int displayImage(uint8_t orig[121*160*2], QLabel* label);
-    QRgb getRgbValue(uint8_t y, uint8_t cb, uint8_t cr);
 
 private slots:
     //Connection
@@ -64,7 +67,8 @@ private slots:
     void connectionUpdateConsole();
 
     //Bluetooth
-    void onBluetoothConnectButtonClicked();
+    void imagelinkUpdateConsole();
+//    void onBluetoothConnectButtonClicked();
 
     //Top Row
     void onActivateTelemetryButtonClicked();
@@ -104,9 +108,10 @@ private slots:
     void onMissionStartButtonClicked();
     void onMissionAbortButtonClicked();
 
-    //Timed Updates
+    //Updates
     void fastUpdate();
     void slowUpdate();
+    void updateImage();
 };
 
 #endif // GROUNDSTATION_H

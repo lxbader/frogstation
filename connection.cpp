@@ -4,7 +4,7 @@
 #include <QtEndian>
 
 Connection::Connection(QObject *parent, bool checkChecksum)
-    : QObject(parent), localAddress(LOCAL_IP), remoteAddress(SATELLITE_IP), port(PORT), udpSocket(this), bound(false), checkChecksum(checkChecksum){
+    : QObject(parent), localAddress(LOCAL_IP), remoteAddress(SATELLITE_IP), port(PORT), udpSocket(this), bound(false), checkChecksum(checkChecksum), consoleText(""){
 }
 
 void Connection::bind(){

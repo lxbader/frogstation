@@ -25,10 +25,12 @@ QGroupBox{border: 2px solid gray; border-radius: 5px; margin-top: 2ex}
 QGroupBox::title{color: white; font: bold; top:-7px; left: 10px; padding-left: 2px}
 QGroupBox#consoleBox::title{left: 446px}
 
-QGroupBox#compassBox{background-color: black}
-QGroupBox#debrisMapBox{background-color: black}
-
-QWidget#rotationVelocityWidget{background-color: gray}
+QGroupBox#compassBox{background-color: gray}
+QGroupBox#debrisMapBox{background-color: gray}
+QGroupBox#groupBox_attitude1{background-color: gray}
+QGroupBox#groupBox_attitude2{background-color: gray}
+QGroupBox#groupBox_attitude3{background-color: gray}
+QGroupBox#groupBox_smallCompass{background-color: gray}
 
 QTabWidget{background: transparent}
 QTabWidget::pane{border: 1px solid gray}
@@ -89,39 +91,27 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
          </spacer>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_11">
+         <widget class="QGroupBox" name="groupBox_smallCompass">
           <property name="minimumSize">
            <size>
-            <width>200</width>
-            <height>0</height>
+            <width>120</width>
+            <height>120</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>120</height>
            </size>
           </property>
           <property name="title">
-           <string>Bluetooth</string>
+           <string/>
           </property>
-          <widget class="QComboBox" name="bluetoothComboBox">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>20</y>
-             <width>69</width>
-             <height>22</height>
-            </rect>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="bluetoothConnectButton">
-           <property name="geometry">
-            <rect>
-             <x>100</x>
-             <y>20</y>
-             <width>75</width>
-             <height>23</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Connect</string>
-           </property>
-          </widget>
+          <layout class="QVBoxLayout" name="verticalLayout_20">
+           <item>
+            <widget class="Compass" name="widget" native="true"/>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
@@ -785,7 +775,7 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                      <item>
                       <layout class="QVBoxLayout" name="verticalLayout_11">
                        <item>
-                        <widget class="QGroupBox" name="groupBox_8">
+                        <widget class="QGroupBox" name="groupBox_attitude1">
                          <property name="minimumSize">
                           <size>
                            <width>0</width>
@@ -861,7 +851,7 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                         </widget>
                        </item>
                        <item>
-                        <widget class="QGroupBox" name="groupBox_9">
+                        <widget class="QGroupBox" name="groupBox_attitude2">
                          <property name="minimumSize">
                           <size>
                            <width>0</width>
@@ -944,7 +934,7 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_3">
                      <item>
-                      <widget class="QGroupBox" name="groupBox_10">
+                      <widget class="QGroupBox" name="groupBox_attitude3">
                        <property name="title">
                         <string/>
                        </property>

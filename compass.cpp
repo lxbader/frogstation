@@ -16,12 +16,12 @@ void Compass::paintEvent(QPaintEvent *)
     static const QPoint hourHand[3] = {
         QPoint(7, 8),
         QPoint(-7, 8),
-        QPoint(0, -40)
+        QPoint(0, -55)
     };
 
     //Setting colors for the hand / lines
-    QColor minuteColor(Qt::green);
-    QColor hourColor(Qt::gray);
+    QColor minuteColor(Qt::black);
+    QColor hourColor(Qt::green);
 
     //Sets the side length of the square to the smallest side
     int side = qMin(width(), height());
@@ -67,13 +67,13 @@ void Compass::paintEvent(QPaintEvent *)
     }
 
     //Paint NESW markings
-    static const QPoint north = QPoint(-4.5,-85);
-    static const QPoint east = QPoint(85,5);
-    static const QPoint south = QPoint(-4.5,95);
-    static const QPoint west = QPoint(-96,5);
+    static const QPoint north = QPoint(-7,-84);
+    static const QPoint east = QPoint(83,8);
+    static const QPoint south = QPoint(-6.5,97);
+    static const QPoint west = QPoint(-103,8);
     painter.setPen(hourColor);
     QFont font=painter.font();
-    font.setPointSize(10);
+    font.setPointSize(15);
     font.setWeight(QFont::DemiBold);
     painter.setFont(font);
     painter.drawText(north, "N");

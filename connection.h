@@ -41,9 +41,11 @@ public:
     void connectionSendCommand(QString msg);
     PayloadSatellite read();
     bool isBound();
-    bool isReadReady();
-    void console(QString msg);
+    bool isReadReady();    
     void bind();
+
+private:
+    void console(QString msg);
 };
 
 #endif // CONNECTION_H

@@ -2,19 +2,21 @@
 #define PAYLOAD_H
 
 #include <QtGlobal>
+#include <QByteArray>
+#include <QtEndian>
 #include "stdint.h"
 
 enum PayloadType{
     PayloadCounterType = 5001,
     PayloadSensorIMUType = 5002,
     PayloadElectricalType = 5003,
-    PayloadImageType = 5004,
+//    PayloadImageType = 5004,
 };
 
 struct PayloadCounter;
 struct PayloadSensorIMU;
 struct PayloadElectrical;
-struct PayloadImage;
+//struct PayloadImage;
 
 struct PayloadSatellite{
     quint16 checksum;
@@ -58,9 +60,9 @@ struct PayloadElectrical{
     PayloadElectrical(const PayloadSatellite payload);
 };
 
-struct PayloadImage{
-    uint8_t image[121*160*2];
-    PayloadImage(const PayloadSatellite payload);
-};
+//struct PayloadImage{
+//    uint8_t image[121*160*2];
+//    PayloadImage(const PayloadSatellite payload);
+//};
 
 #endif // PAYLOAD_H

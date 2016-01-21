@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     console.cpp \
     connection.cpp \
     payload.cpp \
-    qledindicator.cpp
+    qledindicator.cpp \
+    imagelink.cpp
 
 HEADERS  += groundstation.h \
     compass.h \
@@ -31,6 +32,7 @@ HEADERS  += groundstation.h \
     console.h \
     connection.h \
     payload.h \
-    qledindicator.h
+    qledindicator.h \
+    imagelink.h
 
 FORMS    += groundstation.ui
