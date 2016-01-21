@@ -29,13 +29,21 @@ PayloadCounter::PayloadCounter(const PayloadSatellite payload): counter(0){
     counter = *(int*)(payload.userData);
 }
 
-PayloadSensorIMU::PayloadSensorIMU(const PayloadSatellite payload):wz(0), roll(0), pitch(0), yaw(0){
+PayloadSensorIMU::PayloadSensorIMU(const PayloadSatellite payload):ax(0), ay(0), az(0), mx(0), my(0), mz(0), wx(0), wy(0), wz(0), roll(0), pitch(0), yaw(0){
     if(payload.userDataLen != sizeof(PayloadSensorIMU) || payload.topic != PayloadSensorIMUType)
         return;
-    wz = *(float*)(payload.userData);
-    roll = *(float*)(payload.userData + 1 * sizeof(float));
-    pitch = *(float*)(payload.userData + 2 * sizeof(float));
-    yaw = *(float*)(payload.userData + 3 * sizeof(float));
+    ax = *(float*)(payload.userData);
+    ay = *(float*)(payload.userData + 1 * sizeof(float));
+    az = *(float*)(payload.userData + 2 * sizeof(float));
+    mx = *(float*)(payload.userData + 3 * sizeof(float));
+    my = *(float*)(payload.userData + 4 * sizeof(float));
+    mz = *(float*)(payload.userData + 5 * sizeof(float));
+    wx = *(float*)(payload.userData + 6 * sizeof(float));
+    wy = *(float*)(payload.userData + 7 * sizeof(float));
+    wz = *(float*)(payload.userData + 8 * sizeof(float));
+    roll = *(float*)(payload.userData + 9 * sizeof(float));
+    pitch = *(float*)(payload.userData + 10 * sizeof(float));
+    yaw = *(float*)(payload.userData + 11 * sizeof(float));
 }
 
 PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsensorOn(0), electromagnetOn(0), thermalKnifeOn(0), light(0){
@@ -49,6 +57,6 @@ PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsenso
 
 PayloadImage::PayloadImage(const PayloadSatellite payload){
     for(int i = 0; i<(121*160*2); i++){
-        image[i] = *(uint8_t*)(payload.userData + 1 * sizeof(uint8_t));
+        image[i] = *(uint8_t*)(payload.userData + i * sizeof(uint8_t));
     }
 }

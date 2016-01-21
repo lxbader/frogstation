@@ -50,7 +50,7 @@ int Connection::connectionSendData(quint32 topicId, const QByteArray &data){
     *((quint32*)(buffer.data() + 14)) = qToBigEndian((quint32)1);
     *((quint32*)(buffer.data() + 18)) = qToBigEndian((quint32)topicId);
     *((quint16*)(buffer.data() + 22)) = qToBigEndian((quint16)10);
-    *((quint16*)(buffer.data() + 24)) = qToBigEndian((quint16)data.length());
+    *((quint16*)(buffer.data() + 24)) = qToBigEndian((quint16)data.length());    
     memcpy(buffer.data() + 26, data.constData(), data.length());
     *(buffer.data() + 26 + data.length()) = 0x00;
 

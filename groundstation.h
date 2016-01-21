@@ -79,7 +79,6 @@ private slots:
     void onMissionStartButtonClicked();
     void onMissionAbortButtonClicked();
 
-    void onConnectionSendButtonClicked();
     void onActivateTelemetryButtonClicked();
     void onDeactivateTelemetryButtonClicked();
     void onEmergencyOffButtonClicked();

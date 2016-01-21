@@ -9,6 +9,7 @@ Groundstation::Groundstation(QWidget *parent) :
     ui(new Ui::Groundstation)
 {
     ui->setupUi(this);
+    setWindowState(windowState() | Qt::WindowMaximized);
 
     connect(&link, SIGNAL(updateConsole()), this, SLOT(connectionUpdateConsole()));
 
@@ -47,7 +48,6 @@ Groundstation::Groundstation(QWidget *parent) :
     //---------------
 
     //Top Row
-    connect(ui->connectionSendButton, SIGNAL(clicked()), this, SLOT(onConnectionSendButtonClicked()));
     connect(ui->activateTelemetryButton, SIGNAL(clicked()), this, SLOT(onActivateTelemetryButtonClicked()));
     connect(ui->deactivateTelemetryButton, SIGNAL(clicked()), this, SLOT(onDeactivateTelemetryButtonClicked()));
     connect(ui->emergencyOffButton, SIGNAL(clicked()), this, SLOT(onEmergencyOffButtonClicked()));
@@ -126,27 +126,24 @@ Groundstation::~Groundstation()
 //--------
 
 void Groundstation::readoutConnection(){
-//    console("Package handed on to groundstation.");
     PayloadSatellite payload = link.read();
     switch(payload.topic){
     case PayloadSensorIMUType:{
-//        console("Package of type \"IMU\" received.");
+        console("Package of type \"IMU\" received.");
         PayloadSensorIMU psimu(payload);        
         currentRoll = 360*(psimu.roll/(2*M_PI));
         currentPitch = 360*(psimu.pitch/(2*M_PI));
-        currentYaw = 360*(psimu.yaw/(2*M_PI));
+        currentYaw = 360-360*(psimu.yaw/(2*M_PI));
         currentWz = 360*(psimu.wz/(2*M_PI));
-//        console(QString("Current Orientation: %1").arg(currentYaw));
         break;
     }
     case PayloadCounterType:{
-//        console("Package of type \"Counter\" received.");
+        console("Package of type \"Counter\" received.");
         PayloadCounter pscount(payload);
-        ui->counterLCD->display(pscount.counter);
         break;
     }
     case PayloadElectricalType:{
-//        console("Package of type \"Electrical\" received.");
+        console("Package of type \"Electrical\" received.");
         PayloadElectrical pelec(payload);
         electromagnetActive = pelec.electromagnetOn;
         thermalKnifeActive = pelec.thermalKnifeOn;
@@ -188,11 +185,6 @@ void Groundstation::telecommand(int ID, QString msg, QString sign, int value){
 }
 
 //Top Row
-void Groundstation::onConnectionSendButtonClicked(){
-    QString message = ui->connectionLineEdit->text();
-    link.connectionSendCommand(message);
-}
-
 void Groundstation::onActivateTelemetryButtonClicked(){
     if(!telemetryActive){
         console("Activating telemetry.");

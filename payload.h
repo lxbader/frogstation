@@ -35,6 +35,14 @@ struct PayloadCounter{
 };
 
 struct PayloadSensorIMU{
+    float ax;
+    float ay;
+    float az;
+    float mx;
+    float my;
+    float mz;
+    float wx;
+    float wy;
     float wz; //rad/sec
     float roll;
     float pitch;
