@@ -13,6 +13,8 @@
 #include "connection.h"
 #include "imagelink.h"
 
+#define XAXIS_VISIBLE_TIME 30
+
 using namespace std;
 
 namespace Ui {
@@ -33,25 +35,7 @@ public:
 private:
     Ui::Groundstation *ui;
 
-    float currentax;
-    float currentay;
-    float currentaz;
-    float currentmx;
-    float currentmy;
-    float currentmz;
-    float currentwx;
-    float currentwy;
-    float currentwz;
-    float currentRoll;
-    float currentPitch;
-    float currentYaw;
-    int16_t currentLight;
-
-    bool telemetryActive;
-    bool thermalKnifeActive;
-    bool electromagnetActive;
-    bool lightsensorActive;
-
+    double key;
     void telecommand(int ID, QString msg, int value);
     void telecommand(int ID, QString msg, QString sign, int value);
     void setupGraphs();
@@ -110,9 +94,8 @@ private slots:
     void onMissionAbortButtonClicked();
 
     //Updates
-    void fastUpdate();
-    void slowUpdate();
     void updateImage();
+    void telemetryCheck();
 };
 
 #endif // GROUNDSTATION_H

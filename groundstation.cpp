@@ -23,40 +23,10 @@ Groundstation::Groundstation(QWidget *parent) :
         ui->bluetoothComboBox->addItem(info.portName());
     }
 
-    //IMU Payload Contents
-    currentax = 0;
-    currentay = 0;
-    currentaz = 0;
-    currentmx = 0;
-    currentmy = 0;
-    currentmz = 0;
-    currentwx = 0;
-    currentwy = 0;
-    currentwz = 0;
-    currentRoll = 0;
-    currentPitch = 0;
-    currentYaw = 0;
-
-    //Electrical Payload Contents
-    currentLight = 0;
-    electromagnetActive = 0;
-    thermalKnifeActive = 0;
-    lightsensorActive = 0;
-
-    //Other
-    telemetryActive = 1;
-
-
-    //Set up timer + update
-    QTimer *fastTimer = new QTimer(this);
-    fastTimer->setInterval(0);
-    connect(fastTimer, SIGNAL(timeout()), this, SLOT(fastUpdate()));
-    fastTimer->start();
-
-    QTimer *slowTimer = new QTimer(this);
-    slowTimer->setInterval(300);
-    connect(slowTimer, SIGNAL(timeout()), this, SLOT(slowUpdate()));
-    slowTimer->start();
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(1000);
+    connect(timer, SIGNAL(timeout()), this, SLOT(telemetryCheck()));
+    timer->start();
 
     //---------------
     //Connect Buttons
@@ -108,12 +78,6 @@ Groundstation::Groundstation(QWidget *parent) :
 
     //Set up graph widgets
     setupGraphs();
-
-//    //Set up debrisMapWidget with sample points
-//    ui->debrisMapWidget->addDebris(45);
-//    ui->debrisMapWidget->addDebris(160);
-//    ui->debrisMapWidget->addDebris(215.6);
-//    ui->debrisMapWidget->debrisCleaned->append(QPoint(30,30));
 }
 
 Groundstation::~Groundstation()
@@ -126,37 +90,65 @@ Groundstation::~Groundstation()
 //--------
 
 void Groundstation::readoutConnection(){
+    ui->telemetryLED->setChecked(true);
     PayloadSatellite payload = link.read();
     switch(payload.topic){
     case PayloadSensorIMUType:{
         //console("Package of type \"IMU\" received.");
         PayloadSensorIMU psimu(payload);
-        currentax = 360*(psimu.wz/(2*M_PI));
-        currentay = 360*(psimu.wz/(2*M_PI));
-        currentaz = 360*(psimu.wz/(2*M_PI));
-        currentmx = 360*(psimu.wz/(2*M_PI));
-        currentmy = 360*(psimu.wz/(2*M_PI));
-        currentmz = 360*(psimu.wz/(2*M_PI));
-        currentwx = 360*(psimu.wz/(2*M_PI));
-        currentwy = 360*(psimu.wz/(2*M_PI));
-        currentwz = 360*(psimu.wz/(2*M_PI));
-        currentRoll = 360*(psimu.roll/(2*M_PI));
-        currentPitch = 360*(psimu.pitch/(2*M_PI));
-        currentYaw = 360-360*(psimu.yaw/(2*M_PI));
+        float currentWz = 360*(psimu.wz/(2*M_PI));
+        float currentRoll = 360*(psimu.roll/(2*M_PI));
+        float currentPitch = 360*(psimu.pitch/(2*M_PI));
+        float currentHeading = 360-360*(psimu.yaw/(2*M_PI));
+
+        ui->compassWidget->angle = currentHeading;
+        ui->debrisMapWidget->angle = currentHeading;
+        ui->rotationLCD->display(currentWz);
+        ui->orientationLCD->display(currentHeading);
+        ui->pitchLCD->display(currentPitch);
+        ui->rollLCD->display(currentRoll);
+
+        key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+        ui->rotationWidget->graph(0)->addData(key, currentWz);
+        ui->rotationWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->rotationWidget->graph(0)->rescaleValueAxis();
+        ui->rotationWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
+        ui->rotationWidget->replot();
+
+        ui->orientationWidget->graph(0)->addData(key, currentHeading);
+        ui->orientationWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->orientationWidget->graph(0)->rescaleValueAxis();
+        ui->orientationWidget->graph(1)->addData(key, psimu.mz);
+        ui->orientationWidget->graph(1)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->orientationWidget->graph(1)->rescaleValueAxis(true);
+        ui->orientationWidget->graph(2)->addData(key, psimu.az);
+        ui->orientationWidget->graph(2)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->orientationWidget->graph(2)->rescaleValueAxis(true);
+        ui->orientationWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
+        ui->orientationWidget->replot();
+
         break;
     }
     case PayloadCounterType:{
         //console("Package of type \"Counter\" received.");
         PayloadCounter pscount(payload);
+        key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
         break;
     }
     case PayloadElectricalType:{
         //console("Package of type \"Electrical\" received.");
         PayloadElectrical pelec(payload);
-        electromagnetActive = pelec.electromagnetOn;
-        thermalKnifeActive = pelec.thermalKnifeOn;
-        lightsensorActive = pelec.lightsensorOn;
-        currentLight = pelec.light;
+        ui->solarLCD->display(pelec.light);
+        ui->lightsensorLED->setChecked(pelec.lightsensorOn);
+        ui->electromagnetLED->setChecked(pelec.electromagnetOn);
+        ui->thermalKnifeLED->setChecked(pelec.thermalKnifeOn);
+
+        key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+        ui->sunFinderWidget->graph(0)->addData(key, pelec.light);
+        ui->sunFinderWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->sunFinderWidget->graph(0)->rescaleValueAxis();
+        ui->sunFinderWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
+        ui->sunFinderWidget->replot();
         break;
     }
 //    case PayloadImageType:{
@@ -206,23 +198,16 @@ void Groundstation::onClosePortButtonClicked(){
 }
 
 void Groundstation::onActivateTelemetryButtonClicked(){
-    if(!telemetryActive){
-        console("Activating telemetry.");
-        telecommand(5, "TEL", 1);
-        telemetryActive = 1;
-    }
-    else
-        console("Telemetry already active.");
+    console("Activating telemetry.");
+    telecommand(5, "TEL", 1);
+    ui->telemetryLED->setChecked(true);
+    key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
 }
 
 void Groundstation::onDeactivateTelemetryButtonClicked(){
-    if(telemetryActive){
-        console("Deactivating telemetry.");
-        telecommand(5, "TEL", 0);
-        telemetryActive = 0;
-    }
-    else
-        console("Telemetry already inactive.");
+    console("Deactivating telemetry.");
+    telecommand(5, "TEL", 0);
+    ui->telemetryLED->setChecked(false);
 }
 
 void Groundstation::onEmergencyOffButtonClicked(){
@@ -298,57 +283,33 @@ void Groundstation::onStopCRackButtonClicked(){
 }
 
 void Groundstation::onActivateThermalKnifeButtonClicked(){
-    if(!thermalKnifeActive){
-        console("Activating thermal knife.");
-        telecommand(3, "AKN", 1);
-    }
-    else
-        console("Thermal knife already active.");
+    console("Activating thermal knife.");
+    telecommand(3, "AKN", 1);
 }
 
 void Groundstation::onDeactivateThermalKnifeButtonClicked(){
-    if(thermalKnifeActive){
-        console("Deactivating thermal knife.");
-        telecommand(3, "AKN", 0);
-    }
-    else
-        console("Thermal knife already inactive.");
+    console("Deactivating thermal knife.");
+    telecommand(3, "AKN", 0);
 }
 
 void Groundstation::onActivateElectromagnetButtonClicked(){
-    if(!electromagnetActive){
-        console("Activating electromagnet.");
-        telecommand(3, "AMA", 1);
-    }
-    else
-        console("Electromagnet already active.");
+    console("Activating electromagnet.");
+    telecommand(3, "AMA", 1);
 }
 
 void Groundstation::onDeactivateElectromagnetButtonClicked(){
-    if(electromagnetActive){
-        console("Deactivating electromagnet.");
-        telecommand(3, "AMA", 0);
-    }
-    else
-        console("Electromagnet already inactive.");
+    console("Deactivating electromagnet.");
+    telecommand(3, "AMA", 0);
 }
 
 void Groundstation::onActivateLightsensorButtonClicked(){
-    if(!lightsensorActive){
-        console("Activating lightsensor.");
-        telecommand(3, "ALS", 1);
-    }
-    else
-        console("Lightsensor already active.");
+    console("Activating lightsensor.");
+    telecommand(3, "ALS", 1);
 }
 
 void Groundstation::onDeactivateLightsensorButtonClicked(){
-    if(lightsensorActive){
-        console("Deactivating lightsensor.");
-        telecommand(3, "ALS", 0);
-    }
-    else
-        console("Lightsensor already inactive.");
+    console("Deactivating lightsensor.");
+    telecommand(3, "ALS", 0);
 }
 
 void Groundstation::onTakePictureButtonClicked(){
@@ -394,78 +355,6 @@ void Groundstation::onMissionStartButtonClicked(){
 
 void Groundstation::onMissionAbortButtonClicked(){
 
-}
-
-
-//----------------
-//UPDATE FUNCTIONS
-//----------------
-void Groundstation::fastUpdate(){
-        //Compass and debris map update
-        ui->compassWidget->angle = currentYaw;
-        ui->debrisMapWidget->angle = currentYaw;
-
-        //rotationWidget update
-        double keyRot = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
-        static double lastPointKeyRot = 0;
-        if (keyRot-lastPointKeyRot > 0.01){ // at most add point every 10 ms
-            ui->rotationWidget->graph(0)->addData(keyRot, currentwz);
-            ui->rotationWidget->graph(0)->removeDataBefore(keyRot-30);
-            ui->rotationWidget->graph(0)->rescaleValueAxis();
-            lastPointKeyRot = keyRot;
-        }
-        ui->rotationWidget->xAxis->setRange(keyRot+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
-        ui->rotationWidget->replot();
-
-        //orientationWidget update
-        double keyOri = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
-        static double lastPointKeyOri = 0;
-        if (keyOri-lastPointKeyOri > 0.01){ // at most add point every 10 ms
-            ui->orientationWidget->graph(0)->addData(keyOri, currentYaw);
-            ui->orientationWidget->graph(0)->removeDataBefore(keyOri-30);
-            ui->orientationWidget->graph(0)->rescaleValueAxis();
-            ui->orientationWidget->graph(1)->addData(keyOri, currentmz);
-            ui->orientationWidget->graph(1)->removeDataBefore(keyOri-30);
-            ui->orientationWidget->graph(1)->rescaleValueAxis(true);
-            ui->orientationWidget->graph(2)->addData(keyOri, currentaz);
-            ui->orientationWidget->graph(2)->removeDataBefore(keyOri-30);
-            ui->orientationWidget->graph(2)->rescaleValueAxis(true);
-            lastPointKeyOri = keyOri;
-        }
-        ui->orientationWidget->xAxis->setRange(keyOri+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
-        ui->orientationWidget->replot();
-
-        //sunFinderWidget update time-dependent
-        double keySun = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
-        static double lastPointKeySun = 0;
-        if (keySun-lastPointKeySun > 0.01){ // at most add point every 10 ms
-            ui->sunFinderWidget->graph(0)->addData(keySun, currentLight);
-            ui->sunFinderWidget->graph(0)->removeDataBefore(keySun-30);
-            ui->sunFinderWidget->graph(0)->rescaleValueAxis();
-            lastPointKeySun = keySun;
-        }
-        ui->sunFinderWidget->xAxis->setRange(keySun+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
-        ui->sunFinderWidget->replot();
-
-        //LED Updates
-        ui->lightsensorLED->setChecked(lightsensorActive);
-        ui->electromagnetLED->setChecked(electromagnetActive);
-        ui->thermalKnifeLED->setChecked(thermalKnifeActive);
-        ui->telemetryLED->setChecked(telemetryActive);
-}
-
-void Groundstation::slowUpdate(){
-    //LCD updates
-    if(telemetryActive){
-        ui->rotationLCD->display(currentwz);
-        ui->orientationLCD->display(currentYaw);
-        ui->pitchLCD->display(currentPitch);
-        ui->rollLCD->display(currentRoll);
-        ui->solarLCD->display(currentLight);
-//        ui->debrisFoundLCD->display(ui->debrisMapWidget->debrisFound->length()+ui->debrisMapWidget->debrisCleaned->length());
-//        ui->debrisCleanedLCD->display(ui->debrisMapWidget->debrisCleaned->length());
-
-    }
 }
 
 
@@ -552,7 +441,6 @@ void Groundstation::setupGraphs(){
     connect(ui->sunFinderWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->yAxis2, SLOT(setRange(QCPRange)));
 }
 
-
 //--------------------
 //CONSOLE TEXT UPDATES
 //--------------------
@@ -569,11 +457,22 @@ void Groundstation::imagelinkUpdateConsole(){
     ui->consoleWidget->writeString(imager.consoleText);
 }
 
-//------------------------
-//DISPLAY IMAGE IN A LABEL
-//------------------------
+//---------------------
+//DISPLAY UPDATED IMAGE
+//---------------------
 
 void Groundstation::updateImage(){
     QImage scaled = imager.currentImage.scaled(ui->missionInputLabel->width(),ui->missionInputLabel->height(),Qt::KeepAspectRatio);
     ui->missionInputLabel->setPixmap(QPixmap::fromImage(scaled));
+}
+
+//---------------------------------------------
+//DISABLE TELEMETRY LIGHT IN CASE OF INACTIVITY
+//---------------------------------------------
+
+void Groundstation::telemetryCheck(){
+    if((ui->telemetryLED->isChecked()) && (QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0 - key) >= 3){
+        ui->telemetryLED->setChecked(false);
+        console("No telemetry data available.");
+    }
 }

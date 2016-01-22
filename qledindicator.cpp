@@ -35,10 +35,12 @@ QLedIndicator::QLedIndicator(QWidget *parent) : QAbstractButton(parent)
 }
 
 void QLedIndicator::resizeEvent(QResizeEvent *event) {
+    Q_UNUSED(event)
     update();
 }
 
 void QLedIndicator::paintEvent(QPaintEvent *event) {
+    Q_UNUSED(event)
     qreal realSize = qMin(width(), height());
 
     QRadialGradient gradient;
@@ -76,5 +78,25 @@ void QLedIndicator::paintEvent(QPaintEvent *event) {
     }
     painter.setBrush(gradient);
     painter.drawEllipse(QPointF(0,0), 400, 400);
+}
+
+void QLedIndicator::keyPressEvent(QKeyEvent *event){
+    Q_UNUSED(event)
+}
+
+void QLedIndicator::keyReleaseEvent(QKeyEvent *event){
+    Q_UNUSED(event)
+}
+
+void QLedIndicator::mousePressEvent(QMouseEvent *event){
+    Q_UNUSED(event)
+}
+
+void QLedIndicator::mouseReleaseEvent(QMouseEvent *event){
+    Q_UNUSED(event)
+}
+
+void QLedIndicator::mouseMoveEvent(QMouseEvent *event){
+    Q_UNUSED(event)
 }
 

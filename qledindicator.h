@@ -49,6 +49,11 @@ class QLedIndicator : public QAbstractButton
     protected:
         virtual void paintEvent (QPaintEvent *event);
         virtual void resizeEvent(QResizeEvent *event);
+        virtual void keyPressEvent(QKeyEvent *e);
+        virtual void keyReleaseEvent(QKeyEvent *e);
+        virtual void mousePressEvent(QMouseEvent *e);
+        virtual void mouseReleaseEvent(QMouseEvent *e);
+        virtual void mouseMoveEvent(QMouseEvent *e);
 
     private:
         static const qreal scaledSize;  /* init in cpp */
