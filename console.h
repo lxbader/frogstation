@@ -2,6 +2,7 @@
 #define CONSOLE_H
 
 #include <QPlainTextEdit>
+#include <QScrollBar>
 
 class Console : public QPlainTextEdit
 {

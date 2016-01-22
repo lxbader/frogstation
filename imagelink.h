@@ -40,6 +40,7 @@ private:
     QSerialPort *bluetoothPort;
     QByteArray imageBuffer;
     bool imageTransmitActive;
+
     void console(QString msg);
     QRgb getRgbValue(uint8_t y, uint8_t cb, uint8_t cr);
     void readImage();

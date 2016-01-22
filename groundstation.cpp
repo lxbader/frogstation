@@ -1,8 +1,5 @@
 #include "groundstation.h"
 #include "ui_groundstation.h"
-#include "compass.h"
-#include "debrismap.h"
-#include "qcustomplot.h"
 
 Groundstation::Groundstation(QWidget *parent) :
     QMainWindow(parent), link(this), imager(this),
@@ -229,7 +226,13 @@ void Groundstation::onDeactivateTelemetryButtonClicked(){
 }
 
 void Groundstation::onEmergencyOffButtonClicked(){
-
+    console("EMERGENCY OFF: Disengaging all electrical components.");
+    telecommand(3, "SPA", "+", 0);
+    telecommand(3, "SPB", "+", 0);
+    telecommand(3, "SPC", "+", 0);
+    telecommand(3, "AKN", 0);
+    telecommand(3, "AMA", 0);
+    telecommand(3, "ALS", 0);
 }
 
 //General Tab
@@ -423,10 +426,10 @@ void Groundstation::fastUpdate(){
             ui->orientationWidget->graph(0)->rescaleValueAxis();
             ui->orientationWidget->graph(1)->addData(keyOri, currentmz);
             ui->orientationWidget->graph(1)->removeDataBefore(keyOri-30);
-            ui->orientationWidget->graph(1)->rescaleValueAxis();
+            ui->orientationWidget->graph(1)->rescaleValueAxis(true);
             ui->orientationWidget->graph(2)->addData(keyOri, currentaz);
             ui->orientationWidget->graph(2)->removeDataBefore(keyOri-30);
-            ui->orientationWidget->graph(2)->rescaleValueAxis();
+            ui->orientationWidget->graph(2)->rescaleValueAxis(true);
             lastPointKeyOri = keyOri;
         }
         ui->orientationWidget->xAxis->setRange(keyOri+0.25, 30, Qt::AlignRight); //make x-axis range scroll with the data (at a constant range size of 15sec)
@@ -505,6 +508,7 @@ void Groundstation::setupGraphs(){
     ui->orientationWidget->legend->setVisible(true);
     ui->orientationWidget->legend->setFont(legendFont);
     ui->orientationWidget->legend->setBrush(QBrush(QColor(255,255,255,230)));
+    ui->orientationWidget->legend->setIconSize(10,5);
     ui->orientationWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
 
     ui->orientationWidget->addGraph();

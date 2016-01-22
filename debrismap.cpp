@@ -1,5 +1,3 @@
-#include <QtWidgets>
-
 #include "debrismap.h"
 
 DebrisMap::DebrisMap(QWidget *parent) : QWidget(parent)

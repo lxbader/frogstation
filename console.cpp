@@ -1,8 +1,5 @@
 #include "console.h"
 
-#include <QScrollBar>
-
-
 Console::Console(QWidget *parent)
     : QPlainTextEdit(parent)
 {

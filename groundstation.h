@@ -30,8 +30,6 @@ public:
     explicit Groundstation(QWidget *parent = 0);
     ~Groundstation();
 
-
-
 private:
     Ui::Groundstation *ui;
 
@@ -68,7 +66,6 @@ private slots:
 
     //Bluetooth
     void imagelinkUpdateConsole();
-//    void onBluetoothConnectButtonClicked();
 
     //Top Row
     void onOpenPortButtonClicked();

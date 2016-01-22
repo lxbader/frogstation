@@ -2,6 +2,7 @@
 #define COMPASS_H
 
 #include <QWidget>
+#include <QtWidgets>
 
 class Compass : public QWidget
 {

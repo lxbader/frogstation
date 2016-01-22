@@ -1,8 +1,5 @@
 #include "imagelink.h"
 
-#include "stdint.h"
-#include <qdebug.h>
-
 Imagelink::Imagelink(QObject *parent) : QObject(parent), consoleText(""), currentImage(QImage(160, 121, QImage::Format_RGB32)), imageTransmitActive(0){
     bluetoothPort = new QSerialPort(this);
 }
@@ -12,7 +9,7 @@ void Imagelink::initializePort(){
 }
 
 void Imagelink::openPort(){
-   if(activePortName.isEmpty()){
+    if(activePortName.isEmpty()){
         console("ERROR: No port selected or port could not be found.");
         return;
     }

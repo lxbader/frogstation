@@ -1,5 +1,4 @@
 #include "payload.h"
-#include "stdint.h"
 
 PayloadSatellite::PayloadSatellite() : checksum(0), senderNode(0), timestamp(0), senderThread(0), topic(0), ttl(0), userDataLen(0){
     userData[0] = 0;

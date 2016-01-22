@@ -2,6 +2,7 @@
 #define DEBRISMAP_H
 
 #include <QWidget>
+#include <QtWidgets>
 
 class DebrisMap : public QWidget
 {
