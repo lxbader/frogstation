@@ -1,27 +1,22 @@
 #include "imagelink.h"
 
 #include "stdint.h"
+#include <qdebug.h>
 
-Imagelink::Imagelink(QObject *parent) : QObject(parent), consoleText(""), currentImage(QImage(160, 121, QImage::Format_RGB32)){
+Imagelink::Imagelink(QObject *parent) : QObject(parent), consoleText(""), currentImage(QImage(160, 121, QImage::Format_RGB32)), imageTransmitActive(0){
     bluetoothPort = new QSerialPort(this);
 }
 
-
+void Imagelink::initializePort(){
+    connect(bluetoothPort, SIGNAL(readyRead()), this, SLOT(readData()));
+}
 
 void Imagelink::openPort(){
-    connect(bluetoothPort, SIGNAL(readyRead()), this, SLOT(readImage()));
-    QString activePortName = LOCAL_COMPORT;
-    QSerialPortInfo activePortInfo;
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()){
-        if(info.portName() == activePortName)
-            activePortInfo = info;
-    }
-    if(activePortInfo.isNull()){
-        console(QString("ERROR: Port \"%1\" could not be found.").arg(activePortName));
+   if(activePortName.isEmpty()){
+        console("ERROR: No port selected or port could not be found.");
         return;
     }
-    console(QString("Active port set to \"%1\"").arg(activePortName));
-    bluetoothPort->setPort(activePortInfo);
+//    activePortName = LOCAL_COMPORT;
     bluetoothPort->setPortName(activePortName);
     bluetoothPort->setBaudRate(BAUDRATE);
     bluetoothPort->setDataBits(DATABITS);
@@ -29,24 +24,74 @@ void Imagelink::openPort(){
     bluetoothPort->setStopBits(STOPBITS);
     bluetoothPort->setFlowControl(FLOWCONTROL);
     if(bluetoothPort->open(QIODevice::ReadWrite))
-        console(QString("Port \"%1\" opened.").arg(activePortInfo.portName()));
+        console(QString("Port \"%1\" opened.").arg(activePortName));
     else
-        console(QString("ERROR: Port \"%1\" could not be opened.").arg(activePortInfo.portName()));
+        console(QString("ERROR: Port \"%1\" could not be opened.").arg(activePortName));
+}
+
+void Imagelink::closePort(){
+    QSerialPortInfo activePortInfo;
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()){
+        if(activePortName == info.portName()){
+            activePortInfo = info;
+        }
+    }
+    if(activePortInfo.isNull()){
+        console("ERROR: No port selected or port could not be found.");
+        return;
+    }
+    bluetoothPort->setPort(activePortInfo);
+    bluetoothPort->close();
+    console(QString("Port \"%1\" closed.").arg(activePortInfo.portName()));
+}
+
+void Imagelink::sendCommand(QString command){
+    bluetoothPort->write(command.toLocal8Bit());
+}
+
+void Imagelink::readData(){
+    console("Bluetooth package received.");
+    QByteArray data = bluetoothPort->readAll();
+    if(data.startsWith("FRAME START")){
+        data.remove(0, 11);
+        imageBuffer = data;
+        imageTransmitActive = true;
+        console(data);
+    }else if(data.endsWith("FRAME STOP")){
+        data.remove(data.length()-10, 10);
+        imageBuffer.append(data);
+        console(data);
+        readImage();
+    }else if(imageTransmitActive){
+        imageBuffer.append(data);
+        console(data);
+    }else
+        console("Invalid data format.");
 }
 
 void Imagelink::readImage(){
-    QByteArray data = bluetoothPort->readAll();
-    console("Bluetooth package received.");
 
-    if(sizeof(data) != sizeof(uint8_t)*121*160*2){
-        console("ERROR: Received image package size does not fit required size.");
-        return;
+//FRAME START
+//[i] und [i+1] und [i+2] -> uint8_t
+//FRAME STOP
+
+    for(int i=0; i < imageBuffer.length(); i++){
+        console((QString) imageBuffer.at(i));
     }
 
+//    if(sizeof(data) != sizeof(char)*121*160*2*3){
+//        console("ERROR: Received image package size does not fit required size.");
+//        return;
+//    }
+
     //Extract linear int-array out of data
+    QByteArray buffer;
     uint8_t orig[121*160*2];
     for(int i = 0; i<(121*160*2); i++){
-        orig[i] = data[i];
+        buffer.append(imageBuffer.at(3*i));
+        buffer.append(imageBuffer.at(3*i+1));
+        buffer.append(imageBuffer.at(3*i+2));
+        orig[i] = (uint8_t) buffer.toInt();
     }
 
     //Convert linear YCbCr array to RBG image

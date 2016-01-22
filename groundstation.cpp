@@ -21,7 +21,10 @@ Groundstation::Groundstation(QWidget *parent) :
 //    link.addTopic(PayloadImageType);
     connect(&link, SIGNAL(readReady()), this, SLOT(readoutConnection()));
 
-    imager.openPort();
+    imager.initializePort();
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()){
+        ui->bluetoothComboBox->addItem(info.portName());
+    }
 
     //IMU Payload Contents
     currentax = 0;
@@ -63,6 +66,8 @@ Groundstation::Groundstation(QWidget *parent) :
     //---------------
 
     //Top Row
+    connect(ui->openPortButton, SIGNAL(clicked()), this, SLOT(onOpenPortButtonClicked()));
+    connect(ui->closePortButton, SIGNAL(clicked()), this, SLOT(onClosePortButtonClicked()));
     connect(ui->activateTelemetryButton, SIGNAL(clicked()), this, SLOT(onActivateTelemetryButtonClicked()));
     connect(ui->deactivateTelemetryButton, SIGNAL(clicked()), this, SLOT(onDeactivateTelemetryButtonClicked()));
     connect(ui->emergencyOffButton, SIGNAL(clicked()), this, SLOT(onEmergencyOffButtonClicked()));
@@ -86,6 +91,8 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(ui->deactivateElectromagnetButton, SIGNAL(clicked()), this, SLOT(onDeactivateElectromagnetButtonClicked()));
     connect(ui->activateLightsensorButton, SIGNAL(clicked()), this, SLOT(onActivateLightsensorButtonClicked()));
     connect(ui->deactivateLightsensorButton, SIGNAL(clicked()), this, SLOT(onDeactivateLightsensorButtonClicked()));
+
+    connect(ui->takePictureButton, SIGNAL(clicked()), this, SLOT(onTakePictureButtonClicked()));
 
     //Attitude Tab
     connect(ui->orientationSetButton, SIGNAL(clicked()), this, SLOT(onOrientationSetButtonClicked()));
@@ -125,7 +132,7 @@ void Groundstation::readoutConnection(){
     PayloadSatellite payload = link.read();
     switch(payload.topic){
     case PayloadSensorIMUType:{
-        console("Package of type \"IMU\" received.");
+        //console("Package of type \"IMU\" received.");
         PayloadSensorIMU psimu(payload);
         currentax = 360*(psimu.wz/(2*M_PI));
         currentay = 360*(psimu.wz/(2*M_PI));
@@ -142,12 +149,12 @@ void Groundstation::readoutConnection(){
         break;
     }
     case PayloadCounterType:{
-        console("Package of type \"Counter\" received.");
+        //console("Package of type \"Counter\" received.");
         PayloadCounter pscount(payload);
         break;
     }
     case PayloadElectricalType:{
-        console("Package of type \"Electrical\" received.");
+        //console("Package of type \"Electrical\" received.");
         PayloadElectrical pelec(payload);
         electromagnetActive = pelec.electromagnetOn;
         thermalKnifeActive = pelec.thermalKnifeOn;
@@ -176,7 +183,8 @@ void Groundstation::readoutConnection(){
 void Groundstation::telecommand(int ID, QString msg, int value){
     QString command;
     command = QString("$%1%2%3#").arg(QString::number(ID), msg, QString::number(value));
-    link.connectionSendCommand(command);
+//    link.connectionSendCommand(command);
+    imager.sendCommand(command);
 }
 
 void Groundstation::telecommand(int ID, QString msg, QString sign, int value){
@@ -185,10 +193,21 @@ void Groundstation::telecommand(int ID, QString msg, QString sign, int value){
     command.append(msg);
     command.append(sign);
     command.append(QString("%1#").arg(QString::number(value)));
-    link.connectionSendCommand(command);
+//    link.connectionSendCommand(command);
+    imager.sendCommand(command);
 }
 
 //Top Row
+void Groundstation::onOpenPortButtonClicked(){
+    imager.activePortName = ui->bluetoothComboBox->currentText();
+    imager.openPort();
+}
+
+void Groundstation::onClosePortButtonClicked(){
+    imager.activePortName = ui->bluetoothComboBox->currentText();
+    imager.closePort();
+}
+
 void Groundstation::onActivateTelemetryButtonClicked(){
     if(!telemetryActive){
         console("Activating telemetry.");
@@ -327,6 +346,11 @@ void Groundstation::onDeactivateLightsensorButtonClicked(){
     }
     else
         console("Lightsensor already inactive.");
+}
+
+void Groundstation::onTakePictureButtonClicked(){
+    telecommand(4, "PIC", 1);
+
 }
 
 //Attitude Tab

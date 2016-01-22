@@ -71,6 +71,8 @@ private slots:
 //    void onBluetoothConnectButtonClicked();
 
     //Top Row
+    void onOpenPortButtonClicked();
+    void onClosePortButtonClicked();
     void onActivateTelemetryButtonClicked();
     void onDeactivateTelemetryButtonClicked();
     void onEmergencyOffButtonClicked();
@@ -94,6 +96,8 @@ private slots:
     void onDeactivateElectromagnetButtonClicked();
     void onActivateLightsensorButtonClicked();
     void onDeactivateLightsensorButtonClicked();
+
+    void onTakePictureButtonClicked();
 
     //Attitude Tab
     void onOrientationSetButtonClicked();

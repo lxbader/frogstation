@@ -115,6 +115,48 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="groupBox_8">
+          <property name="minimumSize">
+           <size>
+            <width>100</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>100</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>Bluetooth</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_24">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_23">
+             <item>
+              <widget class="QComboBox" name="bluetoothComboBox"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="openPortButton">
+               <property name="text">
+                <string>Open Port</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="closePortButton">
+               <property name="text">
+                <string>Close Port</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QGroupBox" name="groupBox_2">
           <property name="minimumSize">
            <size>
@@ -468,7 +510,7 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
               </size>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="generalTab">
               <attribute name="title">
@@ -682,6 +724,19 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                   </layout>
                  </item>
                 </layout>
+               </widget>
+               <widget class="QPushButton" name="takePictureButton">
+                <property name="geometry">
+                 <rect>
+                  <x>390</x>
+                  <y>80</y>
+                  <width>75</width>
+                  <height>23</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Take Picture</string>
+                </property>
                </widget>
               </widget>
              </widget>
