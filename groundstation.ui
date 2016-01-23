@@ -345,13 +345,13 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
          <widget class="QGroupBox" name="groupBox_2">
           <property name="minimumSize">
            <size>
-            <width>200</width>
+            <width>150</width>
             <height>120</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>200</width>
+            <width>150</width>
             <height>120</height>
            </size>
           </property>
@@ -389,13 +389,13 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                 <widget class="QLabel" name="label_26">
                  <property name="minimumSize">
                   <size>
-                   <width>120</width>
+                   <width>80</width>
                    <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>120</width>
+                   <width>80</width>
                    <height>16777215</height>
                   </size>
                  </property>
@@ -407,7 +407,7 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                   </font>
                  </property>
                  <property name="text">
-                  <string>Telemetry active?</string>
+                  <string>Activity</string>
                  </property>
                 </widget>
                </item>
@@ -552,6 +552,104 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
+          <property name="title">
+           <string>Satellite State</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_35">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_34">
+             <item alignment="Qt::AlignHCenter">
+              <widget class="QLabel" name="label_35">
+               <property name="font">
+                <font>
+                 <italic>true</italic>
+                </font>
+               </property>
+               <property name="text">
+                <string>Deployed?</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_33">
+               <item>
+                <widget class="QLedIndicator" name="solarDeployedLED" native="true"/>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_36">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>80</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <italic>true</italic>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Solar Panels</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_34">
+               <item>
+                <widget class="QLedIndicator" name="racksDeployedLED" native="true"/>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_37">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>80</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <italic>true</italic>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Racks</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_13">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -614,7 +712,7 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
               </font>
              </property>
              <property name="currentIndex">
-              <number>0</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="generalTab">
               <attribute name="title">
@@ -1617,13 +1715,13 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
-                       <height>260</height>
+                       <height>250</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
                        <width>16777215</width>
-                       <height>260</height>
+                       <height>250</height>
                       </size>
                      </property>
                      <property name="font">
@@ -1649,14 +1747,14 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                     <widget class="QGroupBox" name="groupBox_13">
                      <property name="minimumSize">
                       <size>
-                       <width>260</width>
-                       <height>195</height>
+                       <width>250</width>
+                       <height>185</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>260</width>
-                       <height>195</height>
+                       <width>250</width>
+                       <height>185</height>
                       </size>
                      </property>
                      <property name="font">
@@ -1682,14 +1780,14 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                     <widget class="QGroupBox" name="debrisMapBox">
                      <property name="minimumSize">
                       <size>
-                       <width>260</width>
-                       <height>260</height>
+                       <width>250</width>
+                       <height>250</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>260</width>
-                       <height>260</height>
+                       <width>250</width>
+                       <height>250</height>
                       </size>
                      </property>
                      <property name="font">
