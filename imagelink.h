@@ -31,15 +31,18 @@ public:
     void openPort();
     void closePort();
     void sendCommand(QString command);
+    bool isOpen();
 
 signals:
     void updateConsole();
     void updateImage();
+    void updateStatus();
 
 private:
     QSerialPort *bluetoothPort;
     QByteArray imageBuffer;
     bool imageTransmitActive;
+    bool portOpen;
 
     void console(QString msg);
     QRgb getRgbValue(uint8_t y, uint8_t cb, uint8_t cr);

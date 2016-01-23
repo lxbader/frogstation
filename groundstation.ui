@@ -14,8 +14,7 @@
    <string>Space Frog</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/*QMainWindow{color: white; background: black}*/
-QMainWindow{border-image: url(../img/background_galaxy.jpg) 0 0 0 0 stretch stretch}
+   <string notr="true">QMainWindow{border-image: url(../img/background_galaxy.jpg) 0 0 0 0 stretch stretch}
 
 QLabel{color: white}
 
@@ -23,7 +22,6 @@ QLCDNumber{background-color: black}
 
 QGroupBox{border: 2px solid gray; border-radius: 5px; margin-top: 2ex}
 QGroupBox::title{color: white; font: bold; top:-7px; left: 10px; padding-left: 2px}
-QGroupBox#consoleBox::title{left: 446px}
 
 QGroupBox#compassBox{background-color: gray}
 QGroupBox#debrisMapBox{background-color: gray}
@@ -31,19 +29,23 @@ QGroupBox#groupBox_attitude1{background-color: gray}
 QGroupBox#groupBox_attitude2{background-color: gray}
 QGroupBox#groupBox_attitude3{background-color: gray}
 QGroupBox#groupBox_smallCompass{background-color: gray}
+QGroupBox#groupBox_calibrations{background-color: gray}
+QGroupBox#groupBox_magnetRack{background-color: gray}
+QGroupBox#groupBox_weightRack{background-color: gray}
+QGroupBox#groupBox_momentumWheel{background-color: gray}
+QGroupBox#groupBox_thermalKnife{background-color: gray}
+QGroupBox#groupBox_electromagnet{background-color: gray}
+QGroupBox#groupBox_lightsensor{background-color: gray}
+QGroupBox#groupBox_camera{background-color: gray}
+QGroupBox#groupBox_mission{background-color: gray}
+QGroupBox#groupBox_sunfinder{background-color: gray}
 
 QTabWidget{background: transparent}
 QTabWidget::pane{border: 1px solid gray}
 QTabBar{color:white; background: transparent}
 QTabBar::tab{border: 1px solid gray; border-top-left-radius: 4px; border-top-right-radius: 4px; min-width: 8ex; padding-left: 10px;  padding-right: 10px; padding-top: 2px; padding-bottom: 2px}
 QTabBar::tab::!selected{margin-top:2px}
-QTabBar::tab::selected{border-bottom: 0px}
-
-/*QScrollBar:vertical{border: 2px solid gray; background: green; width: 15px; margin: 20px 0 20px 0}
-QScrollBar::handle:vertical{background: black; min-width: 20px}
-QScrollBar::add-line:vertical {border: 2px solid grey; background: blue; height:20px; subcontrol-position: bottom; subcontrol-origin: margin}
-QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:20px; subcontrol-position: top; subcontrol-origin: margin}*/
-</string>
+QTabBar::tab::selected{border-bottom: 0px}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -122,6 +124,11 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
             <height>0</height>
            </size>
           </property>
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
           <property name="title">
            <string>Electrical Activity</string>
           </property>
@@ -146,6 +153,13 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                    <width>80</width>
                    <height>16777215</height>
                   </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <weight>50</weight>
+                   <italic>true</italic>
+                   <bold>false</bold>
+                  </font>
                  </property>
                  <property name="text">
                   <string>Light Sensor</string>
@@ -173,6 +187,13 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                    <height>16777215</height>
                   </size>
                  </property>
+                 <property name="font">
+                  <font>
+                   <weight>50</weight>
+                   <italic>true</italic>
+                   <bold>false</bold>
+                  </font>
+                 </property>
                  <property name="text">
                   <string>Electromagnet</string>
                  </property>
@@ -198,6 +219,13 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                    <width>80</width>
                    <height>16777215</height>
                   </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <weight>50</weight>
+                   <italic>true</italic>
+                   <bold>false</bold>
+                  </font>
                  </property>
                  <property name="text">
                   <string>Thermal Knife</string>
@@ -225,6 +253,11 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
             <height>120</height>
            </size>
           </property>
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
           <property name="title">
            <string>Power</string>
           </property>
@@ -246,6 +279,13 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
              </item>
              <item row="0" column="0">
               <widget class="QLabel" name="label_3">
+               <property name="font">
+                <font>
+                 <weight>50</weight>
+                 <italic>true</italic>
+                 <bold>false</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Battery Voltage</string>
                </property>
@@ -256,6 +296,13 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_4">
+               <property name="font">
+                <font>
+                 <weight>50</weight>
+                 <italic>true</italic>
+                 <bold>false</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Power Consumption</string>
                </property>
@@ -263,6 +310,13 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="label_5">
+               <property name="font">
+                <font>
+                 <weight>50</weight>
+                 <italic>true</italic>
+                 <bold>false</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Expected Lifetime</string>
                </property>
@@ -300,6 +354,11 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
             <width>200</width>
             <height>120</height>
            </size>
+          </property>
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
           </property>
           <property name="title">
            <string>Telemetry</string>
@@ -339,6 +398,13 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                    <width>120</width>
                    <height>16777215</height>
                   </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <weight>50</weight>
+                   <italic>true</italic>
+                   <bold>false</bold>
+                  </font>
                  </property>
                  <property name="text">
                   <string>Telemetry active?</string>
@@ -422,24 +488,49 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
          <widget class="QGroupBox" name="groupBox_8">
           <property name="minimumSize">
            <size>
-            <width>100</width>
+            <width>150</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>100</width>
+            <width>150</width>
             <height>16777215</height>
            </size>
+          </property>
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
           </property>
           <property name="title">
            <string>Bluetooth</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_24">
+          <layout class="QHBoxLayout" name="horizontalLayout_21">
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_23">
              <item>
-              <widget class="QComboBox" name="bluetoothComboBox"/>
+              <layout class="QHBoxLayout" name="horizontalLayout_15">
+               <item>
+                <widget class="QLedIndicator" name="bluetoothLED" native="true"/>
+               </item>
+               <item>
+                <widget class="QComboBox" name="bluetoothComboBox">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>80</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
               <widget class="QPushButton" name="openPortButton">
@@ -491,6 +582,11 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
             <height>530</height>
            </size>
           </property>
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
+          </property>
           <property name="title">
            <string>Operation</string>
           </property>
@@ -509,8 +605,16 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                <height>500</height>
               </size>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>13</pointsize>
+               <weight>75</weight>
+               <italic>true</italic>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="generalTab">
               <attribute name="title">
@@ -519,73 +623,112 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
               <widget class="QWidget" name="">
                <property name="geometry">
                 <rect>
-                 <x>10</x>
-                 <y>10</y>
-                 <width>641</width>
-                 <height>205</height>
+                 <x>9</x>
+                 <y>9</y>
+                 <width>621</width>
+                 <height>330</height>
                 </rect>
                </property>
-               <layout class="QVBoxLayout" name="verticalLayout_31">
+               <layout class="QVBoxLayout" name="verticalLayout_26">
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_14">
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
                   <item>
-                   <widget class="QGroupBox" name="groupBox">
+                   <widget class="QGroupBox" name="groupBox_calibrations">
                     <property name="title">
-                     <string>Calibrations</string>
+                     <string/>
                     </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_28">
+                    <layout class="QVBoxLayout" name="verticalLayout_17">
+                     <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+                      <widget class="QLabel" name="label">
+                       <property name="font">
+                        <font>
+                         <pointsize>11</pointsize>
+                         <weight>75</weight>
+                         <italic>true</italic>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Calibrations</string>
+                       </property>
+                      </widget>
+                     </item>
                      <item>
-                      <layout class="QVBoxLayout" name="verticalLayout_25">
-                       <item>
-                        <widget class="QPushButton" name="calibrateGyroscopeButton">
-                         <property name="text">
-                          <string>Calibrate Gyroscope</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="calibrateAccelerometerButton">
-                         <property name="text">
-                          <string>Calibrate Accelerometer</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="calibrateMagnetometerButton">
-                         <property name="text">
-                          <string>Calibrate Magnetometer</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
+                      <widget class="QPushButton" name="calibrateGyroscopeButton">
+                       <property name="text">
+                        <string>Gyroscope</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="calibrateAccelerometerButton">
+                       <property name="text">
+                        <string>Accelerometer</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="calibrateMagnetometerButton">
+                       <property name="text">
+                        <string>Magnetometer</string>
+                       </property>
+                      </widget>
                      </item>
                     </layout>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QGroupBox" name="groupBox_3">
+                   <spacer name="horizontalSpacer_2">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="groupBox_magnetRack">
                     <property name="title">
-                     <string>Magnet Rack</string>
+                     <string/>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_22">
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLabel" name="label_10">
+                       <property name="font">
+                        <font>
+                         <pointsize>11</pointsize>
+                         <weight>75</weight>
+                         <italic>true</italic>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Magnet Rack</string>
+                       </property>
+                      </widget>
+                     </item>
                      <item>
                       <widget class="QPushButton" name="deployMRackButton">
                        <property name="text">
-                        <string>Deploy Rack</string>
+                        <string>Deploy</string>
                        </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="QPushButton" name="pullMRackButton">
                        <property name="text">
-                        <string>Pull in Rack</string>
+                        <string>Pull in</string>
                        </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="QPushButton" name="stopMRackButton">
                        <property name="text">
-                        <string>Stop Rack</string>
+                        <string>Stop</string>
                        </property>
                       </widget>
                      </item>
@@ -593,29 +736,44 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                    </widget>
                   </item>
                   <item>
-                   <widget class="QGroupBox" name="groupBox_11">
+                   <widget class="QGroupBox" name="groupBox_weightRack">
                     <property name="title">
-                     <string>Weight Rack</string>
+                     <string/>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_30">
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLabel" name="label_11">
+                       <property name="font">
+                        <font>
+                         <pointsize>11</pointsize>
+                         <weight>75</weight>
+                         <italic>true</italic>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Weight Rack</string>
+                       </property>
+                      </widget>
+                     </item>
                      <item>
                       <widget class="QPushButton" name="deployCRackButton">
                        <property name="text">
-                        <string>Deploy Rack</string>
+                        <string>Deploy</string>
                        </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="QPushButton" name="pullCRackButton">
                        <property name="text">
-                        <string>Pull in Rack</string>
+                        <string>Pull in</string>
                        </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="QPushButton" name="stopCRackButton">
                        <property name="text">
-                        <string>Stop Rack</string>
+                        <string>Stop</string>
                        </property>
                       </widget>
                      </item>
@@ -623,25 +781,53 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                    </widget>
                   </item>
                   <item>
-                   <widget class="QGroupBox" name="groupBox_10">
+                   <spacer name="horizontalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="groupBox_momentumWheel">
                     <property name="title">
-                     <string>Momentum Wheel</string>
+                     <string/>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_29">
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLabel" name="label_12">
+                       <property name="font">
+                        <font>
+                         <pointsize>11</pointsize>
+                         <weight>75</weight>
+                         <italic>true</italic>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Momentum Wheel</string>
+                       </property>
+                      </widget>
+                     </item>
                      <item>
                       <widget class="QLineEdit" name="HBALineEdit"/>
                      </item>
                      <item>
                       <widget class="QPushButton" name="setHBAButton">
                        <property name="text">
-                        <string>Set Speed Momentum Wheel</string>
+                        <string>Set Speed</string>
                        </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="QPushButton" name="pushButton">
                        <property name="text">
-                        <string>Stop Momentum Wheel</string>
+                        <string>Stop</string>
                        </property>
                       </widget>
                      </item>
@@ -651,114 +837,176 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                  </layout>
                 </item>
                 <item>
-                 <widget class="QGroupBox" name="groupBox_9">
-                  <property name="title">
-                   <string>Electrical</string>
-                  </property>
-                  <layout class="QHBoxLayout" name="horizontalLayout_13">
-                   <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_12">
-                     <item>
-                      <layout class="QVBoxLayout" name="verticalLayout_18">
-                       <item>
-                        <widget class="QPushButton" name="activateThermalKnifeButton">
-                         <property name="text">
-                          <string>Activate Thermal Knife</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="deactivateThermalKnifeButton">
-                         <property name="text">
-                          <string>Deactivate Thermal Knife</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <spacer name="horizontalSpacer_2">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
+                 <layout class="QHBoxLayout" name="horizontalLayout_11">
+                  <item>
+                   <widget class="QGroupBox" name="groupBox_thermalKnife">
+                    <property name="title">
+                     <string/>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout">
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLabel" name="label_13">
+                       <property name="font">
+                        <font>
+                         <pointsize>11</pointsize>
+                         <weight>75</weight>
+                         <italic>true</italic>
+                         <bold>true</bold>
+                        </font>
                        </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
-                      <layout class="QVBoxLayout" name="verticalLayout_26">
-                       <item>
-                        <widget class="QPushButton" name="activateElectromagnetButton">
-                         <property name="text">
-                          <string>Activate Electromagnet</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="deactivateElectromagnetButton">
-                         <property name="text">
-                          <string>Deactivate Electromagnet</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <spacer name="horizontalSpacer_4">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
-                      <layout class="QVBoxLayout" name="verticalLayout_27">
-                       <item>
-                        <widget class="QPushButton" name="activateLightsensorButton">
-                         <property name="text">
-                          <string>Activate Lightsensor</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QPushButton" name="deactivateLightsensorButton">
-                         <property name="text">
-                          <string>Deactivate Lightsensor</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                     <item>
-                      <spacer name="horizontalSpacer_5">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="takePictureButton">
                        <property name="text">
-                        <string>Take Picture</string>
+                        <string>Thermal Knife</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="activateThermalKnifeButton">
+                       <property name="text">
+                        <string>Activate</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="deactivateThermalKnifeButton">
+                       <property name="text">
+                        <string>Deactivate</string>
                        </property>
                       </widget>
                      </item>
                     </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_4">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="groupBox_electromagnet">
+                    <property name="title">
+                     <string/>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_18">
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLabel" name="label_15">
+                       <property name="font">
+                        <font>
+                         <pointsize>11</pointsize>
+                         <weight>75</weight>
+                         <italic>true</italic>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Electromagnet</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="activateElectromagnetButton">
+                       <property name="text">
+                        <string>Activate</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="deactivateElectromagnetButton">
+                       <property name="text">
+                        <string>Deactivate</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_5">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="groupBox_lightsensor">
+                    <property name="title">
+                     <string/>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_24">
+                     <item alignment="Qt::AlignHCenter">
+                      <widget class="QLabel" name="label_16">
+                       <property name="font">
+                        <font>
+                         <pointsize>11</pointsize>
+                         <weight>75</weight>
+                         <italic>true</italic>
+                         <bold>true</bold>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Lightsensor</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="activateLightsensorButton">
+                       <property name="text">
+                        <string>Activate</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="deactivateLightsensorButton">
+                       <property name="text">
+                        <string>Deactivate</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QGroupBox" name="groupBox_camera">
+                  <property name="title">
+                   <string/>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_25">
+                   <item>
+                    <widget class="QLabel" name="label_33">
+                     <property name="font">
+                      <font>
+                       <pointsize>11</pointsize>
+                       <weight>75</weight>
+                       <italic>true</italic>
+                       <bold>true</bold>
+                      </font>
+                     </property>
+                     <property name="text">
+                      <string>Camera</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="takePictureButton">
+                     <property name="text">
+                      <string>Take Picture</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>
@@ -780,14 +1028,19 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                      <property name="minimumSize">
                       <size>
                        <width>400</width>
-                       <height>230</height>
+                       <height>220</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
                        <width>400</width>
-                       <height>230</height>
+                       <height>220</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <italic>true</italic>
+                      </font>
                      </property>
                      <property name="title">
                       <string>Heading Data</string>
@@ -800,18 +1053,36 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                     </widget>
                    </item>
                    <item>
+                    <spacer name="verticalSpacer_3">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
                     <widget class="QGroupBox" name="groupBox_7">
                      <property name="minimumSize">
                       <size>
                        <width>400</width>
-                       <height>230</height>
+                       <height>220</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
                        <width>400</width>
-                       <height>230</height>
+                       <height>220</height>
                       </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <italic>true</italic>
+                      </font>
                      </property>
                      <property name="title">
                       <string>Rotation Data</string>
@@ -1132,263 +1403,302 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                </item>
               </layout>
              </widget>
-             <widget class="QWidget" name="sunFinderTab">
-              <attribute name="title">
-               <string>Sun Finder</string>
-              </attribute>
-              <layout class="QHBoxLayout" name="horizontalLayout_11">
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_17">
-                 <item>
-                  <layout class="QGridLayout" name="gridLayout_7">
-                   <item row="0" column="1" alignment="Qt::AlignHCenter">
-                    <widget class="QLabel" name="label_30">
-                     <property name="minimumSize">
-                      <size>
-                       <width>100</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>100</width>
-                       <height>40</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Lightsensor Signal</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="2">
-                    <widget class="QLCDNumber" name="solarLCD">
-                     <property name="minimumSize">
-                      <size>
-                       <width>150</width>
-                       <height>40</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>150</width>
-                       <height>40</height>
-                      </size>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="0">
-                    <spacer name="horizontalSpacer_16">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item row="0" column="3">
-                    <widget class="QPushButton" name="sunFinderButton">
-                     <property name="maximumSize">
-                      <size>
-                       <width>200</width>
-                       <height>16777215</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>Search and Deploy Panels</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="4">
-                    <spacer name="horizontalSpacer_3">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="QGroupBox" name="solarPanelVoltageBox">
-                   <property name="minimumSize">
-                    <size>
-                     <width>400</width>
-                     <height>350</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>1000</width>
-                     <height>350</height>
-                    </size>
-                   </property>
-                   <property name="title">
-                    <string>Solar Panel Voltage</string>
-                   </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_16">
-                    <item>
-                     <widget class="QCustomPlot" name="sunFinderWidget" native="true"/>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="verticalSpacer_3">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
              <widget class="QWidget" name="missionTab">
               <attribute name="title">
                <string>Mission</string>
               </attribute>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <layout class="QVBoxLayout" name="verticalLayout_33">
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout">
+                <layout class="QHBoxLayout" name="horizontalLayout_32">
                  <item>
-                  <layout class="QVBoxLayout" name="verticalLayout">
+                  <layout class="QVBoxLayout" name="verticalLayout_32">
                    <item>
-                    <layout class="QGridLayout" name="missionDebrisGrid">
-                     <item row="1" column="0" alignment="Qt::AlignHCenter">
-                      <widget class="QLabel" name="label_14">
-                       <property name="minimumSize">
-                        <size>
-                         <width>100</width>
-                         <height>0</height>
-                        </size>
+                    <layout class="QHBoxLayout" name="horizontalLayout_31">
+                     <item>
+                      <widget class="QGroupBox" name="groupBox_sunfinder">
+                       <property name="title">
+                        <string/>
                        </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>150</width>
-                         <height>16777215</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>Debris parts found</string>
-                       </property>
+                       <layout class="QHBoxLayout" name="horizontalLayout_30">
+                        <item>
+                         <layout class="QVBoxLayout" name="verticalLayout_31">
+                          <item alignment="Qt::AlignHCenter">
+                           <widget class="QLabel" name="label_34">
+                            <property name="font">
+                             <font>
+                              <pointsize>11</pointsize>
+                              <weight>75</weight>
+                              <italic>true</italic>
+                              <bold>true</bold>
+                             </font>
+                            </property>
+                            <property name="text">
+                             <string>Lightsensor</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <layout class="QHBoxLayout" name="horizontalLayout_29">
+                            <item>
+                             <widget class="QLabel" name="label_30">
+                              <property name="minimumSize">
+                               <size>
+                                <width>100</width>
+                                <height>0</height>
+                               </size>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>100</width>
+                                <height>40</height>
+                               </size>
+                              </property>
+                              <property name="font">
+                               <font>
+                                <italic>true</italic>
+                               </font>
+                              </property>
+                              <property name="text">
+                               <string>Raw Data</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLCDNumber" name="solarLCD"/>
+                            </item>
+                           </layout>
+                          </item>
+                          <item>
+                           <widget class="QPushButton" name="sunFinderButton">
+                            <property name="maximumSize">
+                             <size>
+                              <width>200</width>
+                              <height>16777215</height>
+                             </size>
+                            </property>
+                            <property name="text">
+                             <string>Search and Deploy Panels</string>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </item>
+                       </layout>
                       </widget>
                      </item>
-                     <item row="1" column="1">
-                      <widget class="QLCDNumber" name="debrisFoundLCD">
-                       <property name="minimumSize">
+                     <item>
+                      <spacer name="horizontalSpacer_6">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
                         <size>
-                         <width>100</width>
-                         <height>30</height>
+                         <width>40</width>
+                         <height>20</height>
                         </size>
                        </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>100</width>
-                         <height>30</height>
-                        </size>
-                       </property>
-                      </widget>
+                      </spacer>
                      </item>
-                     <item row="2" column="0" alignment="Qt::AlignHCenter">
-                      <widget class="QLabel" name="label_27">
-                       <property name="maximumSize">
-                        <size>
-                         <width>150</width>
-                         <height>16777215</height>
-                        </size>
+                     <item>
+                      <widget class="QGroupBox" name="groupBox_mission">
+                       <property name="title">
+                        <string/>
                        </property>
-                       <property name="text">
-                        <string>Debris parts cleaned</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="1">
-                      <widget class="QLCDNumber" name="debrisCleanedLCD">
-                       <property name="minimumSize">
-                        <size>
-                         <width>100</width>
-                         <height>30</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>100</width>
-                         <height>30</height>
-                        </size>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="0">
-                      <widget class="QPushButton" name="missionStartButton">
-                       <property name="minimumSize">
-                        <size>
-                         <width>100</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>100</width>
-                         <height>16777215</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>Start Mission</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QPushButton" name="missionAbortButton">
-                       <property name="minimumSize">
-                        <size>
-                         <width>100</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>100</width>
-                         <height>16777215</height>
-                        </size>
-                       </property>
-                       <property name="text">
-                        <string>Abort Mission</string>
-                       </property>
+                       <layout class="QHBoxLayout" name="horizontalLayout_22">
+                        <item>
+                         <layout class="QVBoxLayout" name="verticalLayout_28">
+                          <item>
+                           <layout class="QHBoxLayout" name="horizontalLayout_14">
+                            <item>
+                             <widget class="QPushButton" name="missionStartButton">
+                              <property name="minimumSize">
+                               <size>
+                                <width>100</width>
+                                <height>0</height>
+                               </size>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>100</width>
+                                <height>16777215</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string>Start Mission</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QPushButton" name="missionAbortButton">
+                              <property name="minimumSize">
+                               <size>
+                                <width>100</width>
+                                <height>0</height>
+                               </size>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>100</width>
+                                <height>16777215</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string>Abort Mission</string>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </item>
+                          <item>
+                           <layout class="QHBoxLayout" name="horizontalLayout_12">
+                            <item>
+                             <widget class="QLabel" name="label_14">
+                              <property name="minimumSize">
+                               <size>
+                                <width>100</width>
+                                <height>0</height>
+                               </size>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>150</width>
+                                <height>16777215</height>
+                               </size>
+                              </property>
+                              <property name="font">
+                               <font>
+                                <italic>true</italic>
+                               </font>
+                              </property>
+                              <property name="text">
+                               <string>Debris parts found</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLCDNumber" name="debrisFoundLCD"/>
+                            </item>
+                           </layout>
+                          </item>
+                          <item>
+                           <layout class="QHBoxLayout" name="horizontalLayout_13">
+                            <item>
+                             <widget class="QLabel" name="label_27">
+                              <property name="maximumSize">
+                               <size>
+                                <width>150</width>
+                                <height>16777215</height>
+                               </size>
+                              </property>
+                              <property name="font">
+                               <font>
+                                <italic>true</italic>
+                               </font>
+                              </property>
+                              <property name="text">
+                               <string>Debris parts cleaned</string>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLCDNumber" name="debrisCleanedLCD"/>
+                            </item>
+                           </layout>
+                          </item>
+                         </layout>
+                        </item>
+                       </layout>
                       </widget>
                      </item>
                     </layout>
                    </item>
                    <item>
-                    <widget class="QGroupBox" name="debrisMapBox">
+                    <widget class="QGroupBox" name="solarPanelVoltageBox">
                      <property name="minimumSize">
                       <size>
-                       <width>300</width>
-                       <height>300</height>
+                       <width>0</width>
+                       <height>260</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
-                       <width>300</width>
-                       <height>300</height>
+                       <width>16777215</width>
+                       <height>260</height>
                       </size>
                      </property>
+                     <property name="font">
+                      <font>
+                       <italic>true</italic>
+                      </font>
+                     </property>
                      <property name="title">
-                      <string>Debris Map</string>
+                      <string>Lightsensor Data</string>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_16">
+                      <item>
+                       <widget class="QCustomPlot" name="sunFinderWidget" native="true"/>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_27">
+                   <item>
+                    <widget class="QGroupBox" name="groupBox_13">
+                     <property name="minimumSize">
+                      <size>
+                       <width>260</width>
+                       <height>195</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>260</width>
+                       <height>195</height>
+                      </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <italic>true</italic>
+                      </font>
+                     </property>
+                     <property name="title">
+                      <string>Camera</string>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout">
+                      <item>
+                       <widget class="QLabel" name="missionInputLabel">
+                        <property name="text">
+                         <string/>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QGroupBox" name="debrisMapBox">
+                     <property name="minimumSize">
+                      <size>
+                       <width>260</width>
+                       <height>260</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>260</width>
+                       <height>260</height>
+                      </size>
+                     </property>
+                     <property name="font">
+                      <font>
+                       <italic>true</italic>
+                      </font>
+                     </property>
+                     <property name="title">
+                      <string/>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_7">
                       <item>
@@ -1402,78 +1712,6 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
                        </widget>
                       </item>
                      </layout>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QGridLayout" name="missionImgGrid">
-                   <item row="0" column="1" alignment="Qt::AlignHCenter">
-                    <widget class="QLabel" name="label_12">
-                     <property name="font">
-                      <font>
-                       <pointsize>10</pointsize>
-                       <weight>75</weight>
-                       <italic>true</italic>
-                       <bold>true</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Input Image</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="1" alignment="Qt::AlignHCenter">
-                    <widget class="QLabel" name="missionOutputLabel">
-                     <property name="minimumSize">
-                      <size>
-                       <width>240</width>
-                       <height>180</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>240</width>
-                       <height>180</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="1" alignment="Qt::AlignHCenter">
-                    <widget class="QLabel" name="label_13">
-                     <property name="font">
-                      <font>
-                       <pointsize>10</pointsize>
-                       <weight>75</weight>
-                       <italic>true</italic>
-                       <bold>true</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Output Image</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1" alignment="Qt::AlignHCenter">
-                    <widget class="QLabel" name="missionInputLabel">
-                     <property name="minimumSize">
-                      <size>
-                       <width>240</width>
-                       <height>180</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>240</width>
-                       <height>180</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
                     </widget>
                    </item>
                   </layout>
@@ -1500,6 +1738,11 @@ QScrollBar::sub-line:vertical {border: 2px solid grey; background: blue; height:
             <width>400</width>
             <height>530</height>
            </size>
+          </property>
+          <property name="font">
+           <font>
+            <italic>true</italic>
+           </font>
           </property>
           <property name="title">
            <string>Console</string>

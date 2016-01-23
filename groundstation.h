@@ -96,6 +96,7 @@ private slots:
     //Updates
     void updateImage();
     void telemetryCheck();
+    void updateBluetoothLED();
 };
 
 #endif // GROUNDSTATION_H

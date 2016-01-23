@@ -1,11 +1,12 @@
 #include "imagelink.h"
 
-Imagelink::Imagelink(QObject *parent) : QObject(parent), consoleText(""), currentImage(QImage(160, 121, QImage::Format_RGB32)), imageTransmitActive(0){
+Imagelink::Imagelink(QObject *parent) : QObject(parent), consoleText(""), currentImage(QImage(160, 121, QImage::Format_RGB32)), imageTransmitActive(false), portOpen(false){
     bluetoothPort = new QSerialPort(this);
 }
 
 void Imagelink::initializePort(){
     connect(bluetoothPort, SIGNAL(readyRead()), this, SLOT(readData()));
+    emit updateStatus();
 }
 
 void Imagelink::openPort(){
@@ -20,8 +21,11 @@ void Imagelink::openPort(){
     bluetoothPort->setParity(PARITY);
     bluetoothPort->setStopBits(STOPBITS);
     bluetoothPort->setFlowControl(FLOWCONTROL);
-    if(bluetoothPort->open(QIODevice::ReadWrite))
+    if(bluetoothPort->open(QIODevice::ReadWrite)){
         console(QString("Port \"%1\" opened.").arg(activePortName));
+        portOpen = true;
+        emit updateStatus();
+    }
     else
         console(QString("ERROR: Port \"%1\" could not be opened.").arg(activePortName));
 }
@@ -40,6 +44,8 @@ void Imagelink::closePort(){
     bluetoothPort->setPort(activePortInfo);
     bluetoothPort->close();
     console(QString("Port \"%1\" closed.").arg(activePortInfo.portName()));
+    portOpen = false;
+    emit updateStatus();
 }
 
 void Imagelink::sendCommand(QString command){
@@ -54,10 +60,12 @@ void Imagelink::readData(){
         imageBuffer = data;
         imageTransmitActive = true;
         console(data);
-    }else if(data.endsWith("FRAME STOP")){
+    }else if(imageTransmitActive && data.endsWith("FRAME STOP")){
         data.remove(data.length()-10, 10);
         imageBuffer.append(data);
         console(data);
+        imageTransmitActive = false;
+        console("Image transfer complete.");
         readImage();
     }else if(imageTransmitActive){
         imageBuffer.append(data);
@@ -76,10 +84,10 @@ void Imagelink::readImage(){
         console((QString) imageBuffer.at(i));
     }
 
-//    if(sizeof(data) != sizeof(char)*121*160*2*3){
-//        console("ERROR: Received image package size does not fit required size.");
-//        return;
-//    }
+    if(sizeof(imageBuffer) != sizeof(char)*121*160*2*3){
+        console("ERROR: Received image package size does not fit required size.");
+        return;
+    }
 
     //Extract linear int-array out of data
     QByteArray buffer;
@@ -121,4 +129,8 @@ QRgb Imagelink::getRgbValue(uint8_t y, uint8_t cb, uint8_t cr){
 void Imagelink::console(QString msg){
     consoleText = msg;
     emit updateConsole();
+}
+
+bool Imagelink::isOpen(){
+    return portOpen;
 }

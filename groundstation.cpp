@@ -28,6 +28,8 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(telemetryCheck()));
     timer->start();
 
+    connect(&imager, SIGNAL(updateStatus()), this, SLOT(updateBluetoothLED()));
+
     //---------------
     //Connect Buttons
     //---------------
@@ -466,13 +468,18 @@ void Groundstation::updateImage(){
     ui->missionInputLabel->setPixmap(QPixmap::fromImage(scaled));
 }
 
-//---------------------------------------------
-//DISABLE TELEMETRY LIGHT IN CASE OF INACTIVITY
-//---------------------------------------------
+//-----------
+//LED UPDATES
+//-----------
 
+//disable telemetry LED when connection is lost
 void Groundstation::telemetryCheck(){
     if((ui->telemetryLED->isChecked()) && (QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0 - key) >= 3){
         ui->telemetryLED->setChecked(false);
         console("No telemetry data available.");
     }
+}
+
+void Groundstation::updateBluetoothLED(){
+    ui->bluetoothLED->setChecked(imager.isOpen());
 }
