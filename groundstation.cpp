@@ -49,6 +49,7 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(ui->calibrateGyroscopeButton, SIGNAL(clicked()), this, SLOT(onCalibrateGyroscopeButtonClicked()));
 
     connect(ui->setHBAButton, SIGNAL(clicked()), this, SLOT(onSetHBAButtonClicked()));
+    connect(ui->stopHBAButton, SIGNAL(clicked()), this, SLOT(onStopHBAButtonClicked()));
     connect(ui->deployMRackButton, SIGNAL(clicked()), this, SLOT(onDeployMRackButtonClicked()));
     connect(ui->pullMRackButton, SIGNAL(clicked()), this, SLOT(onPullMRackButtonClicked()));
     connect(ui->stopMRackButton, SIGNAL(clicked()), this, SLOT(onStopMRackButtonClicked()));
@@ -173,21 +174,10 @@ void Groundstation::readoutConnection(){
 //--------------------
 
 //Telecommands
-void Groundstation::telecommand(int ID, QString msg, int value){
-    QString command;
-    command = QString("$%1%2%3#").arg(QString::number(ID), msg, QString::number(value));
-    link.connectionSendData(5555, command.toLocal8Bit());
-    //imager.sendCommand(command);
-}
-
-void Groundstation::telecommand(int ID, QString msg, QString sign, int value){
-    QString command;
-    command = QString("$%1").arg(QString::number(ID));
-    command.append(msg);
-    command.append(sign);
-    command.append(QString("%1#").arg(QString::number(value)));
-    link.connectionSendData(5555, command.toLocal8Bit());
-    //imager.sendCommand(command);
+void Groundstation::telecommand(int ID, QByteArray identifier, bool active, int speed){
+    //Command com(ID, identifier, active, speed);
+    //link.connectionSendCommand(TELECOMMAND_TOPIC_ID, com);
+    imager.sendCommand(ui->HBALineEdit->text());
 }
 
 //Top Row
@@ -203,14 +193,14 @@ void Groundstation::onClosePortButtonClicked(){
 
 void Groundstation::onActivateTelemetryButtonClicked(){
     console("Activating telemetry.");
-    telecommand(5, "TEL", 1);
+    telecommand(5, "TEL", true, 0);
     ui->telemetryLED->setChecked(true);
     key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
 }
 
 void Groundstation::onDeactivateTelemetryButtonClicked(){
     console("Deactivating telemetry.");
-    telecommand(5, "TEL", 0);
+    telecommand(5, "TEL", false, 0);
     ui->telemetryLED->setChecked(false);
 }
 
@@ -220,108 +210,110 @@ void Groundstation::onRestartWifiButtonClicked(){
 
 void Groundstation::onEmergencyOffButtonClicked(){
     console("EMERGENCY OFF: Disengaging all electrical components.");
-    telecommand(3, "SPA", "+", 0);
-    telecommand(3, "SPB", "+", 0);
-    telecommand(3, "SPC", "+", 0);
-    telecommand(3, "AKN", 0);
-    telecommand(3, "AMA", 0);
-    telecommand(3, "ALS", 0);
+    telecommand(3, "SPA", true, 0);
+    telecommand(3, "SPB", true, 0);
+    telecommand(3, "SPC", true, 0);
+    telecommand(3, "AKN", false, 0);
+    telecommand(3, "AMA", false, 0);
+    telecommand(3, "ALS", false, 0);
 }
 
 //General Tab
 void Groundstation::onCalibrateMagnetometerButtonClicked(){
     console("Magnetometer calibration started.");
-    telecommand(1, "CMA", 1);
+    telecommand(1, "CMA", true, 0);
 }
 
 void Groundstation::onCalibrateAccelerometerButtonClicked(){
     console("Accelerometer calibration started.");
-    telecommand(1, "CAC", 1);
+    telecommand(1, "CAC", true, 0);
 }
 
 void Groundstation::onCalibrateGyroscopeButtonClicked(){
     console("Gyroscope calibration started.");
-    telecommand(1, "CGY", 1);
+    telecommand(1, "CGY", true, 0);
 }
 
 void Groundstation::onSetHBAButtonClicked(){
     int speedPercent;
     bool ok;
     speedPercent = ui->HBALineEdit->text().toInt(&ok, 10);
-    if(ok && (100 >= speedPercent) && (speedPercent >= 0)){
+    if(ok && (100 >= speedPercent) && (speedPercent >= -100)){
         console(QString("Setting HBridge A motor speed to %1 percent.").arg(speedPercent));
-        telecommand(3, "SPA", "+", abs(speedPercent));
+        telecommand(3, "SPA", true, speedPercent);
     }
-    else if(ok && (0 > speedPercent) && (speedPercent >= -100)){
-        console(QString("Setting HBridge A motor speed to %1 percent.").arg(speedPercent));
-        telecommand(3, "SPA", "-", abs(speedPercent));
-    }
-    else
+    else{
         console("Given motor speed percentage invalid.");
+    }
+}
+
+void Groundstation::onStopHBAButtonClicked(){
+    console("Stopping HBridge A motor.");
+    telecommand(3, "SPA", true, 0);
 }
 
 void Groundstation::onDeployMRackButtonClicked(){
-    telecommand(3, "SPB", "+", 50);
-    console(QString("Setting magnet rack actuator speed to +50 percent."));
+    telecommand(3, "SPB", true, 10);
+    console(QString("Setting magnet rack actuator speed to +10 percent."));
 }
 
 void Groundstation::onPullMRackButtonClicked(){
-    telecommand(3, "SPB", "-", 50);
-    console(QString("Setting magnet rack actuator speed to -50 percent."));
+    telecommand(3, "SPB", true, -10);
+    console(QString("Setting magnet rack actuator speed to -10 percent."));
 }
 
 void Groundstation::onStopMRackButtonClicked(){
-    telecommand(3, "SPB", "+", 0);
+    telecommand(3, "SPB", true, 0);
     console(QString("Stopping magnet rack actuator."));
 }
 
 void Groundstation::onDeployCRackButtonClicked(){
-    telecommand(3, "SPC", "+", 50);
+    telecommand(3, "SPC", true, -10);
     console(QString("Setting counterweight rack actuator speed to +50 percent."));
 }
 
 void Groundstation::onPullCRackButtonClicked(){
-    telecommand(3, "SPC", "-", 50);
+    telecommand(3, "SPC", true, +10);
     console(QString("Setting counterweight rack actuator speed to -50 percent."));
 }
 
 void Groundstation::onStopCRackButtonClicked(){
-    telecommand(3, "SPC", "+", 0);
+    telecommand(3, "SPC", true, 0);
     console(QString("Stopping counterweight rack actuator."));
 }
 
 void Groundstation::onActivateThermalKnifeButtonClicked(){
     console("Activating thermal knife.");
-    telecommand(3, "AKN", 1);
+    telecommand(3, "AKN", true, 0);
 }
 
 void Groundstation::onDeactivateThermalKnifeButtonClicked(){
     console("Deactivating thermal knife.");
-    telecommand(3, "AKN", 0);
+    telecommand(3, "AKN", false, 0);
 }
 
 void Groundstation::onActivateElectromagnetButtonClicked(){
     console("Activating electromagnet.");
-    telecommand(3, "AMA", 1);
+    telecommand(3, "AMA", true, 0);
 }
 
 void Groundstation::onDeactivateElectromagnetButtonClicked(){
     console("Deactivating electromagnet.");
-    telecommand(3, "AMA", 0);
+    telecommand(3, "AMA", false, 0);
 }
 
 void Groundstation::onActivateLightsensorButtonClicked(){
     console("Activating lightsensor.");
-    telecommand(3, "ALS", 1);
+    telecommand(3, "ALS", true, 0);
 }
 
 void Groundstation::onDeactivateLightsensorButtonClicked(){
     console("Deactivating lightsensor.");
-    telecommand(3, "ALS", 0);
+    telecommand(3, "ALS", false, 0);
 }
 
 void Groundstation::onTakePictureButtonClicked(){
-    telecommand(4, "PIC", 1);
+    telecommand(4, "PIC", true, 0);
 
 }
 
@@ -332,7 +324,7 @@ void Groundstation::onOrientationSetButtonClicked(){
     angle = ui->orientationLineEdit->text().toInt(&ok, 10);
     if(ok && (360 >= angle) && (angle >= 0)){
         console(QString("Setting orientation to %1 degrees.").arg(angle));
-        telecommand(3, "STE", angle);
+        telecommand(3, "STE", true, angle);
     }
     else
         console("Orientation angle invalid.");
@@ -340,7 +332,7 @@ void Groundstation::onOrientationSetButtonClicked(){
 
 void Groundstation::onOrientationResetButtonClicked(){
     console("Resetting to N-S-orientation.");
-    telecommand(3, "STE", 0);
+    telecommand(3, "STE", true, 0);
 }
 
 void Groundstation::onSetRotationButtonClicked(){

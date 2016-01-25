@@ -57,3 +57,14 @@ PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsenso
 //        image[i] = *(uint8_t*)(payload.userData + i * sizeof(uint8_t));
 //    }
 //}
+
+Command::Command(int tc_id, QByteArray tc_identifier, bool tc_active, int tc_value){
+    id = tc_id;
+//    for(int i = 0; i<3; i++){
+//        identifier[i] = tc_identifier.at(i);
+//    }
+    strcpy(identifier, tc_identifier.data());
+    active = tc_active;
+    value = tc_value;
+}
+

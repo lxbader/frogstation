@@ -872,7 +872,7 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QPushButton" name="pushButton">
+                      <widget class="QPushButton" name="stopHBAButton">
                        <property name="text">
                         <string>Stop</string>
                        </property>
@@ -1717,6 +1717,18 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                      <layout class="QHBoxLayout" name="horizontalLayout">
                       <item>
                        <widget class="QLabel" name="missionInputLabel">
+                        <property name="minimumSize">
+                         <size>
+                          <width>200</width>
+                          <height>150</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>200</width>
+                          <height>150</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string/>
                         </property>

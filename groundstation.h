@@ -14,6 +14,7 @@
 #include "imagelink.h"
 
 #define XAXIS_VISIBLE_TIME 30
+#define TELECOMMAND_TOPIC_ID 5555
 
 using namespace std;
 
@@ -36,8 +37,7 @@ private:
     Ui::Groundstation *ui;
 
     double key;
-    void telecommand(int ID, QString msg, int value);
-    void telecommand(int ID, QString msg, QString sign, int value);
+    void telecommand(int ID, QByteArray identifier, bool active, int speed);
     void setupGraphs();
     void console(QString msg);
 
@@ -65,6 +65,7 @@ private slots:
     void onCalibrateGyroscopeButtonClicked();
 
     void onSetHBAButtonClicked();
+    void onStopHBAButtonClicked();
     void onDeployMRackButtonClicked();
     void onPullMRackButtonClicked();
     void onStopMRackButtonClicked();
@@ -99,5 +100,7 @@ private slots:
     void telemetryCheck();
     void updateBluetoothLED();
 };
+
+
 
 #endif // GROUNDSTATION_H

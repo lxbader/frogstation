@@ -10,7 +10,6 @@
 #define LOCAL_IP "192.168.1.116"
 #define SATELLITE_IP "192.168.1.255"
 
-#define TELECOMMAND_TOPIC_ID 5555
 
 class Connection : public QObject
 {
@@ -37,8 +36,8 @@ public:
 
     explicit Connection(QObject *parent = 0, bool checkChecksum = false);
     void addTopic(PayloadType);
-    int connectionSendData(quint32 topicId, const QByteArray &data);
-    void connectionSendCommand(QString msg);
+    void connectionSendData(quint32 topicId, const QByteArray &data);
+    void connectionSendCommand(quint32 topicID, const Command &telecommand);
     PayloadSatellite read();
     bool isBound();
     bool isReadReady();    

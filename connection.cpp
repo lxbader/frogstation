@@ -42,7 +42,7 @@ void Connection::connectionReceive(){
     }
 }
 
-int Connection::connectionSendData(quint32 topicId, const QByteArray &data){
+void Connection::connectionSendData(quint32 topicId, const QByteArray &data){
     QByteArray buffer(1023, 0x00);
 
     *((quint32*)(buffer.data() + 2)) = qToBigEndian((quint32)1);
@@ -66,17 +66,18 @@ int Connection::connectionSendData(quint32 topicId, const QByteArray &data){
     }
     *((quint16*)(buffer.data() + 0)) = qToBigEndian((quint16)checksum);
 
-    //console(QString("%1").arg(buffer));
-    //console(buffer);
-
-    return udpSocket.writeDatagram(buffer.constData(), buffer.size(), remoteAddress, port);
+    udpSocket.writeDatagram(buffer.constData(), buffer.size(), remoteAddress, port);
 }
 
-void Connection::connectionSendCommand(QString command){
-    QByteArray data = command.toLocal8Bit();
-    console(QString("Sending telecommand \"%1\".").arg(command));
-    connectionSendData(TELECOMMAND_TOPIC_ID, data);
-    return;
+void Connection::connectionSendCommand(quint32 topicID, const Command &telecommand){
+    QByteArray buffer(sizeof(Command), 0x00);
+    memcpy(buffer.data(), (char*)&telecommand, sizeof(Command));
+    console("Command information:");
+    console(QString("ID: %1").arg(telecommand.id));
+    console(QString("Identifier: %1").arg(telecommand.identifier));
+    console(QString("Active: %1").arg(telecommand.active));
+    console(QString("Value: %1").arg(telecommand.value));
+    connectionSendData(topicID, buffer);
 }
 
 void Connection::addTopic(PayloadType topicId){

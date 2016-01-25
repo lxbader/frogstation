@@ -76,43 +76,68 @@ void Imagelink::sendCommand(QString command){
 void Imagelink::readData(){
     console("Bluetooth package received.");
     QByteArray data = bluetoothPort->readAll();
-    if(data.startsWith("FRAME START") && data.endsWith("FRAME STOP")){
-        data.remove(0, 11);
-        data.remove(data.length()-10, 10);
-        imageBuffer = data;
-        console(data);
-    }else if(data.startsWith("FRAME START")){
-        data.remove(0, 11);
-        imageBuffer = data;
-        imageTransmitActive = true;
-        console(data);
-    }else if(imageTransmitActive && data.endsWith("FRAME STOP")){
-        data.remove(data.length()-10, 10);
-        imageBuffer.append(data);
-        console(data);
-        imageTransmitActive = false;
-        console("Image transfer complete.");
+    imageBuffer.append(data);
+//    if(data.startsWith("FRAME START") && data.endsWith("FRAME STOP\n")){
+//        data.remove(0, 11);
+//        data.remove(data.length()-10, 10);
+//        imageBuffer = data;
+//        console(data);
+//    }else if(data.startsWith("FRAME START")){
+//        data.remove(0, 11);
+//        imageBuffer = data;
+//        imageTransmitActive = true;
+//        console(data);
+//    }else if(imageTransmitActive && data.endsWith("FRAME STOP\n")){
+//        data.remove(data.length()-10, 10);
+//        imageBuffer.append(data);
+//        console(data);
+//        imageTransmitActive = false;
+//        console("Image transfer complete.");
+//        readImage();
+//    }else if(imageTransmitActive){
+//        imageBuffer.append(data);
+//        console(data);
+//    }else{
+//        console("Invalid data format.");
+//        console(data);
+//    }
+    if(data.endsWith("\n")){
+        console("End of transmission.");
         readImage();
-    }else if(imageTransmitActive){
-        imageBuffer.append(data);
-        console(data);
-    }else
-        console("Invalid data format.");
+    }
 }
 
 void Imagelink::readImage(){
+    console("readImage() started");
+    console(imageBuffer);
+
+    QFile file("D:\\rawData.txt");
+    file.open(QIODevice::WriteOnly);
+    file.write(imageBuffer);
+    file.close();
+
+    console("\n\n");
+//    if(( !imageBuffer.startsWith("FRAME START")) || (!imageBuffer.endsWith("FRAME STOP\n"))){
+//        console("Data not fitting for image.");
+//        return;
+//    }
+    imageBuffer.remove(0, 11);
+    imageBuffer.remove(imageBuffer.length()-12, 12);
+
+    QFile file2("D:\\rawData2.txt");
+    file2.open(QIODevice::WriteOnly);
+    file2.write(imageBuffer);
+    file2.close();
+
 
 //FRAME START
 //[i] und [i+1] und [i+2] -> uint8_t
-//FRAME STOP
+//FRAME STOP\n
 
-    for(int i=0; i < imageBuffer.length(); i++){
-        console((QString) imageBuffer.at(i));
-    }
+    console(imageBuffer);
 
-    if(sizeof(imageBuffer) != sizeof(char)*121*160*2*3){
+    if(imageBuffer.length() != 121*160*2*3){
         console("ERROR: Received image package size does not fit required size.");
-        return;
     }
 
     //Extract linear int-array out of data

@@ -65,4 +65,12 @@ struct PayloadElectrical{
 //    PayloadImage(const PayloadSatellite payload);
 //};
 
+struct Command{
+    int id;
+    char identifier[3];
+    bool active;
+    int value;
+    Command(int tc_id, QByteArray tc_identifier, bool tc_active, int tc_value);
+};
+
 #endif // PAYLOAD_H

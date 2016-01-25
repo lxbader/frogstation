@@ -7,6 +7,7 @@
 #include <QtEndian>
 #include <QImage>
 #include <QVector>
+#include <QFile>
 
 #include "stdint.h"
 
