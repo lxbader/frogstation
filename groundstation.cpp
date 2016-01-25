@@ -40,6 +40,7 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(ui->bluetoothComboBox, SIGNAL(activated(int)), this, SLOT(updateBluetoothLED()));
     connect(ui->activateTelemetryButton, SIGNAL(clicked()), this, SLOT(onActivateTelemetryButtonClicked()));
     connect(ui->deactivateTelemetryButton, SIGNAL(clicked()), this, SLOT(onDeactivateTelemetryButtonClicked()));
+    connect(ui->restartWifiButton, SIGNAL(clicked()), this, SLOT(onRestartWifiButtonClicked()));
     connect(ui->emergencyOffButton, SIGNAL(clicked()), this, SLOT(onEmergencyOffButtonClicked()));
 
     //General Tab
@@ -175,8 +176,8 @@ void Groundstation::readoutConnection(){
 void Groundstation::telecommand(int ID, QString msg, int value){
     QString command;
     command = QString("$%1%2%3#").arg(QString::number(ID), msg, QString::number(value));
-//    link.connectionSendCommand(command);
-    imager.sendCommand(command);
+    link.connectionSendData(5555, command.toLocal8Bit());
+    //imager.sendCommand(command);
 }
 
 void Groundstation::telecommand(int ID, QString msg, QString sign, int value){
@@ -185,8 +186,8 @@ void Groundstation::telecommand(int ID, QString msg, QString sign, int value){
     command.append(msg);
     command.append(sign);
     command.append(QString("%1#").arg(QString::number(value)));
-//    link.connectionSendCommand(command);
-    imager.sendCommand(command);
+    link.connectionSendData(5555, command.toLocal8Bit());
+    //imager.sendCommand(command);
 }
 
 //Top Row
@@ -211,6 +212,10 @@ void Groundstation::onDeactivateTelemetryButtonClicked(){
     console("Deactivating telemetry.");
     telecommand(5, "TEL", 0);
     ui->telemetryLED->setChecked(false);
+}
+
+void Groundstation::onRestartWifiButtonClicked(){
+    link.bind();
 }
 
 void Groundstation::onEmergencyOffButtonClicked(){

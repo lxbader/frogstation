@@ -56,6 +56,7 @@ private slots:
     void onClosePortButtonClicked();
     void onActivateTelemetryButtonClicked();
     void onDeactivateTelemetryButtonClicked();
+    void onRestartWifiButtonClicked();
     void onEmergencyOffButtonClicked();
 
     //General Tab
