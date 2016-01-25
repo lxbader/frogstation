@@ -17,6 +17,13 @@
 #define STOPBITS QSerialPort::OneStop
 #define FLOWCONTROL QSerialPort::NoFlowControl
 
+struct PortInfo{
+    QString portName;
+    bool isOpen;
+    PortInfo(QString name, bool open);
+    bool operator==(PortInfo& test);
+};
+
 class Imagelink : public QObject
 {
     Q_OBJECT
@@ -43,6 +50,7 @@ private:
     QByteArray imageBuffer;
     bool imageTransmitActive;
     bool portOpen;
+    QList<PortInfo> list;
 
     void console(QString msg);
     QRgb getRgbValue(uint8_t y, uint8_t cb, uint8_t cr);

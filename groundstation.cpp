@@ -37,6 +37,7 @@ Groundstation::Groundstation(QWidget *parent) :
     //Top Row
     connect(ui->openPortButton, SIGNAL(clicked()), this, SLOT(onOpenPortButtonClicked()));
     connect(ui->closePortButton, SIGNAL(clicked()), this, SLOT(onClosePortButtonClicked()));
+    connect(ui->bluetoothComboBox, SIGNAL(activated(int)), this, SLOT(updateBluetoothLED()));
     connect(ui->activateTelemetryButton, SIGNAL(clicked()), this, SLOT(onActivateTelemetryButtonClicked()));
     connect(ui->deactivateTelemetryButton, SIGNAL(clicked()), this, SLOT(onDeactivateTelemetryButtonClicked()));
     connect(ui->emergencyOffButton, SIGNAL(clicked()), this, SLOT(onEmergencyOffButtonClicked()));
@@ -481,5 +482,6 @@ void Groundstation::telemetryCheck(){
 }
 
 void Groundstation::updateBluetoothLED(){
+    imager.activePortName = ui->bluetoothComboBox->currentText();
     ui->bluetoothLED->setChecked(imager.isOpen());
 }

@@ -6,16 +6,25 @@ Imagelink::Imagelink(QObject *parent) : QObject(parent), consoleText(""), curren
 
 void Imagelink::initializePort(){
     connect(bluetoothPort, SIGNAL(readyRead()), this, SLOT(readData()));
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()){
+        list.append(PortInfo(info.portName(), false));
+    }
     emit updateStatus();
 }
 
 void Imagelink::openPort(){
-    if(activePortName.isEmpty()){
+    QSerialPortInfo activePortInfo;
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()){
+        if(activePortName == info.portName()){
+            activePortInfo = info;
+        }
+    }
+    if(activePortInfo.isNull()){
         console("ERROR: No port selected or port could not be found.");
         return;
     }
-//    activePortName = LOCAL_COMPORT;
-    bluetoothPort->setPortName(activePortName);
+    bluetoothPort->setPort(activePortInfo);
+//    bluetoothPort->setPortName(LOCAL_COMPORT);
     bluetoothPort->setBaudRate(BAUDRATE);
     bluetoothPort->setDataBits(DATABITS);
     bluetoothPort->setParity(PARITY);
@@ -24,6 +33,12 @@ void Imagelink::openPort(){
     if(bluetoothPort->open(QIODevice::ReadWrite)){
         console(QString("Port \"%1\" opened.").arg(activePortName));
         portOpen = true;
+        PortInfo activeInfo = PortInfo(activePortName, false);
+        for(int i = 0; i < list.length(); i++){
+            PortInfo listInfo = list.at(i);
+            if(listInfo == activeInfo)
+                list.replace(i, PortInfo(activePortName, true));
+        }
         emit updateStatus();
     }
     else
@@ -45,6 +60,12 @@ void Imagelink::closePort(){
     bluetoothPort->close();
     console(QString("Port \"%1\" closed.").arg(activePortInfo.portName()));
     portOpen = false;
+    PortInfo activeInfo = PortInfo(activePortName, true);
+    for(int i = 0; i < list.length(); i++){
+        PortInfo listInfo = list.at(i);
+        if(listInfo == activeInfo)
+            list.replace(i, PortInfo(activePortName, false));
+    }
     emit updateStatus();
 }
 
@@ -55,7 +76,12 @@ void Imagelink::sendCommand(QString command){
 void Imagelink::readData(){
     console("Bluetooth package received.");
     QByteArray data = bluetoothPort->readAll();
-    if(data.startsWith("FRAME START")){
+    if(data.startsWith("FRAME START") && data.endsWith("FRAME STOP")){
+        data.remove(0, 11);
+        data.remove(data.length()-10, 10);
+        imageBuffer = data;
+        console(data);
+    }else if(data.startsWith("FRAME START")){
         data.remove(0, 11);
         imageBuffer = data;
         imageTransmitActive = true;
@@ -132,5 +158,23 @@ void Imagelink::console(QString msg){
 }
 
 bool Imagelink::isOpen(){
-    return portOpen;
+    PortInfo activeInfo = PortInfo(activePortName, false);
+    for(int i = 0; i < list.length(); i++){
+        PortInfo listInfo = list.at(i);
+        if(listInfo == activeInfo)
+            return listInfo.isOpen;
+    }
+    console("ERROR: Port problem.");
+    return 0;
+}
+
+PortInfo::PortInfo(QString name, bool open){
+    portName = name;
+    isOpen = open;
+}
+
+bool PortInfo::operator==(PortInfo& test){
+    if(this->portName == test.portName)
+        return true;
+    return false;
 }
