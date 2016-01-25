@@ -60,7 +60,6 @@ void Connection::connectionSendData(quint32 topicId, const QByteArray &data){
             checksum = checksum >> 1 | 0x8000;
         else
             checksum >>= 1;
-
         checksum += (quint8)buffer[i];
         checksum &= 0xFFFF;
     }
@@ -74,7 +73,7 @@ void Connection::connectionSendCommand(quint32 topicID, const Command &telecomma
     memcpy(buffer.data(), (char*)&telecommand, sizeof(Command));
     console("Command information:");
     console(QString("ID: %1").arg(telecommand.id));
-    console(QString("Identifier: %1").arg(telecommand.identifier));
+    console(QString("Identifier: %1").arg(telecommand.identifier.data()));
     console(QString("Active: %1").arg(telecommand.active));
     console(QString("Value: %1").arg(telecommand.value));
     connectionSendData(topicID, buffer);

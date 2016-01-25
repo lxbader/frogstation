@@ -37,7 +37,7 @@ private:
     Ui::Groundstation *ui;
 
     double key;
-    void telecommand(int ID, QByteArray identifier, bool active, int speed);
+    void telecommand(int ID, QByteArray identifier, bool active, float value);
     void setupGraphs();
     void console(QString msg);
 
@@ -51,7 +51,7 @@ private slots:
     //Bluetooth
     void imagelinkUpdateConsole();
 
-    //Top Row
+    //Buttons Top Row
     void onOpenPortButtonClicked();
     void onClosePortButtonClicked();
     void onActivateTelemetryButtonClicked();
@@ -59,7 +59,7 @@ private slots:
     void onRestartWifiButtonClicked();
     void onEmergencyOffButtonClicked();
 
-    //General Tab
+    //Buttons Manual Control Tab
     void onCalibrateMagnetometerButtonClicked();
     void onCalibrateAccelerometerButtonClicked();
     void onCalibrateGyroscopeButtonClicked();
@@ -82,16 +82,14 @@ private slots:
 
     void onTakePictureButtonClicked();
 
-    //Attitude Tab
+    //Buttons Attitude Tab
     void onOrientationSetButtonClicked();
     void onOrientationResetButtonClicked();
     void onSetRotationButtonClicked();
     void onStopRotationButtonClicked();
 
-    //Sun Finder Tab
+    //Buttons Mission Tab
     void onSunFinderButtonClicked();
-
-    //Mission Tab
     void onMissionStartButtonClicked();
     void onMissionAbortButtonClicked();
 

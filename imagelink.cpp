@@ -69,38 +69,25 @@ void Imagelink::closePort(){
     emit updateStatus();
 }
 
-void Imagelink::sendCommand(QString command){
-    bluetoothPort->write(command.toLocal8Bit());
+void Imagelink::sendData(const QByteArray &command){
+    bluetoothPort->write(command);
+}
+
+void Imagelink::sendCommand(const Command &tc){
+    QByteArray buffer(sizeof(Command), 0x00);
+    memcpy(buffer.data(), (char*)&tc, sizeof(Command));
+    console("Command information:");
+    console(QString("ID: %1").arg(tc.id));
+    console(QString("Identifier: %1").arg(tc.identifier.data()));
+    console(QString("Active: %1").arg(tc.active));
+    console(QString("Value: %1").arg(tc.value));
+    sendData(buffer);
 }
 
 void Imagelink::readData(){
-    console("Bluetooth package received.");
+    //console("Bluetooth package received.");
     QByteArray data = bluetoothPort->readAll();
     imageBuffer.append(data);
-//    if(data.startsWith("FRAME START") && data.endsWith("FRAME STOP\n")){
-//        data.remove(0, 11);
-//        data.remove(data.length()-10, 10);
-//        imageBuffer = data;
-//        console(data);
-//    }else if(data.startsWith("FRAME START")){
-//        data.remove(0, 11);
-//        imageBuffer = data;
-//        imageTransmitActive = true;
-//        console(data);
-//    }else if(imageTransmitActive && data.endsWith("FRAME STOP\n")){
-//        data.remove(data.length()-10, 10);
-//        imageBuffer.append(data);
-//        console(data);
-//        imageTransmitActive = false;
-//        console("Image transfer complete.");
-//        readImage();
-//    }else if(imageTransmitActive){
-//        imageBuffer.append(data);
-//        console(data);
-//    }else{
-//        console("Invalid data format.");
-//        console(data);
-//    }
     if(data.endsWith("\n")){
         console("End of transmission.");
         readImage();
@@ -108,47 +95,49 @@ void Imagelink::readData(){
 }
 
 void Imagelink::readImage(){
-    console("readImage() started");
-    console(imageBuffer);
 
+    //FRAME START
+    //[i] and [i+1] and [i+2] -> uint8_t
+    //FRAME STOP\n
+
+    //Readings from maybe fucked up sample image file
     QFile file("D:\\rawData.txt");
-    file.open(QIODevice::WriteOnly);
-    file.write(imageBuffer);
+    file.open(QIODevice::ReadOnly);
+    imageBuffer = file.readAll();
     file.close();
 
-    console("\n\n");
-//    if(( !imageBuffer.startsWith("FRAME START")) || (!imageBuffer.endsWith("FRAME STOP\n"))){
-//        console("Data not fitting for image.");
-//        return;
-//    }
+    //Save image in file for later tests
+//    QFile file2("D:\\rawData2.txt");
+//    file2.open(QIODevice::WriteOnly);
+//    file2.write(imageBuffer);
+//    file2.close();
+
+    if((!imageBuffer.startsWith("FRAME START")) || (!imageBuffer.endsWith("\n"))){
+        console("Data not fitting for image.");
+        return;
+    }
+
+    //Remove flags
     imageBuffer.remove(0, 11);
     imageBuffer.remove(imageBuffer.length()-12, 12);
 
-    QFile file2("D:\\rawData2.txt");
-    file2.open(QIODevice::WriteOnly);
-    file2.write(imageBuffer);
-    file2.close();
-
-
-//FRAME START
-//[i] und [i+1] und [i+2] -> uint8_t
-//FRAME STOP\n
-
-    console(imageBuffer);
-
+    //Check length
     if(imageBuffer.length() != 121*160*2*3){
         console("ERROR: Received image package size does not fit required size.");
+        return;
     }
 
-    //Extract linear int-array out of data
-    QByteArray buffer;
+    //Extract linear uint8-array out of data
+    QByteArray buffer(3,0x00);
     uint8_t orig[121*160*2];
     for(int i = 0; i<(121*160*2); i++){
-        buffer.append(imageBuffer.at(3*i));
-        buffer.append(imageBuffer.at(3*i+1));
-        buffer.append(imageBuffer.at(3*i+2));
+        buffer[0] = (imageBuffer.at(3*i));
+        buffer[1] = (imageBuffer.at(3*i+1));
+        buffer[2] = (imageBuffer.at(3*i+2));
         orig[i] = (uint8_t) buffer.toInt();
     }
+
+    /*Should be alright till here!!!!*/
 
     //Convert linear YCbCr array to RBG image
     QImage rgb(160, 121, QImage::Format_RGB32);
@@ -156,6 +145,7 @@ void Imagelink::readImage(){
     uint8_t cb = 0;
     uint8_t cr = 0;
 
+    //RGB (doesn't work?)
     for(int line = 0; line < 121; line++){
         for(int column = 0; column < 80; column++){
             y   = orig[320*line + 4*column + 1];
@@ -163,9 +153,20 @@ void Imagelink::readImage(){
             cr  = orig[320*line + 4*column + 2];
             rgb.setPixel(2*column, line, getRgbValue(y, cb, cr));
             y   = orig[320*line + 4*column + 3];
-            rgb.setPixel(2*column+1, line, getRgbValue(y,cb,cr));
+            rgb.setPixel(2*column+1, line, getRgbValue(y, cb, cr));
         }
     }
+
+    //Grayscale (not very different of course)
+//    for(int line = 0; line < 121; line++){
+//        for(int column = 0; column < 80; column++){
+//            y   = orig[320*line + 4*column + 1];
+//            rgb.setPixel(2*column, line, qRgb(y, y, y));
+//            y   = orig[320*line + 4*column + 3];
+//            rgb.setPixel(2*column+1, line, qRgb(y, y, y));
+//        }
+//    }
+
     currentImage = rgb;
     emit updateImage();
 }

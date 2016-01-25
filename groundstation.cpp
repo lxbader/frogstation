@@ -83,6 +83,9 @@ Groundstation::Groundstation(QWidget *parent) :
 
     //Set up graph widgets
     setupGraphs();
+
+    //Test Image
+    imager.readImage();
 }
 
 Groundstation::~Groundstation()
@@ -174,10 +177,17 @@ void Groundstation::readoutConnection(){
 //--------------------
 
 //Telecommands
-void Groundstation::telecommand(int ID, QByteArray identifier, bool active, int speed){
-    //Command com(ID, identifier, active, speed);
-    //link.connectionSendCommand(TELECOMMAND_TOPIC_ID, com);
-    imager.sendCommand(ui->HBALineEdit->text());
+void Groundstation::telecommand(int ID, QByteArray identifier, bool active, float value){
+    /*WIFI*/
+//    Command com(ID, identifier, active, value);
+//    link.connectionSendCommand(TELECOMMAND_TOPIC_ID, com);
+
+    /*BLUETOOTH*/
+//    imager.sendCommand(com);
+
+    /*OLD BLUETOOTH TYPE BY HAND*/
+    imager.sendData(ui->HBALineEdit->text().toLocal8Bit());
+
 }
 
 //Top Row
@@ -218,7 +228,7 @@ void Groundstation::onEmergencyOffButtonClicked(){
     telecommand(3, "ALS", false, 0);
 }
 
-//General Tab
+//Manual Control Tab
 void Groundstation::onCalibrateMagnetometerButtonClicked(){
     console("Magnetometer calibration started.");
     telecommand(1, "CMA", true, 0);
@@ -235,9 +245,9 @@ void Groundstation::onCalibrateGyroscopeButtonClicked(){
 }
 
 void Groundstation::onSetHBAButtonClicked(){
-    int speedPercent;
+    float speedPercent;
     bool ok;
-    speedPercent = ui->HBALineEdit->text().toInt(&ok, 10);
+    speedPercent = ui->HBALineEdit->text().toFloat(&ok);
     if(ok && (100 >= speedPercent) && (speedPercent >= -100)){
         console(QString("Setting HBridge A motor speed to %1 percent.").arg(speedPercent));
         telecommand(3, "SPA", true, speedPercent);
@@ -319,9 +329,9 @@ void Groundstation::onTakePictureButtonClicked(){
 
 //Attitude Tab
 void Groundstation::onOrientationSetButtonClicked(){
-    int angle;
+    float angle;
     bool ok;
-    angle = ui->orientationLineEdit->text().toInt(&ok, 10);
+    angle = ui->orientationLineEdit->text().toFloat(&ok);
     if(ok && (360 >= angle) && (angle >= 0)){
         console(QString("Setting orientation to %1 degrees.").arg(angle));
         telecommand(3, "STE", true, angle);
@@ -343,12 +353,12 @@ void Groundstation::onStopRotationButtonClicked(){
 
 }
 
-//Sun Finder Tab
+//Mission Tab
+
 void Groundstation::onSunFinderButtonClicked(){
 
 }
 
-//Mission Tab
 void Groundstation::onMissionStartButtonClicked(){
 
 }

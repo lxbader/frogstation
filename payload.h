@@ -67,10 +67,10 @@ struct PayloadElectrical{
 
 struct Command{
     int id;
-    char identifier[3];
+    QByteArray identifier;
     bool active;
-    int value;
-    Command(int tc_id, QByteArray tc_identifier, bool tc_active, int tc_value);
+    float value;
+    Command(int tc_id, QByteArray tc_identifier, bool tc_active, float tc_value);
 };
 
 #endif // PAYLOAD_H

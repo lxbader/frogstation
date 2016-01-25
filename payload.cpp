@@ -58,13 +58,7 @@ PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsenso
 //    }
 //}
 
-Command::Command(int tc_id, QByteArray tc_identifier, bool tc_active, int tc_value){
-    id = tc_id;
-//    for(int i = 0; i<3; i++){
-//        identifier[i] = tc_identifier.at(i);
-//    }
-    strcpy(identifier, tc_identifier.data());
-    active = tc_active;
-    value = tc_value;
+Command::Command(int tc_id, QByteArray tc_identifier, bool tc_active, float tc_value): id(tc_id), identifier(tc_identifier), active(tc_active), value(tc_value){
+
 }
 

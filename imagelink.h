@@ -8,8 +8,11 @@
 #include <QImage>
 #include <QVector>
 #include <QFile>
+#include<QColor>
 
 #include "stdint.h"
+
+#include "payload.h"
 
 #define LOCAL_COMPORT "COM3"
 #define BAUDRATE QSerialPort::Baud115200
@@ -38,8 +41,10 @@ public:
     void initializePort();
     void openPort();
     void closePort();
-    void sendCommand(QString command);
+    void sendData(const QByteArray &command);
+    void sendCommand(const Command &tc);
     bool isOpen();
+    void readImage();
 
 signals:
     void updateConsole();
@@ -55,7 +60,7 @@ private:
 
     void console(QString msg);
     QRgb getRgbValue(uint8_t y, uint8_t cb, uint8_t cr);
-    void readImage();
+//    void readImage();
 
 private slots:
     void readData();
