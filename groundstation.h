@@ -14,7 +14,12 @@
 #include "imagelink.h"
 
 #define XAXIS_VISIBLE_TIME 30
-#define TELECOMMAND_TOPIC_ID 5555
+
+#define ID_CALIBRATE 1
+#define ID_ATTITUDE 2
+#define ID_ELECTRICAL 3
+#define ID_PICTURE 4
+#define ID_MISSION 5
 
 using namespace std;
 
@@ -37,7 +42,7 @@ private:
     Ui::Groundstation *ui;
 
     double key;
-    void telecommand(int ID, QByteArray identifier, bool active, float value);
+    void telecommand(int ID, int identifier, bool active, float value);
     void setupGraphs();
     void console(QString msg);
 
@@ -54,31 +59,16 @@ private slots:
     //Buttons Top Row
     void onOpenPortButtonClicked();
     void onClosePortButtonClicked();
-    void onActivateTelemetryButtonClicked();
-    void onDeactivateTelemetryButtonClicked();
     void onRestartWifiButtonClicked();
     void onEmergencyOffButtonClicked();
 
     //Buttons Manual Control Tab
-    void onCalibrateMagnetometerButtonClicked();
-    void onCalibrateAccelerometerButtonClicked();
-    void onCalibrateGyroscopeButtonClicked();
+    void onDeployRacksButtonClicked();
+    void onPullRacksButtonClicked();
+    void onStopRacksButtonClicked();
 
-    void onSetHBAButtonClicked();
-    void onStopHBAButtonClicked();
-    void onDeployMRackButtonClicked();
-    void onPullMRackButtonClicked();
-    void onStopMRackButtonClicked();
-    void onDeployCRackButtonClicked();
-    void onPullCRackButtonClicked();
-    void onStopCRackButtonClicked();
-
-    void onActivateThermalKnifeButtonClicked();
-    void onDeactivateThermalKnifeButtonClicked();
     void onActivateElectromagnetButtonClicked();
     void onDeactivateElectromagnetButtonClicked();
-    void onActivateLightsensorButtonClicked();
-    void onDeactivateLightsensorButtonClicked();
 
     void onTakePictureButtonClicked();
 

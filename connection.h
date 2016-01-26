@@ -10,6 +10,8 @@
 #define LOCAL_IP "192.168.1.116"
 #define SATELLITE_IP "192.168.1.255"
 
+#define TELECOMMAND_TOPIC_ID 5555
+
 
 class Connection : public QObject
 {

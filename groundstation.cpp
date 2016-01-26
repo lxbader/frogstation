@@ -38,32 +38,15 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(ui->openPortButton, SIGNAL(clicked()), this, SLOT(onOpenPortButtonClicked()));
     connect(ui->closePortButton, SIGNAL(clicked()), this, SLOT(onClosePortButtonClicked()));
     connect(ui->bluetoothComboBox, SIGNAL(activated(int)), this, SLOT(updateBluetoothLED()));
-    connect(ui->activateTelemetryButton, SIGNAL(clicked()), this, SLOT(onActivateTelemetryButtonClicked()));
-    connect(ui->deactivateTelemetryButton, SIGNAL(clicked()), this, SLOT(onDeactivateTelemetryButtonClicked()));
     connect(ui->restartWifiButton, SIGNAL(clicked()), this, SLOT(onRestartWifiButtonClicked()));
     connect(ui->emergencyOffButton, SIGNAL(clicked()), this, SLOT(onEmergencyOffButtonClicked()));
 
-    //General Tab
-    connect(ui->calibrateMagnetometerButton, SIGNAL(clicked()), this, SLOT(onCalibrateMagnetometerButtonClicked()));
-    connect(ui->calibrateAccelerometerButton, SIGNAL(clicked()), this, SLOT(onCalibrateAccelerometerButtonClicked()));
-    connect(ui->calibrateGyroscopeButton, SIGNAL(clicked()), this, SLOT(onCalibrateGyroscopeButtonClicked()));
-
-    connect(ui->setHBAButton, SIGNAL(clicked()), this, SLOT(onSetHBAButtonClicked()));
-    connect(ui->stopHBAButton, SIGNAL(clicked()), this, SLOT(onStopHBAButtonClicked()));
-    connect(ui->deployMRackButton, SIGNAL(clicked()), this, SLOT(onDeployMRackButtonClicked()));
-    connect(ui->pullMRackButton, SIGNAL(clicked()), this, SLOT(onPullMRackButtonClicked()));
-    connect(ui->stopMRackButton, SIGNAL(clicked()), this, SLOT(onStopMRackButtonClicked()));
-    connect(ui->deployCRackButton, SIGNAL(clicked()), this, SLOT(onDeployCRackButtonClicked()));
-    connect(ui->pullCRackButton, SIGNAL(clicked()), this, SLOT(onPullCRackButtonClicked()));
-    connect(ui->stopCRackButton, SIGNAL(clicked()), this, SLOT(onStopCRackButtonClicked()));
-
-    connect(ui->activateThermalKnifeButton, SIGNAL(clicked()), this, SLOT(onActivateThermalKnifeButtonClicked()));
-    connect(ui->deactivateThermalKnifeButton, SIGNAL(clicked()), this, SLOT(onDeactivateThermalKnifeButtonClicked()));
+    //Manual Control Tab
+    connect(ui->deployRacksButton, SIGNAL(clicked()), this, SLOT(onDeployRacksButtonClicked()));
+    connect(ui->pullRacksButton, SIGNAL(clicked()), this, SLOT(onPullRacksButtonClicked()));
+    connect(ui->stopRacksButton, SIGNAL(clicked()), this, SLOT(onStopRacksButtonClicked()));
     connect(ui->activateElectromagnetButton, SIGNAL(clicked()), this, SLOT(onActivateElectromagnetButtonClicked()));
     connect(ui->deactivateElectromagnetButton, SIGNAL(clicked()), this, SLOT(onDeactivateElectromagnetButtonClicked()));
-    connect(ui->activateLightsensorButton, SIGNAL(clicked()), this, SLOT(onActivateLightsensorButtonClicked()));
-    connect(ui->deactivateLightsensorButton, SIGNAL(clicked()), this, SLOT(onDeactivateLightsensorButtonClicked()));
-
     connect(ui->takePictureButton, SIGNAL(clicked()), this, SLOT(onTakePictureButtonClicked()));
 
     //Attitude Tab
@@ -85,7 +68,7 @@ Groundstation::Groundstation(QWidget *parent) :
     setupGraphs();
 
     //Test Image
-    imager.readImage();
+    //imager.readImage();
 }
 
 Groundstation::~Groundstation()
@@ -146,13 +129,13 @@ void Groundstation::readoutConnection(){
     case PayloadElectricalType:{
         //console("Package of type \"Electrical\" received.");
         PayloadElectrical pelec(payload);
-        ui->solarLCD->display(pelec.light);
+        ui->solarLCD->display((int) pelec.light);
         ui->lightsensorLED->setChecked(pelec.lightsensorOn);
         ui->electromagnetLED->setChecked(pelec.electromagnetOn);
         ui->thermalKnifeLED->setChecked(pelec.thermalKnifeOn);
 
         key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
-        ui->sunFinderWidget->graph(0)->addData(key, pelec.light);
+        ui->sunFinderWidget->graph(0)->addData(key, (int) pelec.light);
         ui->sunFinderWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
         ui->sunFinderWidget->graph(0)->rescaleValueAxis();
         ui->sunFinderWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
@@ -177,17 +160,16 @@ void Groundstation::readoutConnection(){
 //--------------------
 
 //Telecommands
-void Groundstation::telecommand(int ID, QByteArray identifier, bool active, float value){
+void Groundstation::telecommand(int ID, int identifier, bool active, float value){
     /*WIFI*/
-//    Command com(ID, identifier, active, value);
-//    link.connectionSendCommand(TELECOMMAND_TOPIC_ID, com);
+    Command com(ID, identifier, active, value);
+    link.connectionSendCommand(TELECOMMAND_TOPIC_ID, com);
 
     /*BLUETOOTH*/
 //    imager.sendCommand(com);
 
     /*OLD BLUETOOTH TYPE BY HAND*/
-    imager.sendData(ui->HBALineEdit->text().toLocal8Bit());
-
+//    imager.sendData(ui->HBALineEdit->text().toLocal8Bit());
 }
 
 //Top Row
@@ -201,130 +183,47 @@ void Groundstation::onClosePortButtonClicked(){
     imager.closePort();
 }
 
-void Groundstation::onActivateTelemetryButtonClicked(){
-    console("Activating telemetry.");
-    telecommand(5, "TEL", true, 0);
-    ui->telemetryLED->setChecked(true);
-    key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
-}
-
-void Groundstation::onDeactivateTelemetryButtonClicked(){
-    console("Deactivating telemetry.");
-    telecommand(5, "TEL", false, 0);
-    ui->telemetryLED->setChecked(false);
-}
-
 void Groundstation::onRestartWifiButtonClicked(){
     link.bind();
 }
 
 void Groundstation::onEmergencyOffButtonClicked(){
     console("EMERGENCY OFF: Disengaging all electrical components.");
-    telecommand(3, "SPA", true, 0);
-    telecommand(3, "SPB", true, 0);
-    telecommand(3, "SPC", true, 0);
-    telecommand(3, "AKN", false, 0);
-    telecommand(3, "AMA", false, 0);
-    telecommand(3, "ALS", false, 0);
+    telecommand(ID_ELECTRICAL, 3003, true, 0); //Stop racks
+    telecommand(ID_ELECTRICAL, 3004, false, 0); //Turn off electromagnet
+    telecommand(ID_ELECTRICAL, 3005, false, 0); //Turn off thermal knife
+    telecommand(ID_ELECTRICAL, 3006, false, 0); //Stop main motor
 }
 
 //Manual Control Tab
-void Groundstation::onCalibrateMagnetometerButtonClicked(){
-    console("Magnetometer calibration started.");
-    telecommand(1, "CMA", true, 0);
+void Groundstation::onDeployRacksButtonClicked(){
+    console("Deploying racks...");
+    telecommand(ID_ELECTRICAL, 3001, true, 0);
 }
 
-void Groundstation::onCalibrateAccelerometerButtonClicked(){
-    console("Accelerometer calibration started.");
-    telecommand(1, "CAC", true, 0);
+void Groundstation::onPullRacksButtonClicked(){
+    console("Pulling in racks...");
+    telecommand(ID_ELECTRICAL, 3002, true, 0);
 }
 
-void Groundstation::onCalibrateGyroscopeButtonClicked(){
-    console("Gyroscope calibration started.");
-    telecommand(1, "CGY", true, 0);
-}
-
-void Groundstation::onSetHBAButtonClicked(){
-    float speedPercent;
-    bool ok;
-    speedPercent = ui->HBALineEdit->text().toFloat(&ok);
-    if(ok && (100 >= speedPercent) && (speedPercent >= -100)){
-        console(QString("Setting HBridge A motor speed to %1 percent.").arg(speedPercent));
-        telecommand(3, "SPA", true, speedPercent);
-    }
-    else{
-        console("Given motor speed percentage invalid.");
-    }
-}
-
-void Groundstation::onStopHBAButtonClicked(){
-    console("Stopping HBridge A motor.");
-    telecommand(3, "SPA", true, 0);
-}
-
-void Groundstation::onDeployMRackButtonClicked(){
-    telecommand(3, "SPB", true, 10);
-    console(QString("Setting magnet rack actuator speed to +10 percent."));
-}
-
-void Groundstation::onPullMRackButtonClicked(){
-    telecommand(3, "SPB", true, -10);
-    console(QString("Setting magnet rack actuator speed to -10 percent."));
-}
-
-void Groundstation::onStopMRackButtonClicked(){
-    telecommand(3, "SPB", true, 0);
-    console(QString("Stopping magnet rack actuator."));
-}
-
-void Groundstation::onDeployCRackButtonClicked(){
-    telecommand(3, "SPC", true, -10);
-    console(QString("Setting counterweight rack actuator speed to +50 percent."));
-}
-
-void Groundstation::onPullCRackButtonClicked(){
-    telecommand(3, "SPC", true, +10);
-    console(QString("Setting counterweight rack actuator speed to -50 percent."));
-}
-
-void Groundstation::onStopCRackButtonClicked(){
-    telecommand(3, "SPC", true, 0);
-    console(QString("Stopping counterweight rack actuator."));
-}
-
-void Groundstation::onActivateThermalKnifeButtonClicked(){
-    console("Activating thermal knife.");
-    telecommand(3, "AKN", true, 0);
-}
-
-void Groundstation::onDeactivateThermalKnifeButtonClicked(){
-    console("Deactivating thermal knife.");
-    telecommand(3, "AKN", false, 0);
+void Groundstation::onStopRacksButtonClicked(){
+    console("Stopping racks...");
+    telecommand(ID_ELECTRICAL, 3003, true, 0);
 }
 
 void Groundstation::onActivateElectromagnetButtonClicked(){
     console("Activating electromagnet.");
-    telecommand(3, "AMA", true, 0);
+    telecommand(ID_ELECTRICAL, 3004, true, 0);
 }
 
 void Groundstation::onDeactivateElectromagnetButtonClicked(){
     console("Deactivating electromagnet.");
-    telecommand(3, "AMA", false, 0);
-}
-
-void Groundstation::onActivateLightsensorButtonClicked(){
-    console("Activating lightsensor.");
-    telecommand(3, "ALS", true, 0);
-}
-
-void Groundstation::onDeactivateLightsensorButtonClicked(){
-    console("Deactivating lightsensor.");
-    telecommand(3, "ALS", false, 0);
+    telecommand(ID_ELECTRICAL, 3004, false, 0);
 }
 
 void Groundstation::onTakePictureButtonClicked(){
-    telecommand(4, "PIC", true, 0);
-
+    console("Taking picture.");
+    telecommand(ID_PICTURE, 4001, true, 0);
 }
 
 //Attitude Tab
@@ -334,7 +233,7 @@ void Groundstation::onOrientationSetButtonClicked(){
     angle = ui->orientationLineEdit->text().toFloat(&ok);
     if(ok && (360 >= angle) && (angle >= 0)){
         console(QString("Setting orientation to %1 degrees.").arg(angle));
-        telecommand(3, "STE", true, angle);
+        telecommand(ID_ATTITUDE, 2002, true, angle);
     }
     else
         console("Orientation angle invalid.");
@@ -342,31 +241,41 @@ void Groundstation::onOrientationSetButtonClicked(){
 
 void Groundstation::onOrientationResetButtonClicked(){
     console("Resetting to N-S-orientation.");
-    telecommand(3, "STE", true, 0);
+    telecommand(ID_ATTITUDE, 2002, true, 0);
 }
 
 void Groundstation::onSetRotationButtonClicked(){
-
+    float angle;
+    bool ok;
+    angle = ui->rotationLineEdit->text().toFloat(&ok);
+    if(ok && (360 >= angle) && (angle >= -360)){
+        console(QString("Setting orientation to %1 degrees.").arg(angle));
+        telecommand(ID_ATTITUDE, 2001, true, angle);
+    }
+    else
+        console("Orientation angle invalid.");
 }
 
 void Groundstation::onStopRotationButtonClicked(){
-
+    console("Stopping rotation.");
+    telecommand(ID_ATTITUDE, 2001, true, 0);
 }
 
 //Mission Tab
-
 void Groundstation::onSunFinderButtonClicked(){
-
+    console("Sun acquisition routine started.");
+    telecommand(ID_MISSION, 5001, true, 0);
 }
 
 void Groundstation::onMissionStartButtonClicked(){
-
+    console("Mission started.");
+    telecommand(ID_MISSION, 5002, true, 0);
 }
 
 void Groundstation::onMissionAbortButtonClicked(){
-
+    console("Mission stopped.");
+    telecommand(ID_MISSION, 5002, false, 0);
 }
-
 
 //------------
 //GRAPH SETUPS
@@ -442,7 +351,7 @@ void Groundstation::setupGraphs(){
     ui->sunFinderWidget->xAxis->setDateTimeFormat("hh:mm:ss");
     ui->sunFinderWidget->xAxis->setAutoTickStep(false);
     ui->sunFinderWidget->xAxis->setTickStep(5);
-    ui->sunFinderWidget->yAxis->setLabel("Solar Voltage");
+    ui->sunFinderWidget->yAxis->setLabel("Lightsensor Data");
     ui->sunFinderWidget->axisRect()->setupFullAxesBox();
     ui->sunFinderWidget->addGraph();
     ui->sunFinderWidget->graph(0)->setPen(QPen(Qt::blue));

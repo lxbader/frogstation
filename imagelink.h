@@ -21,6 +21,10 @@
 #define STOPBITS QSerialPort::OneStop
 #define FLOWCONTROL QSerialPort::NoFlowControl
 
+#define IMAGE_WIDTH 160
+#define IMAGE_HEIGHT 121
+#define IMAGE_PIXELS IMAGE_WIDTH*IMAGE_HEIGHT
+
 struct PortInfo{
     QString portName;
     bool isOpen;

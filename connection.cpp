@@ -65,17 +65,23 @@ void Connection::connectionSendData(quint32 topicId, const QByteArray &data){
     }
     *((quint16*)(buffer.data() + 0)) = qToBigEndian((quint16)checksum);
 
-    udpSocket.writeDatagram(buffer.constData(), buffer.size(), remoteAddress, port);
+    int j = udpSocket.writeDatagram(buffer.constData(), buffer.size(), remoteAddress, port);
+    int k = data.length();
+    console("Datagram sent.");
+    console(QString("Size of sent message: %1 bytes.").arg(j));
+    console(QString("Size of data in sent message: %1 bytes.").arg(k));
 }
 
 void Connection::connectionSendCommand(quint32 topicID, const Command &telecommand){
     QByteArray buffer(sizeof(Command), 0x00);
     memcpy(buffer.data(), (char*)&telecommand, sizeof(Command));
+
     console("Command information:");
     console(QString("ID: %1").arg(telecommand.id));
-    console(QString("Identifier: %1").arg(telecommand.identifier.data()));
+    console(QString("Identifier: %1").arg(telecommand.identifier));
     console(QString("Active: %1").arg(telecommand.active));
     console(QString("Value: %1").arg(telecommand.value));
+
     connectionSendData(topicID, buffer);
 }
 

@@ -87,11 +87,12 @@ void Imagelink::sendCommand(const Command &tc){
 void Imagelink::readData(){
     //console("Bluetooth package received.");
     QByteArray data = bluetoothPort->readAll();
-    imageBuffer.append(data);
-    if(data.endsWith("\n")){
-        console("End of transmission.");
-        readImage();
-    }
+    console(data);
+//    imageBuffer.append(data);
+//    if(data.endsWith("\n")){
+//        console("End of transmission.");
+//        readImage();
+//    }
 }
 
 void Imagelink::readImage(){
@@ -101,13 +102,13 @@ void Imagelink::readImage(){
     //FRAME STOP\n
 
     //Readings from maybe fucked up sample image file
-    QFile file("D:\\rawData.txt");
+    QFile file("D:\\picture.txt");
     file.open(QIODevice::ReadOnly);
     imageBuffer = file.readAll();
     file.close();
 
     //Save image in file for later tests
-//    QFile file2("D:\\rawData2.txt");
+//    QFile file2("D:\\rawData3.txt");
 //    file2.open(QIODevice::WriteOnly);
 //    file2.write(imageBuffer);
 //    file2.close();
@@ -122,15 +123,15 @@ void Imagelink::readImage(){
     imageBuffer.remove(imageBuffer.length()-12, 12);
 
     //Check length
-    if(imageBuffer.length() != 121*160*2*3){
+    if(imageBuffer.length() != IMAGE_PIXELS*2*3){
         console("ERROR: Received image package size does not fit required size.");
         return;
     }
 
     //Extract linear uint8-array out of data
     QByteArray buffer(3,0x00);
-    uint8_t orig[121*160*2];
-    for(int i = 0; i<(121*160*2); i++){
+    uint8_t orig[IMAGE_PIXELS*2];
+    for(int i = 0; i<(IMAGE_PIXELS*2); i++){
         buffer[0] = (imageBuffer.at(3*i));
         buffer[1] = (imageBuffer.at(3*i+1));
         buffer[2] = (imageBuffer.at(3*i+2));
@@ -140,30 +141,32 @@ void Imagelink::readImage(){
     /*Should be alright till here!!!!*/
 
     //Convert linear YCbCr array to RBG image
-    QImage rgb(160, 121, QImage::Format_RGB32);
+    QImage rgb(IMAGE_WIDTH, IMAGE_HEIGHT, QImage::Format_RGB32);
     uint8_t y = 0;
     uint8_t cb = 0;
     uint8_t cr = 0;
 
     //RGB (doesn't work?)
-    for(int line = 0; line < 121; line++){
-        for(int column = 0; column < 80; column++){
-            y   = orig[320*line + 4*column + 1];
-            cb  = orig[320*line + 4*column + 0];
-            cr  = orig[320*line + 4*column + 2];
-            rgb.setPixel(2*column, line, getRgbValue(y, cb, cr));
-            y   = orig[320*line + 4*column + 3];
-            rgb.setPixel(2*column+1, line, getRgbValue(y, cb, cr));
+    for(int line = 0; line < IMAGE_HEIGHT; line++){
+        for(int column = 0; column < IMAGE_WIDTH; column +=2){
+            y   = orig[IMAGE_WIDTH*2*line + 2*column + 1];
+            cb  = orig[IMAGE_WIDTH*2*line + 2*column + 0];
+            cr  = orig[IMAGE_WIDTH*2*line + 2*column + 2];
+            rgb.setPixel(column, line, getRgbValue(y, cb, cr));
+            y   = orig[IMAGE_WIDTH*2*line + 2*column + 3];
+            rgb.setPixel(column+1, line, getRgbValue(y, cb, cr));
         }
     }
 
     //Grayscale (not very different of course)
-//    for(int line = 0; line < 121; line++){
-//        for(int column = 0; column < 80; column++){
-//            y   = orig[320*line + 4*column + 1];
-//            rgb.setPixel(2*column, line, qRgb(y, y, y));
-//            y   = orig[320*line + 4*column + 3];
-//            rgb.setPixel(2*column+1, line, qRgb(y, y, y));
+//    for(int line = 0; line < IMAGE_HEIGHT; line++){
+//        for(int column = 0; column < IMAGE_WIDTH; column +=2){
+//            y   = orig[IMAGE_WIDTH*2*line + 2*column + 1];
+//            cb  = orig[IMAGE_WIDTH*2*line + 2*column + 0];
+//            cr  = orig[IMAGE_WIDTH*2*line + 2*column + 2];
+//            rgb.setPixel(column, line, qRgb(y, y, y));
+//            y   = orig[IMAGE_WIDTH*2*line + 2*column + 3];
+//            rgb.setPixel(column+1, line, qRgb(y, y, y));
 //        }
 //    }
 
