@@ -68,9 +68,8 @@ struct PayloadElectrical{
 struct Command{
     int id;
     int identifier;
-    bool active;
-    float value;
-    Command(int tc_id, int tc_identifier, bool tc_active, float tc_value);
+    int value;
+    Command(int tc_id, int tc_identifier, int tc_value);
 };
 
 #endif // PAYLOAD_H

@@ -160,9 +160,9 @@ void Groundstation::readoutConnection(){
 //--------------------
 
 //Telecommands
-void Groundstation::telecommand(int ID, int identifier, bool active, float value){
+void Groundstation::telecommand(int ID, int identifier, int value){
     /*WIFI*/
-    Command com(ID, identifier, active, value);
+    Command com(ID, identifier, value);
     link.connectionSendCommand(TELECOMMAND_TOPIC_ID, com);
 
     /*BLUETOOTH*/
@@ -189,92 +189,92 @@ void Groundstation::onRestartWifiButtonClicked(){
 
 void Groundstation::onEmergencyOffButtonClicked(){
     console("EMERGENCY OFF: Disengaging all electrical components.");
-    telecommand(ID_ELECTRICAL, 3003, true, 0); //Stop racks
-    telecommand(ID_ELECTRICAL, 3004, false, 0); //Turn off electromagnet
-    telecommand(ID_ELECTRICAL, 3005, false, 0); //Turn off thermal knife
-    telecommand(ID_ELECTRICAL, 3006, false, 0); //Stop main motor
+    telecommand(ID_ELECTRICAL, 3001, 0); //Stop racks
+//    telecommand(ID_ELECTRICAL, 3004, false, 0); //Turn off electromagnet
+//    telecommand(ID_ELECTRICAL, 3005, false, 0); //Turn off thermal knife
+//    telecommand(ID_ELECTRICAL, 3006, false, 0); //Stop main motor
 }
 
 //Manual Control Tab
 void Groundstation::onDeployRacksButtonClicked(){
     console("Deploying racks...");
-    telecommand(ID_ELECTRICAL, 3001, true, 0);
+    telecommand(ID_ELECTRICAL, 3001, 1);
 }
 
 void Groundstation::onPullRacksButtonClicked(){
     console("Pulling in racks...");
-    telecommand(ID_ELECTRICAL, 3002, true, 0);
+    telecommand(ID_ELECTRICAL, 3001, -1);
 }
 
 void Groundstation::onStopRacksButtonClicked(){
     console("Stopping racks...");
-    telecommand(ID_ELECTRICAL, 3003, true, 0);
+    telecommand(ID_ELECTRICAL, 3001, 0);
 }
 
 void Groundstation::onActivateElectromagnetButtonClicked(){
-    console("Activating electromagnet.");
-    telecommand(ID_ELECTRICAL, 3004, true, 0);
+//    console("Activating electromagnet.");
+//    telecommand(ID_ELECTRICAL, 3004, true, 0);
 }
 
 void Groundstation::onDeactivateElectromagnetButtonClicked(){
-    console("Deactivating electromagnet.");
-    telecommand(ID_ELECTRICAL, 3004, false, 0);
+//    console("Deactivating electromagnet.");
+//    telecommand(ID_ELECTRICAL, 3004, false, 0);
 }
 
 void Groundstation::onTakePictureButtonClicked(){
-    console("Taking picture.");
-    telecommand(ID_PICTURE, 4001, true, 0);
+//    console("Taking picture.");
+//    telecommand(ID_PICTURE, 4001, true, 0);
 }
 
 //Attitude Tab
 void Groundstation::onOrientationSetButtonClicked(){
-    float angle;
-    bool ok;
-    angle = ui->orientationLineEdit->text().toFloat(&ok);
-    if(ok && (360 >= angle) && (angle >= 0)){
-        console(QString("Setting orientation to %1 degrees.").arg(angle));
-        telecommand(ID_ATTITUDE, 2002, true, angle);
-    }
-    else
-        console("Orientation angle invalid.");
+//    float angle;
+//    bool ok;
+//    angle = ui->orientationLineEdit->text().toFloat(&ok);
+//    if(ok && (360 >= angle) && (angle >= 0)){
+//        console(QString("Setting orientation to %1 degrees.").arg(angle));
+//        telecommand(ID_ATTITUDE, 2002, true, angle);
+//    }
+//    else
+//        console("Orientation angle invalid.");
 }
 
 void Groundstation::onOrientationResetButtonClicked(){
-    console("Resetting to N-S-orientation.");
-    telecommand(ID_ATTITUDE, 2002, true, 0);
+//    console("Resetting to N-S-orientation.");
+//    telecommand(ID_ATTITUDE, 2002, true, 0);
 }
 
 void Groundstation::onSetRotationButtonClicked(){
-    float angle;
-    bool ok;
-    angle = ui->rotationLineEdit->text().toFloat(&ok);
-    if(ok && (360 >= angle) && (angle >= -360)){
-        console(QString("Setting orientation to %1 degrees.").arg(angle));
-        telecommand(ID_ATTITUDE, 2001, true, angle);
-    }
-    else
-        console("Orientation angle invalid.");
+//    float angle;
+//    bool ok;
+//    angle = ui->rotationLineEdit->text().toFloat(&ok);
+//    if(ok && (360 >= angle) && (angle >= -360)){
+//        console(QString("Setting orientation to %1 degrees.").arg(angle));
+//        telecommand(ID_ATTITUDE, 2001, true, angle);
+//    }
+//    else
+//        console("Orientation angle invalid.");
 }
 
 void Groundstation::onStopRotationButtonClicked(){
-    console("Stopping rotation.");
-    telecommand(ID_ATTITUDE, 2001, true, 0);
+//    console("Stopping rotation.");
+//    telecommand(ID_ATTITUDE, 2001, true, 0);
 }
 
 //Mission Tab
 void Groundstation::onSunFinderButtonClicked(){
-    console("Sun acquisition routine started.");
-    telecommand(ID_MISSION, 5001, true, 0);
+//    console("Sun acquisition routine started.");
+//    telecommand(ID_MISSION, 5001, true, 0);
 }
 
 void Groundstation::onMissionStartButtonClicked(){
-    console("Mission started.");
-    telecommand(ID_MISSION, 5002, true, 0);
+//    console("Mission started.");
+//    telecommand(ID_MISSION, 5002, true, 0);
 }
 
 void Groundstation::onMissionAbortButtonClicked(){
-    console("Mission stopped.");
-    telecommand(ID_MISSION, 5002, false, 0);
+//    console("Mission stopped.");
+//    telecommand(ID_MISSION, 5002, false, 0);
 }
 
 //------------

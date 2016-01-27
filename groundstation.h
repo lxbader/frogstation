@@ -42,7 +42,7 @@ private:
     Ui::Groundstation *ui;
 
     double key;
-    void telecommand(int ID, int identifier, bool active, float value);
+    void telecommand(int ID, int identifier, int value);
     void setupGraphs();
     void console(QString msg);
 
