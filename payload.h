@@ -4,19 +4,18 @@
 #include <QtGlobal>
 #include <QByteArray>
 #include <QtEndian>
+
 #include "stdint.h"
 
 enum PayloadType{
     PayloadCounterType = 5001,
     PayloadSensorIMUType = 5002,
     PayloadElectricalType = 5003,
-//    PayloadImageType = 5004,
 };
 
 struct PayloadCounter;
 struct PayloadSensorIMU;
 struct PayloadElectrical;
-//struct PayloadImage;
 
 struct PayloadSatellite{
     quint16 checksum;
@@ -37,17 +36,17 @@ struct PayloadCounter{
 };
 
 struct PayloadSensorIMU{
-    float ax;       //milli-g
-    float ay;
-    float az;
-    float wx;       //rad/sec
-    float wy;
-    float wz;
-    float roll;     //rad
-    float pitch;
-    float headingFusion;
-    float headingXm;
-    float headingGyro;
+    float ax;               /*milli-g*/
+    float ay;               /*milli-g*/
+    float az;               /*milli-g*/
+    float wx;               /*rad/sec*/
+    float wy;               /*rad/sec*/
+    float wz;               /*rad/sec*/
+    float roll;             /*rad*/
+    float pitch;            /*rad*/
+    float headingFusion;    /*rad*/
+    float headingXm;        /*rad*/
+    float headingGyro;      /*rad*/
     PayloadSensorIMU(const PayloadSatellite payload);
 };
 

@@ -4,6 +4,10 @@
 #include <QUdpSocket>
 #include <QQueue>
 #include <QSet>
+#include <QNetworkInterface>
+#include <QDateTime>
+#include <QtEndian>
+
 #include "payload.h"
 
 #define PORT 37647

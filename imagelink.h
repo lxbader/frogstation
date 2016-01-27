@@ -8,7 +8,8 @@
 #include <QImage>
 #include <QVector>
 #include <QFile>
-#include<QColor>
+#include <QColor>
+#include <QDateTime>
 
 #include "stdint.h"
 
@@ -48,7 +49,7 @@ public:
     void sendData(const QByteArray &command);
     void sendCommand(const Command &tc);
     bool isOpen();
-    void readImage();
+    void readImage(); /*Set public only for offline tests*/
 
 signals:
     void updateConsole();

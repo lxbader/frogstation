@@ -6,67 +6,72 @@ Groundstation::Groundstation(QWidget *parent) :
     ui(new Ui::Groundstation)
 {
     ui->setupUi(this);
+
+    /*Maximize window*/
     setWindowState(windowState() | Qt::WindowMaximized);
 
+    /*Set up console updates from lower classes*/
     connect(&link, SIGNAL(updateConsole()), this, SLOT(connectionUpdateConsole()));
     connect(&imager, SIGNAL(updateConsole()), this, SLOT(imagelinkUpdateConsole()));
 
+    /*Set up Wifi*/
     link.bind();
     link.addTopic(PayloadSensorIMUType);
     link.addTopic(PayloadCounterType);
     link.addTopic(PayloadElectricalType);
-//    link.addTopic(PayloadImageType);
     connect(&link, SIGNAL(readReady()), this, SLOT(readoutConnection()));
 
+    /*Set up bluetooth menu and LED*/
     imager.initializePort();
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()){
         ui->bluetoothComboBox->addItem(info.portName());
     }
+    connect(&imager, SIGNAL(updateStatus()), this, SLOT(updateBluetoothLED()));     /*Updating bluetooth LED*/
+    connect(&imager, SIGNAL(updateImage()), this, SLOT(updateImage()));             /*Updating image in groundstation*/
 
+    /*Set up timer for telemetry activity check*/
     QTimer *timer = new QTimer(this);
     timer->setInterval(1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(telemetryCheck()));
     timer->start();
 
-    connect(&imager, SIGNAL(updateStatus()), this, SLOT(updateBluetoothLED()));
+    /*---------------*/
+    /*CONNECT BUTTONS*/
+    /*---------------*/
 
-    //---------------
-    //Connect Buttons
-    //---------------
+    /*Top Row menus*/
+    connect(ui->openPortButton, SIGNAL(clicked()), this, SLOT(onOpenPortButtonClicked()));          /*Open selected bluetooth port*/
+    connect(ui->closePortButton, SIGNAL(clicked()), this, SLOT(onClosePortButtonClicked()));        /*Close selected bluetooth port*/
+    connect(ui->bluetoothComboBox, SIGNAL(activated(int)), this, SLOT(updateBluetoothLED()));       /*update bluetooth status LED when different port is selected*/
+    connect(ui->restartWifiButton, SIGNAL(clicked()), this, SLOT(onRestartWifiButtonClicked()));    /*Wifi restart (for those x>1000 times I hang around in RZUWsec instead of yetenet*/
+    connect(ui->emergencyOffButton, SIGNAL(clicked()), this, SLOT(onEmergencyOffButtonClicked()));  /*Turn off moving, power-consuming or dangerous devices instantly*/
 
-    //Top Row
-    connect(ui->openPortButton, SIGNAL(clicked()), this, SLOT(onOpenPortButtonClicked()));
-    connect(ui->closePortButton, SIGNAL(clicked()), this, SLOT(onClosePortButtonClicked()));
-    connect(ui->bluetoothComboBox, SIGNAL(activated(int)), this, SLOT(updateBluetoothLED()));
-    connect(ui->restartWifiButton, SIGNAL(clicked()), this, SLOT(onRestartWifiButtonClicked()));
-    connect(ui->emergencyOffButton, SIGNAL(clicked()), this, SLOT(onEmergencyOffButtonClicked()));
-
-    //Manual Control Tab
+    /*Manual Control Tab*/
     connect(ui->deployRacksButton, SIGNAL(clicked()), this, SLOT(onDeployRacksButtonClicked()));
     connect(ui->pullRacksButton, SIGNAL(clicked()), this, SLOT(onPullRacksButtonClicked()));
     connect(ui->stopRacksButton, SIGNAL(clicked()), this, SLOT(onStopRacksButtonClicked()));
     connect(ui->activateElectromagnetButton, SIGNAL(clicked()), this, SLOT(onActivateElectromagnetButtonClicked()));
     connect(ui->deactivateElectromagnetButton, SIGNAL(clicked()), this, SLOT(onDeactivateElectromagnetButtonClicked()));
-    connect(ui->takePictureButton, SIGNAL(clicked()), this, SLOT(onTakePictureButtonClicked()));
+    connect(ui->takePictureButton, SIGNAL(clicked()), this, SLOT(onTakePictureButtonClicked()));    /*Take picture and receive it via bluetooth*/
 
-    //Attitude Tab
-    connect(ui->orientationSetButton, SIGNAL(clicked()), this, SLOT(onOrientationSetButtonClicked()));
-    connect(ui->setRotationButton, SIGNAL(clicked()), this, SLOT(onSetRotationButtonClicked()));
+    /*Attitude Tab*/
+    connect(ui->orientationSetButton, SIGNAL(clicked()), this, SLOT(onOrientationSetButtonClicked()));          /*Setting wished orientation angle...*/
+    connect(ui->orientationLineEdit, SIGNAL(returnPressed()), this, SLOT(onOrientationSetButtonClicked()));     /*...also works with return in the lineEdit instead of clicking annoying button*/
+    connect(ui->setRotationButton, SIGNAL(clicked()), this, SLOT(onSetRotationButtonClicked()));                /*Setting wished rotation speed...*/
+    connect(ui->rotationLineEdit, SIGNAL(returnPressed()), this, SLOT(onSetRotationButtonClicked()));           /*...also works with return in the lineEdit instead of clicking annoying button*/
 
-    //Sun Finder Tab
-    connect(ui->sunFinderButton, SIGNAL(clicked()), this, SLOT(onSunFinderButtonClicked()));
+    /*Sun Finder Tab*/
+    connect(ui->sunFinderButton, SIGNAL(clicked()), this, SLOT(onSunFinderButtonClicked()));                    /*Start sun acquisition*/
 
-    //Mission Tab
-    connect(ui->missionStartButton, SIGNAL(clicked()), this, SLOT(onMissionStartButtonClicked()));
-    connect(ui->missionAbortButton, SIGNAL(clicked()), this, SLOT(onMissionAbortButtonClicked()));
+    /*Mission Tab*/
+    connect(ui->missionStartButton, SIGNAL(clicked()), this, SLOT(onMissionStartButtonClicked()));              /*Start mission*/
+    connect(ui->missionAbortButton, SIGNAL(clicked()), this, SLOT(onMissionAbortButtonClicked()));              /*Stop mission*/
 
-    connect(&imager, SIGNAL(updateImage()), this, SLOT(updateImage()));
-
-    //Set up graph widgets
+    /*Set up graph widgets*/
     setupGraphs();
 
-    //Test Image
-    //imager.readImage();
+    /*Image Test*/
+    imager.readImage();
 }
 
 Groundstation::~Groundstation()
@@ -74,20 +79,24 @@ Groundstation::~Groundstation()
     delete ui;
 }
 
-//--------
-//READOUTS
-//--------
+
+/*-------------*/
+/*Wifi readouts*/
+/*-------------*/
 
 void Groundstation::readoutConnection(){
+    if(!ui->telemetryLED->isChecked()){
+        console("Telemetry online.");
+    }
     ui->telemetryLED->setChecked(true);
     PayloadSatellite payload = link.read();
     switch(payload.topic){
     case PayloadSensorIMUType:{
-        //console("Package of type \"IMU\" received.");
+//        console("Package of type \"IMU\" received.");
         PayloadSensorIMU psimu(payload);
         key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
 
-        //accelerometerWidget update
+        /*accelerometerWidget update*/
         ui->accelerometerWidget->graph(0)->addData(key, psimu.ax/1000);
         ui->accelerometerWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
         ui->accelerometerWidget->graph(0)->rescaleValueAxis();
@@ -100,7 +109,7 @@ void Groundstation::readoutConnection(){
         ui->accelerometerWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
         ui->accelerometerWidget->replot();
 
-        //gyroscopeWidget update
+        /*gyroscopeWidget update*/
         ui->gyroscopeWidget->graph(0)->addData(key, radToDeg(psimu.wx));
         ui->gyroscopeWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
         ui->gyroscopeWidget->graph(0)->rescaleValueAxis();
@@ -113,7 +122,7 @@ void Groundstation::readoutConnection(){
         ui->gyroscopeWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
         ui->gyroscopeWidget->replot();
 
-        //headingWidget update
+        /*headingWidget update*/
         ui->headingWidget->graph(0)->addData(key, radToDeg(psimu.headingXm));
         ui->headingWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
         ui->headingWidget->graph(0)->rescaleValueAxis();
@@ -126,7 +135,7 @@ void Groundstation::readoutConnection(){
         ui->headingWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
         ui->headingWidget->replot();
 
-        //LCD updates
+        /*LCD updates*/
         ui->compassWidget->angle = radToDeg(psimu.headingFusion);
         ui->debrisMapWidget->angle = radToDeg(psimu.headingFusion);
         ui->rotationLCD->display(radToDeg(psimu.wz));
@@ -136,24 +145,24 @@ void Groundstation::readoutConnection(){
         break;
     }
     case PayloadCounterType:{
-        //console("Package of type \"Counter\" received.");
+//        console("Package of type \"Counter\" received.");
         PayloadCounter pscount(payload);
         key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
         break;
     }
     case PayloadElectricalType:{
-        //console("Package of type \"Electrical\" received.");
+//        console("Package of type \"Electrical\" received.");
         PayloadElectrical pelec(payload);
         key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
 
-        //LED updates
+        /*LED updates*/
         ui->lightsensorLED->setChecked(pelec.lightsensorOn);
         ui->electromagnetLED->setChecked(pelec.electromagnetOn);
         ui->thermalKnifeLED->setChecked(pelec.thermalKnifeOn);
         ui->racksDeployedLED->setChecked(pelec.racksOut);
         ui->solarDeployedLED->setChecked(pelec.solarPanelsOut);
 
-        //LCD updates
+        /*LCD updates*/
         ui->lightsensorLCD->display((int) pelec.light);
         ui->solarVoltageLCD->display(pelec.solarPanelVoltage);
         ui->solarCurrentLCD->display(pelec.solarPanelCurrent);
@@ -161,6 +170,7 @@ void Groundstation::readoutConnection(){
         ui->batteryVoltageLCD->display(pelec.batteryVoltage);
         ui->powerConsumptionLCD->display(pelec.batteryVoltage * pelec.batteryCurrent / 1000);
 
+        /*sunFinderWidget / lightsensor graph update*/
         ui->sunFinderWidget->graph(0)->addData(key, (int) pelec.light);
         ui->sunFinderWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
         ui->sunFinderWidget->graph(0)->rescaleValueAxis();
@@ -168,12 +178,6 @@ void Groundstation::readoutConnection(){
         ui->sunFinderWidget->replot();
         break;
     }
-//    case PayloadImageType:{
-//        console("Package of type \"Image\" received.");
-//        PayloadImage pimage(payload);
-//        displayImage(pimage.image, ui->missionInputLabel);
-//        break;
-//    }
     default:
         break;
     }
@@ -181,11 +185,13 @@ void Groundstation::readoutConnection(){
 }
 
 
-//--------------------
-//BUTTONS/TELECOMMANDS
-//--------------------
+/*--------------------*/
+/*BUTTONS/TELECOMMANDS*/
+/*--------------------*/
 
-//Telecommands
+/*Command-struct to be found in payload.h / .cpp*/
+
+/*Telecommands*/
 void Groundstation::telecommand(int ID, int identifier, int value){
     /*WIFI*/
     Command com(ID, identifier, value);
@@ -193,12 +199,9 @@ void Groundstation::telecommand(int ID, int identifier, int value){
 
     /*BLUETOOTH*/
 //    imager.sendCommand(com);
-
-    /*OLD BLUETOOTH TYPE BY HAND*/
-//    imager.sendData(ui->HBALineEdit->text().toLocal8Bit());
 }
 
-//Top Row
+/*Top Row*/
 void Groundstation::onOpenPortButtonClicked(){
     imager.activePortName = ui->bluetoothComboBox->currentText();
     imager.openPort();
@@ -215,13 +218,13 @@ void Groundstation::onRestartWifiButtonClicked(){
 
 void Groundstation::onEmergencyOffButtonClicked(){
     console("EMERGENCY OFF: Disengaging all electrical components.");
-    telecommand(ID_ELECTRICAL, 3001, 0); //Stop racks
-//    telecommand(ID_ELECTRICAL, 3004, false, 0); //Turn off electromagnet
-//    telecommand(ID_ELECTRICAL, 3005, false, 0); //Turn off thermal knife
-//    telecommand(ID_ELECTRICAL, 3006, false, 0); //Stop main motor
+    telecommand(ID_ELECTRICAL, 3001, 0);    /*Stop racks*/
+    telecommand(ID_ELECTRICAL, 3002, 0);    /*Turn off electromagnet*/
+    telecommand(ID_ELECTRICAL, 3003, 0);    /*Turn off thermal knife*/
+    telecommand(ID_ELECTRICAL, 3004, 0);    /*Stop main motor*/
 }
 
-//Manual Control Tab
+/*Manual Control Tab*/
 void Groundstation::onDeployRacksButtonClicked(){
     console("Deploying racks...");
     telecommand(ID_ELECTRICAL, 3001, 1);
@@ -238,56 +241,46 @@ void Groundstation::onStopRacksButtonClicked(){
 }
 
 void Groundstation::onActivateElectromagnetButtonClicked(){
-//    console("Activating electromagnet.");
-//    telecommand(ID_ELECTRICAL, 3004, true, 0);
+    console("Activating electromagnet.");
+    telecommand(ID_ELECTRICAL, 3002, 1);
 }
 
 void Groundstation::onDeactivateElectromagnetButtonClicked(){
-//    console("Deactivating electromagnet.");
-//    telecommand(ID_ELECTRICAL, 3004, false, 0);
+    console("Deactivating electromagnet.");
+    telecommand(ID_ELECTRICAL, 3002, 0);
 }
 
 void Groundstation::onTakePictureButtonClicked(){
-//    console("Taking picture.");
-//    telecommand(ID_PICTURE, 4001, true, 0);
+    console("Taking picture.");
+    telecommand(ID_PICTURE, 4001, 1);
 }
 
-//Attitude Tab
+/*Attitude Tab*/
 void Groundstation::onOrientationSetButtonClicked(){
-//    float angle;
-//    bool ok;
-//    angle = ui->orientationLineEdit->text().toFloat(&ok);
-//    if(ok && (360 >= angle) && (angle >= 0)){
-//        console(QString("Setting orientation to %1 degrees.").arg(angle));
-//        telecommand(ID_ATTITUDE, 2002, true, angle);
-//    }
-//    else
-//        console("Orientation angle invalid.");
-}
-
-void Groundstation::onOrientationResetButtonClicked(){
-//    console("Resetting to N-S-orientation.");
-//    telecommand(ID_ATTITUDE, 2002, true, 0);
+    int angle;
+    bool ok;
+    angle = ui->orientationLineEdit->text().toInt(&ok);
+    if(ok && (360 >= angle) && (angle >= 0)){
+        console(QString("Setting orientation to %1 degrees.").arg(angle));
+        telecommand(ID_ATTITUDE, 2002, angle);
+    }
+    else
+        console("Orientation angle invalid.");
 }
 
 void Groundstation::onSetRotationButtonClicked(){
-//    float angle;
-//    bool ok;
-//    angle = ui->rotationLineEdit->text().toFloat(&ok);
-//    if(ok && (360 >= angle) && (angle >= -360)){
-//        console(QString("Setting orientation to %1 degrees.").arg(angle));
-//        telecommand(ID_ATTITUDE, 2001, true, angle);
-//    }
-//    else
-//        console("Orientation angle invalid.");
+    int angle;
+    bool ok;
+    angle = ui->rotationLineEdit->text().toInt(&ok);
+    if(ok && (360 >= angle) && (angle >= -360)){
+        console(QString("Setting orientation to %1 degrees.").arg(angle));
+        telecommand(ID_ATTITUDE, 2001, angle);
+    }
+    else
+        console("Orientation angle invalid.");
 }
 
-void Groundstation::onStopRotationButtonClicked(){
-//    console("Stopping rotation.");
-//    telecommand(ID_ATTITUDE, 2001, true, 0);
-}
-
-//Mission Tab
+/*Mission Tab*/
 void Groundstation::onSunFinderButtonClicked(){
 //    console("Sun acquisition routine started.");
 //    telecommand(ID_MISSION, 5001, true, 0);
@@ -303,14 +296,14 @@ void Groundstation::onMissionAbortButtonClicked(){
 //    telecommand(ID_MISSION, 5002, false, 0);
 }
 
-//------------
-//GRAPH SETUPS
-//------------
+/*------------*/
+/*GRAPH SETUPS*/
+/*------------*/
 void Groundstation::setupGraphs(){
-    QFont legendFont = font();  // start out with MainWindow's font..
-    legendFont.setPointSize(7); // and make a bit smaller for legend
+    QFont legendFont = font();      /*Take MainWindow font..*/
+    legendFont.setPointSize(7);     /*...and make a bit smaller for legend*/
 
-    //Set up accelerometerWidget
+    /*Set up accelerometerWidget*/
     ui->accelerometerWidget->xAxis->setLabel("Current Time");
     ui->accelerometerWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     ui->accelerometerWidget->xAxis->setDateTimeFormat("hh:mm:ss");
@@ -333,11 +326,13 @@ void Groundstation::setupGraphs(){
     ui->accelerometerWidget->addGraph();
     ui->accelerometerWidget->graph(2)->setPen(QPen(Qt::green));
     ui->accelerometerWidget->graph(2)->setName("z");
-    // make left and bottom axes transfer their ranges to right and top axes:
+
+    /*make left and bottom axes transfer their ranges to right and top axes*/
     connect(ui->accelerometerWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->accelerometerWidget->xAxis2, SLOT(setRange(QCPRange)));
     connect(ui->accelerometerWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->accelerometerWidget->yAxis2, SLOT(setRange(QCPRange)));
 
-    //Set up gyroscopeWidget
+
+    /*Set up gyroscopeWidget*/
     ui->gyroscopeWidget->xAxis->setLabel("Current Time");
     ui->gyroscopeWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     ui->gyroscopeWidget->xAxis->setDateTimeFormat("hh:mm:ss");
@@ -360,11 +355,13 @@ void Groundstation::setupGraphs(){
     ui->gyroscopeWidget->addGraph();
     ui->gyroscopeWidget->graph(2)->setPen(QPen(Qt::green));
     ui->gyroscopeWidget->graph(2)->setName("z");
-    // make left and bottom axes transfer their ranges to right and top axes:
+
+    /*make left and bottom axes transfer their ranges to right and top axes*/
     connect(ui->gyroscopeWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->gyroscopeWidget->xAxis2, SLOT(setRange(QCPRange)));
     connect(ui->gyroscopeWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->gyroscopeWidget->yAxis2, SLOT(setRange(QCPRange)));
 
-    //Set up headingWidget
+
+    /*Set up headingWidget*/
     ui->headingWidget->xAxis->setLabel("Current Time");
     ui->headingWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     ui->headingWidget->xAxis->setDateTimeFormat("hh:mm:ss");
@@ -387,23 +384,11 @@ void Groundstation::setupGraphs(){
     ui->headingWidget->addGraph();
     ui->headingWidget->graph(2)->setPen(QPen(Qt::green));
     ui->headingWidget->graph(2)->setName("Combined");
-    // make left and bottom axes transfer their ranges to right and top axes:
+
+    /*make left and bottom axes transfer their ranges to right and top axes*/
     connect(ui->headingWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->headingWidget->xAxis2, SLOT(setRange(QCPRange)));
     connect(ui->headingWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->headingWidget->yAxis2, SLOT(setRange(QCPRange)));
 
-
-//    //Set up sunFinderWidget
-//    ui->sunFinderWidget->xAxis->setLabel("Angle");
-//    ui->sunFinderWidget->xAxis->setAutoTickStep(false);
-//    ui->sunFinderWidget->xAxis->setTickStep(90);
-//    ui->sunFinderWidget->xAxis->setRange(0, 360);
-//    ui->sunFinderWidget->yAxis->setLabel("Solar Voltage");
-//    ui->sunFinderWidget->axisRect()->setupFullAxesBox();
-//    ui->sunFinderWidget->addGraph();
-//    ui->sunFinderWidget->graph(0)->setPen(QPen(Qt::blue));
-//    // make left and bottom axes transfer their ranges to right and top axes:
-//    connect(ui->sunFinderWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->xAxis2, SLOT(setRange(QCPRange)));
-//    connect(ui->sunFinderWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->yAxis2, SLOT(setRange(QCPRange)));
 
     //Set up sunFinderWidget time-dependent
     ui->sunFinderWidget->xAxis->setLabel("Current Time");
@@ -415,14 +400,29 @@ void Groundstation::setupGraphs(){
     ui->sunFinderWidget->axisRect()->setupFullAxesBox();
     ui->sunFinderWidget->addGraph();
     ui->sunFinderWidget->graph(0)->setPen(QPen(Qt::blue));
-    // make left and bottom axes transfer their ranges to right and top axes:
+
+    /*make left and bottom axes transfer their ranges to right and top axes*/
     connect(ui->sunFinderWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->xAxis2, SLOT(setRange(QCPRange)));
     connect(ui->sunFinderWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->yAxis2, SLOT(setRange(QCPRange)));
+
+//    /*Maybe an angle dependent setup?*/
+//    ui->sunFinderWidget->xAxis->setLabel("Angle");
+//    ui->sunFinderWidget->xAxis->setAutoTickStep(false);
+//    ui->sunFinderWidget->xAxis->setTickStep(90);
+//    ui->sunFinderWidget->xAxis->setRange(0, 360);
+//    ui->sunFinderWidget->yAxis->setLabel("Solar Voltage");
+//    ui->sunFinderWidget->axisRect()->setupFullAxesBox();
+//    ui->sunFinderWidget->addGraph();
+//    ui->sunFinderWidget->graph(0)->setPen(QPen(Qt::blue));
+//
+//    /*make left and bottom axes transfer their ranges to right and top axes*/
+//    connect(ui->sunFinderWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->xAxis2, SLOT(setRange(QCPRange)));
+//    connect(ui->sunFinderWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->yAxis2, SLOT(setRange(QCPRange)));
 }
 
-//--------------------
-//CONSOLE TEXT UPDATES
-//--------------------
+/*--------------------*/
+/*CONSOLE TEXT UPDATES*/
+/*--------------------*/
 
 void Groundstation::console(QString msg){
     ui->consoleWidget->writeString(msg);
@@ -436,32 +436,34 @@ void Groundstation::imagelinkUpdateConsole(){
     ui->consoleWidget->writeString(imager.consoleText);
 }
 
-//---------------------
-//DISPLAY UPDATED IMAGE
-//---------------------
+/*---------------------*/
+/*DISPLAY UPDATED IMAGE*/
+/*---------------------*/
 
 void Groundstation::updateImage(){
     QImage scaled = imager.currentImage.scaled(ui->missionInputLabel->width(),ui->missionInputLabel->height(),Qt::KeepAspectRatio);
     ui->missionInputLabel->setPixmap(QPixmap::fromImage(scaled));
 }
 
-//-----------
-//LED UPDATES
-//-----------
+/*-----------*/
+/*LED UPDATES*/
+/*-----------*/
 
-//disable telemetry LED when connection is lost
+/*disable telemetry LED when connection is lost after around 3 seconds*/
 void Groundstation::telemetryCheck(){
     if((ui->telemetryLED->isChecked()) && (QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0 - key) >= 3){
         ui->telemetryLED->setChecked(false);
-        console("No telemetry data available.");
+        console("Telemetry lost.");
     }
 }
 
+/*update bluetooth activity LED when a different port is selected from list*/
 void Groundstation::updateBluetoothLED(){
     imager.activePortName = ui->bluetoothComboBox->currentText();
     ui->bluetoothLED->setChecked(imager.isOpen());
 }
 
+/*Radiants to degrees conversion*/
 float Groundstation::radToDeg(float rad){
     return (rad*180)/M_PI;
 }

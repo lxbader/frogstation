@@ -33,7 +33,6 @@ class Groundstation : public QMainWindow
     Connection link;
     Imagelink imager;
 
-
 public:
     explicit Groundstation(QWidget *parent = 0);
     ~Groundstation();
@@ -50,20 +49,20 @@ private:
     float radToDeg(float rad);
 
 private slots:
-    //Connection
+    /*Connection*/
     void readoutConnection();
     void connectionUpdateConsole();
 
-    //Bluetooth
+    /*Bluetooth*/
     void imagelinkUpdateConsole();
 
-    //Buttons Top Row
+    /*Buttons Top Row*/
     void onOpenPortButtonClicked();
     void onClosePortButtonClicked();
     void onRestartWifiButtonClicked();
     void onEmergencyOffButtonClicked();
 
-    //Buttons Manual Control Tab
+    /*Buttons Manual Control Tab*/
     void onDeployRacksButtonClicked();
     void onPullRacksButtonClicked();
     void onStopRacksButtonClicked();
@@ -73,18 +72,16 @@ private slots:
 
     void onTakePictureButtonClicked();
 
-    //Buttons Attitude Tab
+    /*Buttons Attitude Tab*/
     void onOrientationSetButtonClicked();
-    void onOrientationResetButtonClicked();
     void onSetRotationButtonClicked();
-    void onStopRotationButtonClicked();
 
-    //Buttons Mission Tab
+    /*Buttons Mission Tab*/
     void onSunFinderButtonClicked();
     void onMissionStartButtonClicked();
     void onMissionAbortButtonClicked();
 
-    //Updates
+    /*Updates*/
     void updateImage();
     void telemetryCheck();
     void updateBluetoothLED();

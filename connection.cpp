@@ -1,12 +1,10 @@
 #include "connection.h"
-#include <QNetworkInterface>
-#include <QDateTime>
-#include <QtEndian>
 
 Connection::Connection(QObject *parent, bool checkChecksum)
     : QObject(parent), localAddress(LOCAL_IP), remoteAddress(SATELLITE_IP), port(PORT), udpSocket(this), bound(false), checkChecksum(checkChecksum), consoleText(""){
 }
 
+/*Binding to predefined IP and port*/
 void Connection::bind(){
     console(QString("Binding ground station to IP %1 at port %2.").arg(LOCAL_IP).arg(PORT));
     if(udpSocket.bind(localAddress, port)){
@@ -20,12 +18,14 @@ void Connection::bind(){
     connect(&udpSocket, SIGNAL(readyRead()), this, SLOT(connectionReceive()));
 }
 
+/*Receiving published RODOS topics = payloads*/
 void Connection::connectionReceive(){
     QByteArray buffer(1023, 0x00);
     udpSocket.readDatagram(buffer.data(), buffer.size());
 
     PayloadSatellite payload(buffer);
 
+    /*Calculate checksum*/
     quint16 checksum = 0;
     for(int i = 2; i < 26 + payload.userDataLen; ++i){
         bool lowestBit = checksum & 1;
@@ -36,12 +36,14 @@ void Connection::connectionReceive(){
         checksum += buffer[i];
     }
 
+    /*Check checksum*/
     if((!checkChecksum || checksum == payload.checksum) && topics.contains(payload.topic)){
         payloads.enqueue(payload);
         emit readReady();
     }
 }
 
+/*Send QByteArray with RODOS header*/
 void Connection::connectionSendData(quint32 topicId, const QByteArray &data){
     QByteArray buffer(1023, 0x00);
 
@@ -54,6 +56,7 @@ void Connection::connectionSendData(quint32 topicId, const QByteArray &data){
     memcpy(buffer.data() + 26, data.constData(), data.length());
     *(buffer.data() + 26 + data.length()) = 0x00;
 
+    /*Calculate checksum*/
     quint32 checksum = 0;
     for(int i = 2; i < 26 + data.length(); ++i){
         if (checksum & 01)
@@ -63,8 +66,10 @@ void Connection::connectionSendData(quint32 topicId, const QByteArray &data){
         checksum += (quint8)buffer[i];
         checksum &= 0xFFFF;
     }
+    /*Put checksum in the right place*/
     *((quint16*)(buffer.data() + 0)) = qToBigEndian((quint16)checksum);
 
+    /*Display size of transmission and size of the actual message*/
     int j = udpSocket.writeDatagram(buffer.constData(), buffer.size(), remoteAddress, port);
     int k = data.length();
     console("Datagram sent.");
@@ -72,10 +77,14 @@ void Connection::connectionSendData(quint32 topicId, const QByteArray &data){
     console(QString("Size of data in sent message: %1 bytes.").arg(k));
 }
 
+/*Send Command-structs with RODOS header*/
 void Connection::connectionSendCommand(quint32 topicID, const Command &telecommand){
+
+    /*Break Command-struct into data and hand on to sending function*/
     QByteArray buffer(sizeof(Command), 0x00);
     memcpy(buffer.data(), (char*)&telecommand, sizeof(Command));
 
+    /*Display information about the sent command for telemetry verification purposes*/
     console("Command information:");
     console(QString("ID: %1").arg(telecommand.id));
     console(QString("Identifier: %1").arg(telecommand.identifier));
