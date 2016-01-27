@@ -15,7 +15,7 @@
 #include "payload.h"
 
 #define LOCAL_COMPORT "COM3"
-#define BAUDRATE QSerialPort::Baud115200
+#define BAUDRATE 921600
 #define DATABITS QSerialPort::Data8
 #define PARITY QSerialPort::NoParity
 #define STOPBITS QSerialPort::OneStop

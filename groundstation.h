@@ -47,6 +47,7 @@ private:
     void console(QString msg);
 
     int displayImage(uint8_t orig[121*160*2], QLabel* label);
+    float radToDeg(float rad);
 
 private slots:
     //Connection

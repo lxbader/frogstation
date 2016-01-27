@@ -37,18 +37,17 @@ struct PayloadCounter{
 };
 
 struct PayloadSensorIMU{
-    float ax;
+    float ax;       //milli-g
     float ay;
     float az;
-    float mx;
-    float my;
-    float mz;
-    float wx;
+    float wx;       //rad/sec
     float wy;
-    float wz; //rad/sec
-    float roll;
+    float wz;
+    float roll;     //rad
     float pitch;
-    float yaw;
+    float headingFusion;
+    float headingXm;
+    float headingGyro;
     PayloadSensorIMU(const PayloadSatellite payload);
 };
 
@@ -56,14 +55,15 @@ struct PayloadElectrical{
     bool lightsensorOn;
     bool electromagnetOn;
     bool thermalKnifeOn;
-    int16_t light;
+    bool racksOut;
+    bool solarPanelsOut;
+    int32_t light;
+    float batteryVoltage;
+    float batteryCurrent;
+    float solarPanelVoltage;
+    float solarPanelCurrent;
     PayloadElectrical(const PayloadSatellite payload);
 };
-
-//struct PayloadImage{
-//    uint8_t image[121*160*2];
-//    PayloadImage(const PayloadSatellite payload);
-//};
 
 struct Command{
     int id;

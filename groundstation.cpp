@@ -51,9 +51,7 @@ Groundstation::Groundstation(QWidget *parent) :
 
     //Attitude Tab
     connect(ui->orientationSetButton, SIGNAL(clicked()), this, SLOT(onOrientationSetButtonClicked()));
-    connect(ui->orientationResetButton, SIGNAL(clicked()), this, SLOT(onOrientationResetButtonClicked()));
     connect(ui->setRotationButton, SIGNAL(clicked()), this, SLOT(onSetRotationButtonClicked()));
-    connect(ui->stopRotationButton, SIGNAL(clicked()), this, SLOT(onStopRotationButtonClicked()));
 
     //Sun Finder Tab
     connect(ui->sunFinderButton, SIGNAL(clicked()), this, SLOT(onSunFinderButtonClicked()));
@@ -87,37 +85,54 @@ void Groundstation::readoutConnection(){
     case PayloadSensorIMUType:{
         //console("Package of type \"IMU\" received.");
         PayloadSensorIMU psimu(payload);
-        float currentWz = 360*(psimu.wz/(2*M_PI));
-        float currentRoll = 360*(psimu.roll/(2*M_PI));
-        float currentPitch = 360*(psimu.pitch/(2*M_PI));
-        float currentHeading = 360-360*(psimu.yaw/(2*M_PI));
-
-        ui->compassWidget->angle = currentHeading;
-        ui->debrisMapWidget->angle = currentHeading;
-        ui->rotationLCD->display(currentWz);
-        ui->orientationLCD->display(currentHeading);
-        ui->pitchLCD->display(currentPitch);
-        ui->rollLCD->display(currentRoll);
-
         key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
-        ui->rotationWidget->graph(0)->addData(key, currentWz);
-        ui->rotationWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
-        ui->rotationWidget->graph(0)->rescaleValueAxis();
-        ui->rotationWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
-        ui->rotationWidget->replot();
 
-        ui->orientationWidget->graph(0)->addData(key, currentHeading);
-        ui->orientationWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
-        ui->orientationWidget->graph(0)->rescaleValueAxis();
-        ui->orientationWidget->graph(1)->addData(key, psimu.mz);
-        ui->orientationWidget->graph(1)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
-        ui->orientationWidget->graph(1)->rescaleValueAxis(true);
-        ui->orientationWidget->graph(2)->addData(key, psimu.az);
-        ui->orientationWidget->graph(2)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
-        ui->orientationWidget->graph(2)->rescaleValueAxis(true);
-        ui->orientationWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
-        ui->orientationWidget->replot();
+        //accelerometerWidget update
+        ui->accelerometerWidget->graph(0)->addData(key, psimu.ax/1000);
+        ui->accelerometerWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->accelerometerWidget->graph(0)->rescaleValueAxis();
+        ui->accelerometerWidget->graph(1)->addData(key, psimu.ay/1000);
+        ui->accelerometerWidget->graph(1)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->accelerometerWidget->graph(1)->rescaleValueAxis(true);
+        ui->accelerometerWidget->graph(2)->addData(key, psimu.az/1000);
+        ui->accelerometerWidget->graph(2)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->accelerometerWidget->graph(2)->rescaleValueAxis(true);
+        ui->accelerometerWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
+        ui->accelerometerWidget->replot();
 
+        //gyroscopeWidget update
+        ui->gyroscopeWidget->graph(0)->addData(key, radToDeg(psimu.wx));
+        ui->gyroscopeWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->gyroscopeWidget->graph(0)->rescaleValueAxis();
+        ui->gyroscopeWidget->graph(1)->addData(key, radToDeg(psimu.wy));
+        ui->gyroscopeWidget->graph(1)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->gyroscopeWidget->graph(1)->rescaleValueAxis(true);
+        ui->gyroscopeWidget->graph(2)->addData(key, radToDeg(psimu.wz));
+        ui->gyroscopeWidget->graph(2)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->gyroscopeWidget->graph(2)->rescaleValueAxis(true);
+        ui->gyroscopeWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
+        ui->gyroscopeWidget->replot();
+
+        //headingWidget update
+        ui->headingWidget->graph(0)->addData(key, radToDeg(psimu.headingXm));
+        ui->headingWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->headingWidget->graph(0)->rescaleValueAxis();
+        ui->headingWidget->graph(1)->addData(key, radToDeg(psimu.headingGyro));
+        ui->headingWidget->graph(1)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->headingWidget->graph(1)->rescaleValueAxis(true);
+        ui->headingWidget->graph(2)->addData(key, radToDeg(psimu.headingFusion));
+        ui->headingWidget->graph(2)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
+        ui->headingWidget->graph(2)->rescaleValueAxis(true);
+        ui->headingWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
+        ui->headingWidget->replot();
+
+        //LCD updates
+        ui->compassWidget->angle = radToDeg(psimu.headingFusion);
+        ui->debrisMapWidget->angle = radToDeg(psimu.headingFusion);
+        ui->rotationLCD->display(radToDeg(psimu.wz));
+        ui->orientationLCD->display(radToDeg(psimu.headingFusion));
+        ui->pitchLCD->display(radToDeg(psimu.pitch));
+        ui->rollLCD->display(radToDeg(psimu.roll));
         break;
     }
     case PayloadCounterType:{
@@ -129,12 +144,23 @@ void Groundstation::readoutConnection(){
     case PayloadElectricalType:{
         //console("Package of type \"Electrical\" received.");
         PayloadElectrical pelec(payload);
-        ui->solarLCD->display((int) pelec.light);
+        key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+
+        //LED updates
         ui->lightsensorLED->setChecked(pelec.lightsensorOn);
         ui->electromagnetLED->setChecked(pelec.electromagnetOn);
         ui->thermalKnifeLED->setChecked(pelec.thermalKnifeOn);
+        ui->racksDeployedLED->setChecked(pelec.racksOut);
+        ui->solarDeployedLED->setChecked(pelec.solarPanelsOut);
 
-        key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+        //LCD updates
+        ui->lightsensorLCD->display((int) pelec.light);
+        ui->solarVoltageLCD->display(pelec.solarPanelVoltage);
+        ui->solarCurrentLCD->display(pelec.solarPanelCurrent);
+        ui->batteryCurrentLCD->display(pelec.batteryCurrent);
+        ui->batteryVoltageLCD->display(pelec.batteryVoltage);
+        ui->powerConsumptionLCD->display(pelec.batteryVoltage * pelec.batteryCurrent / 1000);
+
         ui->sunFinderWidget->graph(0)->addData(key, (int) pelec.light);
         ui->sunFinderWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
         ui->sunFinderWidget->graph(0)->rescaleValueAxis();
@@ -284,53 +310,87 @@ void Groundstation::setupGraphs(){
     QFont legendFont = font();  // start out with MainWindow's font..
     legendFont.setPointSize(7); // and make a bit smaller for legend
 
-    //Set up rotationWidget
-    ui->rotationWidget->xAxis->setLabel("Current Time");
-    ui->rotationWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
-    ui->rotationWidget->xAxis->setDateTimeFormat("hh:mm:ss");
-    ui->rotationWidget->xAxis->setAutoTickStep(false);
-    ui->rotationWidget->xAxis->setTickStep(10);
-    ui->rotationWidget->yAxis->setLabel("Rotation Velocity (deg/sec)");
-    ui->rotationWidget->axisRect()->setupFullAxesBox();
-//    ui->rotationWidget->legend->setVisible(true);
-//    ui->rotationWidget->legend->setFont(legendFont);
-//    ui->rotationWidget->legend->setBrush(QBrush(QColor(255,255,255,230)));
-//    ui->rotationWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
+    //Set up accelerometerWidget
+    ui->accelerometerWidget->xAxis->setLabel("Current Time");
+    ui->accelerometerWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+    ui->accelerometerWidget->xAxis->setDateTimeFormat("hh:mm:ss");
+    ui->accelerometerWidget->xAxis->setAutoTickStep(false);
+    ui->accelerometerWidget->xAxis->setTickStep(10);
+    ui->accelerometerWidget->yAxis->setLabel("Acceleration (g)");
+    ui->accelerometerWidget->axisRect()->setupFullAxesBox();
+    ui->accelerometerWidget->legend->setVisible(true);
+    ui->accelerometerWidget->legend->setFont(legendFont);
+    ui->accelerometerWidget->legend->setBrush(QBrush(QColor(255,255,255,230)));
+    ui->accelerometerWidget->legend->setIconSize(10,5);
+    ui->accelerometerWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
 
-    ui->rotationWidget->addGraph();
-    ui->rotationWidget->graph(0)->setPen(QPen(Qt::blue));
-//    ui->rotationWidget->graph(0)->setName("Combined");
-    ui->rotationWidget->addGraph();
+    ui->accelerometerWidget->addGraph();
+    ui->accelerometerWidget->graph(0)->setPen(QPen(Qt::blue));
+    ui->accelerometerWidget->graph(0)->setName("x");
+    ui->accelerometerWidget->addGraph();
+    ui->accelerometerWidget->graph(1)->setPen(QPen(Qt::red));
+    ui->accelerometerWidget->graph(1)->setName("y");
+    ui->accelerometerWidget->addGraph();
+    ui->accelerometerWidget->graph(2)->setPen(QPen(Qt::green));
+    ui->accelerometerWidget->graph(2)->setName("z");
     // make left and bottom axes transfer their ranges to right and top axes:
-    connect(ui->rotationWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->rotationWidget->xAxis2, SLOT(setRange(QCPRange)));
-    connect(ui->rotationWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->rotationWidget->yAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->accelerometerWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->accelerometerWidget->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->accelerometerWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->accelerometerWidget->yAxis2, SLOT(setRange(QCPRange)));
 
-    //Set up orientationWidget
-    ui->orientationWidget->xAxis->setLabel("Current Time");
-    ui->orientationWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
-    ui->orientationWidget->xAxis->setDateTimeFormat("hh:mm:ss");
-    ui->orientationWidget->xAxis->setAutoTickStep(false);
-    ui->orientationWidget->xAxis->setTickStep(10);
-    ui->orientationWidget->yAxis->setLabel("Heading (deg)");
-    ui->orientationWidget->axisRect()->setupFullAxesBox();
-    ui->orientationWidget->legend->setVisible(true);
-    ui->orientationWidget->legend->setFont(legendFont);
-    ui->orientationWidget->legend->setBrush(QBrush(QColor(255,255,255,230)));
-    ui->orientationWidget->legend->setIconSize(10,5);
-    ui->orientationWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
+    //Set up gyroscopeWidget
+    ui->gyroscopeWidget->xAxis->setLabel("Current Time");
+    ui->gyroscopeWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+    ui->gyroscopeWidget->xAxis->setDateTimeFormat("hh:mm:ss");
+    ui->gyroscopeWidget->xAxis->setAutoTickStep(false);
+    ui->gyroscopeWidget->xAxis->setTickStep(10);
+    ui->gyroscopeWidget->yAxis->setLabel("Angular Speed (deg/sec)");
+    ui->gyroscopeWidget->axisRect()->setupFullAxesBox();
+    ui->gyroscopeWidget->legend->setVisible(true);
+    ui->gyroscopeWidget->legend->setFont(legendFont);
+    ui->gyroscopeWidget->legend->setBrush(QBrush(QColor(255,255,255,230)));
+    ui->gyroscopeWidget->legend->setIconSize(10,5);
+    ui->gyroscopeWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
 
-    ui->orientationWidget->addGraph();
-    ui->orientationWidget->graph(0)->setPen(QPen(Qt::blue));
-    ui->orientationWidget->graph(0)->setName("Combined");
-    ui->orientationWidget->addGraph();
-    ui->orientationWidget->graph(1)->setPen(QPen(Qt::red));
-    ui->orientationWidget->graph(1)->setName("Magnetometer");
-    ui->orientationWidget->addGraph();
-    ui->orientationWidget->graph(2)->setPen(QPen(Qt::green));
-    ui->orientationWidget->graph(2)->setName("Accelerometer");
+    ui->gyroscopeWidget->addGraph();
+    ui->gyroscopeWidget->graph(0)->setPen(QPen(Qt::blue));
+    ui->gyroscopeWidget->graph(0)->setName("x");
+    ui->gyroscopeWidget->addGraph();
+    ui->gyroscopeWidget->graph(1)->setPen(QPen(Qt::red));
+    ui->gyroscopeWidget->graph(1)->setName("y");
+    ui->gyroscopeWidget->addGraph();
+    ui->gyroscopeWidget->graph(2)->setPen(QPen(Qt::green));
+    ui->gyroscopeWidget->graph(2)->setName("z");
     // make left and bottom axes transfer their ranges to right and top axes:
-    connect(ui->orientationWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->orientationWidget->xAxis2, SLOT(setRange(QCPRange)));
-    connect(ui->orientationWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->orientationWidget->yAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->gyroscopeWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->gyroscopeWidget->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->gyroscopeWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->gyroscopeWidget->yAxis2, SLOT(setRange(QCPRange)));
+
+    //Set up headingWidget
+    ui->headingWidget->xAxis->setLabel("Current Time");
+    ui->headingWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+    ui->headingWidget->xAxis->setDateTimeFormat("hh:mm:ss");
+    ui->headingWidget->xAxis->setAutoTickStep(false);
+    ui->headingWidget->xAxis->setTickStep(10);
+    ui->headingWidget->yAxis->setLabel("Heading (deg)");
+    ui->headingWidget->axisRect()->setupFullAxesBox();
+    ui->headingWidget->legend->setVisible(true);
+    ui->headingWidget->legend->setFont(legendFont);
+    ui->headingWidget->legend->setBrush(QBrush(QColor(255,255,255,230)));
+    ui->headingWidget->legend->setIconSize(10,5);
+    ui->headingWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
+
+    ui->headingWidget->addGraph();
+    ui->headingWidget->graph(0)->setPen(QPen(Qt::blue));
+    ui->headingWidget->graph(0)->setName("Xm");
+    ui->headingWidget->addGraph();
+    ui->headingWidget->graph(1)->setPen(QPen(Qt::red));
+    ui->headingWidget->graph(1)->setName("Gyro");
+    ui->headingWidget->addGraph();
+    ui->headingWidget->graph(2)->setPen(QPen(Qt::green));
+    ui->headingWidget->graph(2)->setName("Combined");
+    // make left and bottom axes transfer their ranges to right and top axes:
+    connect(ui->headingWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->headingWidget->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->headingWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->headingWidget->yAxis2, SLOT(setRange(QCPRange)));
+
 
 //    //Set up sunFinderWidget
 //    ui->sunFinderWidget->xAxis->setLabel("Angle");
@@ -400,4 +460,8 @@ void Groundstation::telemetryCheck(){
 void Groundstation::updateBluetoothLED(){
     imager.activePortName = ui->bluetoothComboBox->currentText();
     ui->bluetoothLED->setChecked(imager.isOpen());
+}
+
+float Groundstation::radToDeg(float rad){
+    return (rad*180)/M_PI;
 }

@@ -78,8 +78,7 @@ void Imagelink::sendCommand(const Command &tc){
     memcpy(buffer.data(), (char*)&tc, sizeof(Command));
     console("Command information:");
     console(QString("ID: %1").arg(tc.id));
-    console(QString("Identifier: %1").arg(tc.identifier.data()));
-    console(QString("Active: %1").arg(tc.active));
+    console(QString("Identifier: %1").arg(tc.identifier));
     console(QString("Value: %1").arg(tc.value));
     sendData(buffer);
 }
