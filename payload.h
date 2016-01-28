@@ -4,6 +4,7 @@
 #include <QtGlobal>
 #include <QByteArray>
 #include <QtEndian>
+#include <QDebug>
 
 #include "stdint.h"
 
@@ -58,11 +59,11 @@ struct PayloadElectrical{
     bool thermalKnifeOn;
     bool racksOut;
     bool solarPanelsOut;
-    int32_t light;
-    float batteryVoltage;
+    float light;
     float batteryCurrent;
-    float solarPanelVoltage;
+    float batteryVoltage;
     float solarPanelCurrent;
+    float solarPanelVoltage;
     PayloadElectrical(const PayloadSatellite payload);
 };
 

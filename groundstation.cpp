@@ -1,6 +1,8 @@
 #include "groundstation.h"
 #include "ui_groundstation.h"
 
+#include <QtEndian>
+
 Groundstation::Groundstation(QWidget *parent) :
     QMainWindow(parent), link(this), imager(this),
     ui(new Ui::Groundstation)
@@ -70,9 +72,6 @@ Groundstation::Groundstation(QWidget *parent) :
 
     /*Set up graph widgets*/
     setupGraphs();
-
-    /*Image Test*/
-//    imager.readImage();
 }
 
 Groundstation::~Groundstation()
@@ -86,7 +85,7 @@ Groundstation::~Groundstation()
 /*-------------*/
 
 void Groundstation::readoutConnection(){
-    console("Package received");
+//    console("Package received");
     if(!ui->telemetryLED->isChecked()){
         console("Telemetry online.");
     }
@@ -147,8 +146,7 @@ void Groundstation::readoutConnection(){
 
         /*LED updates*/
         if(psimu.calibrationActive){
-            console("Calibration started. Telemetry switched off");
-            ui->telemetryLED->setChecked(false);
+            console("Calibration running...");
         }
 
         break;
@@ -164,6 +162,9 @@ void Groundstation::readoutConnection(){
         PayloadElectrical pelec(payload);
         key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
 
+//        console(QString("%1").arg(pelec.light));
+//        QByteArray bitBuffer = QByteArray::number((int)pelec.light, 2);
+//        console(bitBuffer);
         /*LED updates*/
         ui->lightsensorLED->setChecked(pelec.lightsensorOn);
         ui->electromagnetLED->setChecked(pelec.electromagnetOn);
@@ -172,7 +173,11 @@ void Groundstation::readoutConnection(){
         ui->solarDeployedLED->setChecked(pelec.solarPanelsOut);
 
         /*LCD updates*/
-        ui->lightsensorLCD->display((int) pelec.light);
+        if(pelec.lightsensorOn){
+            ui->lightsensorLCD->display(pelec.light);
+        }else{
+            ui->lightsensorLCD->display(0);
+        }
         ui->solarVoltageLCD->display(pelec.solarPanelVoltage);
         ui->solarCurrentLCD->display(pelec.solarPanelCurrent);
         ui->batteryCurrentLCD->display(pelec.batteryCurrent);
@@ -180,7 +185,11 @@ void Groundstation::readoutConnection(){
         ui->powerConsumptionLCD->display(pelec.batteryVoltage * pelec.batteryCurrent / 1000);
 
         /*sunFinderWidget / lightsensor graph update*/
-        ui->sunFinderWidget->graph(0)->addData(key, (int) pelec.light);
+        if(pelec.lightsensorOn){
+            ui->sunFinderWidget->graph(0)->addData(key, pelec.light);
+        }else{
+            ui->sunFinderWidget->graph(0)->addData(key, 0);
+        }
         ui->sunFinderWidget->graph(0)->removeDataBefore(key-XAXIS_VISIBLE_TIME);
         ui->sunFinderWidget->graph(0)->rescaleValueAxis();
         ui->sunFinderWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);

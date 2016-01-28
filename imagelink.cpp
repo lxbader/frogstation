@@ -101,17 +101,17 @@ void Imagelink::readData(){
 
 void Imagelink::readImage(){
     /*Readings from saved imageBuffer file*/
-//    QFile file("D:\\SPACEMASTER\\SFPICS\\picture.txt");
-//    file.open(QIODevice::ReadOnly);
-//    imageBuffer = file.readAll();
-//    file.close();
+    QFile file("D:\\SPACEMASTER\\SFPICS\\new_picture.txt");
+    file.open(QIODevice::ReadOnly);
+    imageBuffer = file.readAll();
+    file.close();
 
     /*Save imageBuffer in file for later tests*/
-    int i = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    QFile file2(QString("D:\\SPACEMASTER\\SFPICS\\image_%1.txt").arg(abs(i)));
-    file2.open(QIODevice::WriteOnly);
-    file2.write(imageBuffer);
-    file2.close();
+//    int i = QDateTime::currentDateTime().toMSecsSinceEpoch();
+//    QFile file2(QString("D:\\SPACEMASTER\\SFPICS\\image_%1.txt").arg(abs(i)));
+//    file2.open(QIODevice::WriteOnly);
+//    file2.write(imageBuffer);
+//    file2.close();
 
     /*Check flags*/
     if((!imageBuffer.startsWith("FRAME START")) || (!imageBuffer.endsWith("\n"))){

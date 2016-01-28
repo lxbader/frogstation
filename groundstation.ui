@@ -734,7 +734,7 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
               </font>
              </property>
              <property name="currentIndex">
-              <number>0</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="generalTab">
               <attribute name="title">
@@ -873,9 +873,6 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                 </spacer>
                </item>
               </layout>
-              <zorder>groupBox_electromagnet</zorder>
-              <zorder>groupBox_magnetRack</zorder>
-              <zorder>label_33</zorder>
               <zorder>verticalSpacer_2</zorder>
              </widget>
              <widget class="QWidget" name="rotationTab">

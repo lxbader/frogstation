@@ -40,7 +40,7 @@ void Connection::connectionReceive(){
 
 
     /*Check checksum*/
-    console(QString("Payload topic ID: %1").arg(payload.topic));
+    //console(QString("Payload topic ID: %1").arg(payload.topic));
     if((!checkChecksum || checksum == payload.checksum) && topics.contains(payload.topic)){
         payloads.enqueue(payload);
         emit readReady();
