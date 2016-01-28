@@ -91,9 +91,10 @@ void Imagelink::readData(){
     console("Bluetooth package received.");
     QByteArray data = bluetoothPort->readAll();
     imageBuffer.append(data);
+    console(data);
 
     /*Due to package size as small as one char, flags can only be read out after completion of transmission*/
-    if(data.endsWith("\n")){
+    if(data.endsWith("&")){
         console("End of transmission.");
         readImage();
     }
@@ -101,10 +102,10 @@ void Imagelink::readData(){
 
 void Imagelink::readImage(){
     /*Readings from saved imageBuffer file*/
-    QFile file("D:\\SPACEMASTER\\SFPICS\\new_picture.txt");
-    file.open(QIODevice::ReadOnly);
-    imageBuffer = file.readAll();
-    file.close();
+//    QFile file("D:\\SPACEMASTER\\SFPICS\\new_picture.txt");
+//    file.open(QIODevice::ReadOnly);
+//    imageBuffer = file.readAll();
+//    file.close();
 
     /*Save imageBuffer in file for later tests*/
 //    int i = QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -113,19 +114,27 @@ void Imagelink::readImage(){
 //    file2.write(imageBuffer);
 //    file2.close();
 
+    /*Remove everything before flag to get rid of annoying error messages*/
+    int x = imageBuffer.lastIndexOf("&", 2000);
+    imageBuffer.remove(0, x+1);
+
     /*Check flags*/
-    if((!imageBuffer.startsWith("FRAME START")) || (!imageBuffer.endsWith("\n"))){
+    if((!imageBuffer.startsWith("FRAME START")) || (!imageBuffer.endsWith("&"))){
         console("Data not fitting for image.");
+        imageBuffer.clear();
         return;
     }
 
     /*Remove flags*/
     imageBuffer.remove(0, 11);
-    imageBuffer.remove(imageBuffer.length()-12, 12);
+    imageBuffer.remove(imageBuffer.length()-11, 11);
+
+    console(imageBuffer);
 
     /*Check length*/
     if(imageBuffer.length() != IMAGE_PIXELS*2*3){
         console("ERROR: Received image package size does not fit required size.");
+        imageBuffer.clear();
         return;
     }
 
@@ -139,20 +148,22 @@ void Imagelink::readImage(){
         orig[i] = (uint8_t) buffer.toInt();
     }
 
+    imageBuffer.clear();
+
     /*Convert linear YCbCr array to RBG image*/
     QImage rgb(IMAGE_WIDTH, IMAGE_HEIGHT, QImage::Format_RGB32);
     uint8_t y1 = 0;
     uint8_t y2 = 0;
-    uint8_t cb = 0;
-    uint8_t cr = 0;
+//    uint8_t cb = 0;
+//    uint8_t cr = 0;
 
     /*Combine to RGB-/Grayscale image*/
     for(int line = 0; line < IMAGE_HEIGHT; line++){
         for(int column = 0; column < IMAGE_WIDTH; column +=2){
             y1   = orig[IMAGE_WIDTH*2*line + 2*column + 0];
-            cb  = orig[IMAGE_WIDTH*2*line + 2*column + 1];
+//            cb  = orig[IMAGE_WIDTH*2*line + 2*column + 1];
             y2   = orig[IMAGE_WIDTH*2*line + 2*column + 2];
-            cr  = orig[IMAGE_WIDTH*2*line + 2*column + 3];
+//            cr  = orig[IMAGE_WIDTH*2*line + 2*column + 3];
 
             /*RGB (doesn't work for whatever reason)*/
 //            rgb.setPixel(column, line, getRgbValue(y1, cb, cr));
@@ -163,6 +174,8 @@ void Imagelink::readImage(){
             rgb.setPixel(column+1, line, qRgb(y2, y2, y2));
         }
     }
+
+    /*Update image*/
     currentImage = rgb;
     emit updateImage();
 
