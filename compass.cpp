@@ -19,7 +19,7 @@ void Compass::paintEvent(QPaintEvent *)
 
     /*Setting colors*/
     QColor minuteColor(Qt::black);
-    QColor hourColor(Qt::green);
+    QColor hourColor(Qt::yellow);
 
     /*Sets the side length of the square to the smaller side*/
     int side = qMin(width(), height());
@@ -27,9 +27,11 @@ void Compass::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
+    /*Moving painter to the middle of the canvas*/
     painter.translate(width() / 2, height() / 2);
     painter.scale(side / 200.0, side / 200.0);
 
+    painter.setPen(Qt::NoPen);
     painter.setBrush(minuteColor);
 
     painter.save();
@@ -47,6 +49,7 @@ void Compass::paintEvent(QPaintEvent *)
         painter.rotate(30.0);
     }
 
+    painter.setPen(Qt::NoPen);
     painter.setBrush(hourColor);
 
     /*Paint minute markings*/

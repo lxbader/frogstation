@@ -88,7 +88,7 @@ void Imagelink::sendCommand(const Command &tc){
 }
 
 void Imagelink::readData(){
-//    console("Bluetooth package received.");
+    console("Bluetooth package received.");
     QByteArray data = bluetoothPort->readAll();
     imageBuffer.append(data);
 
@@ -101,10 +101,10 @@ void Imagelink::readData(){
 
 void Imagelink::readImage(){
     /*Readings from saved imageBuffer file*/
-    QFile file("D:\\SPACEMASTER\\SFPICS\\picture.txt");
-    file.open(QIODevice::ReadOnly);
-    imageBuffer = file.readAll();
-    file.close();
+//    QFile file("D:\\SPACEMASTER\\SFPICS\\picture.txt");
+//    file.open(QIODevice::ReadOnly);
+//    imageBuffer = file.readAll();
+//    file.close();
 
     /*Save imageBuffer in file for later tests*/
     int i = QDateTime::currentDateTime().toMSecsSinceEpoch();

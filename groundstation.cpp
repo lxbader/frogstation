@@ -19,6 +19,7 @@ Groundstation::Groundstation(QWidget *parent) :
     link.addTopic(PayloadSensorIMUType);
     link.addTopic(PayloadCounterType);
     link.addTopic(PayloadElectricalType);
+    link.addTopic(PayloadMissionType);
     connect(&link, SIGNAL(readReady()), this, SLOT(readoutConnection()));
 
     /*Set up bluetooth menu and LED*/
@@ -71,7 +72,7 @@ Groundstation::Groundstation(QWidget *parent) :
     setupGraphs();
 
     /*Image Test*/
-    imager.readImage();
+//    imager.readImage();
 }
 
 Groundstation::~Groundstation()
@@ -85,6 +86,7 @@ Groundstation::~Groundstation()
 /*-------------*/
 
 void Groundstation::readoutConnection(){
+    console("Package received");
     if(!ui->telemetryLED->isChecked()){
         console("Telemetry online.");
     }
@@ -142,6 +144,13 @@ void Groundstation::readoutConnection(){
         ui->orientationLCD->display(radToDeg(psimu.headingFusion));
         ui->pitchLCD->display(radToDeg(psimu.pitch));
         ui->rollLCD->display(radToDeg(psimu.roll));
+
+        /*LED updates*/
+        if(psimu.calibrationActive){
+            console("Calibration started. Telemetry switched off");
+            ui->telemetryLED->setChecked(false);
+        }
+
         break;
     }
     case PayloadCounterType:{
@@ -177,6 +186,13 @@ void Groundstation::readoutConnection(){
         ui->sunFinderWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
         ui->sunFinderWidget->replot();
         break;
+    }
+    case PayloadMissionType:{
+//        console("Package of type \"Mission\" received.");
+        PayloadMission pmission(payload);
+        key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+        Debris tc_debris = Debris(pmission.partNumber, pmission.angle, pmission.isCleaned);
+        ui->debrisMapWidget->processDebris(&tc_debris);
     }
     default:
         break;

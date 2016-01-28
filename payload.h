@@ -11,6 +11,7 @@ enum PayloadType{
     PayloadCounterType = 5001,
     PayloadSensorIMUType = 5002,
     PayloadElectricalType = 5003,
+    PayloadMissionType = 5004,
 };
 
 struct PayloadCounter;
@@ -47,6 +48,7 @@ struct PayloadSensorIMU{
     float headingFusion;    /*rad*/
     float headingXm;        /*rad*/
     float headingGyro;      /*rad*/
+    bool calibrationActive;
     PayloadSensorIMU(const PayloadSatellite payload);
 };
 
@@ -62,6 +64,13 @@ struct PayloadElectrical{
     float solarPanelVoltage;
     float solarPanelCurrent;
     PayloadElectrical(const PayloadSatellite payload);
+};
+
+struct PayloadMission{
+    int partNumber;
+    float angle;
+    bool isCleaned;
+    PayloadMission(const PayloadSatellite payload);
 };
 
 struct Command{

@@ -40,6 +40,7 @@ PayloadSensorIMU::PayloadSensorIMU(const PayloadSatellite payload):ax(0), ay(0),
     headingFusion = *(float*)(payload.userData + 8 * sizeof(float));
     headingXm = *(float*)(payload.userData + 9 * sizeof(float));
     headingGyro = *(float*)(payload.userData + 10 * sizeof(float));
+    calibrationActive = *(bool*)(payload.userData+ 11*sizeof(float));
 }
 
 PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsensorOn(0), electromagnetOn(0), thermalKnifeOn(0), light(0){
@@ -55,6 +56,12 @@ PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsenso
     batteryCurrent = *(float*)(payload.userData + 5 * sizeof(bool) + 1 * sizeof(int32_t) + 1 * sizeof(float));
     solarPanelVoltage = *(float*)(payload.userData + 5 * sizeof(bool) + 1 * sizeof(int32_t) + 2 * sizeof(float));
     solarPanelCurrent = *(float*)(payload.userData + 5 * sizeof(bool) + 1 * sizeof(int32_t) + 3 * sizeof(float));
+}
+
+PayloadMission::PayloadMission(const PayloadSatellite payload): partNumber(0), angle(0), isCleaned(0){
+    partNumber = *(int*)(payload.userData);
+    angle = *(float*)(payload.userData + 1 * sizeof(int));
+    isCleaned = *(bool*)(payload.userData + 1 * sizeof(int) + 1 * sizeof(float));
 }
 
 Command::Command(int tc_id, int tc_identifier, int tc_value): id(tc_id), identifier(tc_identifier), value(tc_value){

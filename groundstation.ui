@@ -734,131 +734,97 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
               </font>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="generalTab">
               <attribute name="title">
                <string>Manual Control</string>
               </attribute>
-              <layout class="QHBoxLayout" name="horizontalLayout_23">
+              <layout class="QVBoxLayout" name="verticalLayout_12">
                <item>
-                <spacer name="horizontalSpacer_2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_26">
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
                  <item>
-                  <spacer name="verticalSpacer_7">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
+                  <widget class="QGroupBox" name="groupBox_magnetRack">
+                   <property name="title">
+                    <string/>
                    </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
+                   <layout class="QVBoxLayout" name="verticalLayout_22">
+                    <item alignment="Qt::AlignHCenter">
+                     <widget class="QLabel" name="label_10">
+                      <property name="font">
+                       <font>
+                        <pointsize>11</pointsize>
+                        <weight>75</weight>
+                        <italic>true</italic>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Racks</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="deployRacksButton">
+                      <property name="text">
+                       <string>Deploy</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="pullRacksButton">
+                      <property name="text">
+                       <string>Pull in</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="stopRacksButton">
+                      <property name="text">
+                       <string>Stop</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
                  </item>
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_2">
-                   <item>
-                    <widget class="QGroupBox" name="groupBox_magnetRack">
-                     <property name="title">
-                      <string/>
-                     </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_22">
-                      <item alignment="Qt::AlignHCenter">
-                       <widget class="QLabel" name="label_10">
-                        <property name="font">
-                         <font>
-                          <pointsize>11</pointsize>
-                          <weight>75</weight>
-                          <italic>true</italic>
-                          <bold>true</bold>
-                         </font>
-                        </property>
-                        <property name="text">
-                         <string>Racks</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="deployRacksButton">
-                        <property name="text">
-                         <string>Deploy</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="pullRacksButton">
-                        <property name="text">
-                         <string>Pull in</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="stopRacksButton">
-                        <property name="text">
-                         <string>Stop</string>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_11">
-                   <item>
-                    <widget class="QGroupBox" name="groupBox_electromagnet">
-                     <property name="title">
-                      <string/>
-                     </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_18">
-                      <item alignment="Qt::AlignHCenter">
-                       <widget class="QLabel" name="label_15">
-                        <property name="font">
-                         <font>
-                          <pointsize>11</pointsize>
-                          <weight>75</weight>
-                          <italic>true</italic>
-                          <bold>true</bold>
-                         </font>
-                        </property>
-                        <property name="text">
-                         <string>Electromagnet</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="activateElectromagnetButton">
-                        <property name="text">
-                         <string>Activate</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QPushButton" name="deactivateElectromagnetButton">
-                        <property name="text">
-                         <string>Deactivate</string>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                  </layout>
+                  <widget class="QGroupBox" name="groupBox_electromagnet">
+                   <property name="title">
+                    <string/>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_18">
+                    <item alignment="Qt::AlignHCenter">
+                     <widget class="QLabel" name="label_15">
+                      <property name="font">
+                       <font>
+                        <pointsize>11</pointsize>
+                        <weight>75</weight>
+                        <italic>true</italic>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Electromagnet</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="activateElectromagnetButton">
+                      <property name="text">
+                       <string>Activate</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="deactivateElectromagnetButton">
+                      <property name="text">
+                       <string>Deactivate</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
                  </item>
                  <item>
                   <widget class="QGroupBox" name="groupBox_camera">
@@ -891,35 +857,26 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                    </layout>
                   </widget>
                  </item>
-                 <item>
-                  <spacer name="verticalSpacer_6">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
                 </layout>
                </item>
                <item>
-                <spacer name="horizontalSpacer_3">
+                <spacer name="verticalSpacer_2">
                  <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
+                  <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>40</width>
-                   <height>20</height>
+                   <width>20</width>
+                   <height>40</height>
                   </size>
                  </property>
                 </spacer>
                </item>
               </layout>
+              <zorder>groupBox_electromagnet</zorder>
+              <zorder>groupBox_magnetRack</zorder>
+              <zorder>label_33</zorder>
+              <zorder>verticalSpacer_2</zorder>
              </widget>
              <widget class="QWidget" name="rotationTab">
               <attribute name="title">
@@ -1523,7 +1480,7 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                      </property>
                      <property name="font">
                       <font>
-                       <italic>true</italic>
+                       <italic>false</italic>
                       </font>
                      </property>
                      <property name="title">

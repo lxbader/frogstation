@@ -4,24 +4,30 @@
 #include <QWidget>
 #include <QtWidgets>
 
+struct Debris{
+    int partNumber;
+    QPoint location;
+    bool isCleaned;
+    Debris(int tc_partNumber, float tc_angle, bool tc_isCleaned);
+};
+
 class DebrisMap : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit DebrisMap(QWidget *parent = 0);
-    QVector<QPoint>* debrisFound;
-    QVector<QPoint>* debrisCleaned;    
     float angle;
+
+    void processDebris(Debris* tc_debris);
+    int getFoundNumber();
+    int getCleanedNumber();
+
+private:
+    QVector<Debris*> debrisList;
 
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-
-signals:
-
-public slots:
-    void addDebris(double angle);
-    void cleanedDebris(QPoint debris);
 
 };
 

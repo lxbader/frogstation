@@ -20,6 +20,7 @@ void Connection::bind(){
 
 /*Receiving published RODOS topics = payloads*/
 void Connection::connectionReceive(){
+
     QByteArray buffer(1023, 0x00);
     udpSocket.readDatagram(buffer.data(), buffer.size());
 
@@ -36,7 +37,10 @@ void Connection::connectionReceive(){
         checksum += buffer[i];
     }
 
+
+
     /*Check checksum*/
+    console(QString("Payload topic ID: %1").arg(payload.topic));
     if((!checkChecksum || checksum == payload.checksum) && topics.contains(payload.topic)){
         payloads.enqueue(payload);
         emit readReady();
