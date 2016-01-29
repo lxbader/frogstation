@@ -4,6 +4,7 @@
 
 int main(int argc, char *argv[])
 {
+    /*Set darker window theme with gray buttons*/
     QApplication::setStyle(QStyleFactory::create("Fusion"));
     QPalette p;
     QApplication a(argc, argv);

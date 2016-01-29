@@ -9,6 +9,7 @@ DebrisMap::DebrisMap(QWidget *parent) : QWidget(parent)
     angle = 0;
 }
 
+
 void DebrisMap::paintEvent(QPaintEvent *)
 {
     /*Defining points for the triangle-shaped hand*/
@@ -83,7 +84,6 @@ void DebrisMap::paintEvent(QPaintEvent *)
     painter.drawText(west, "W");
 
    /*Paint debris markings*/
-
     foreach (const Debris* piece, debrisList){
         if(piece->isCleaned){
             painter.setPen(cleanedColor);
@@ -95,10 +95,10 @@ void DebrisMap::paintEvent(QPaintEvent *)
             painter.drawEllipse(piece->location, 4, 4);
         }
     }
-
     painter.end();
 }
 
+/*Adding debris pieces to debrisList or updating their status*/
 void DebrisMap::processDebris(Debris* tc_debris){
     foreach (Debris* piece, debrisList){
         if(piece->partNumber == tc_debris->partNumber){
@@ -110,10 +110,12 @@ void DebrisMap::processDebris(Debris* tc_debris){
     debrisList.append(tc_debris);
 }
 
+/*Number of found debris pieces*/
 int DebrisMap::getFoundNumber(){
     return debrisList.length();
 }
 
+/*Number of picked up = "cleaned" debris pieces*/
 int DebrisMap::getCleanedNumber(){
     int cleaned = 0;
     foreach (Debris* piece, debrisList){
@@ -123,6 +125,7 @@ int DebrisMap::getCleanedNumber(){
     }
     return cleaned;
 }
+
 
 Debris::Debris(int tc_partNumber, float tc_angle, bool tc_isCleaned): partNumber(0), location(QPoint(0,0)), isCleaned(false){
     partNumber = tc_partNumber;

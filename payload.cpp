@@ -43,6 +43,10 @@ PayloadSensorIMU::PayloadSensorIMU(const PayloadSatellite payload):ax(0), ay(0),
     calibrationActive = *(bool*)(payload.userData+ 11*sizeof(float));
 }
 
+/*This struct gives strange values. All the bools are just fine, but none of the floats is alright.
+ * It's neither a bit/byteshift nor a bigEndian/littleEndian problem, we tried everything. Moving the lightsensor value into
+ * another struct gives the right values. Due to time constrictions and low priority, we didn't send all the current and voltage
+ * floats in a new struct.*/
 PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsensorOn(0), electromagnetOn(0), thermalKnifeOn(0), batteryCurrent(0), batteryVoltage(0), solarPanelCurrent(0), solarPanelVoltage(0){
     if(payload.userDataLen != sizeof(PayloadElectrical) || payload.topic != PayloadElectricalType)
         return;

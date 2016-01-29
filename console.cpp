@@ -13,6 +13,7 @@ Console::Console(QWidget *parent)
     setPalette(p);
 }
 
+
 /*Give out string on console*/
 void Console::writeString(QString input){
     insertPlainText(QString("%1\n").arg(input));
@@ -21,6 +22,7 @@ void Console::writeString(QString input){
     QScrollBar *bar = verticalScrollBar();
     bar->setValue(bar->maximum());
 }
+
 
 /*Disable typing*/
 void Console::keyPressEvent(QKeyEvent *e){
@@ -33,6 +35,7 @@ void Console::keyPressEvent(QKeyEvent *e){
         break;
     }
 }
+
 
 /*Disable mouse actions (pressing/clicking/rightclick)*/
 void Console::mousePressEvent(QMouseEvent *e){

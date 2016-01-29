@@ -4,6 +4,7 @@ Imagelink::Imagelink(QObject *parent) : QObject(parent), consoleText(""), curren
     bluetoothPort = new QSerialPort(this);
 }
 
+
 void Imagelink::initializePort(){
     connect(bluetoothPort, SIGNAL(readyRead()), this, SLOT(readData()));
 
@@ -13,6 +14,7 @@ void Imagelink::initializePort(){
     }
     emit updateStatus();
 }
+
 
 void Imagelink::openPort(){
     QSerialPortInfo activePortInfo;
@@ -48,6 +50,7 @@ void Imagelink::openPort(){
         console(QString("ERROR: Port \"%1\" could not be opened.").arg(activePortName));
 }
 
+
 void Imagelink::closePort(){
     QSerialPortInfo activePortInfo;
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()){
@@ -73,10 +76,13 @@ void Imagelink::closePort(){
     emit updateStatus();
 }
 
+
+/*Sending data (not used)*/
 void Imagelink::sendData(const QByteArray &command){
     bluetoothPort->write(command);
 }
 
+/*Sending commands (not used)*/
 void Imagelink::sendCommand(const Command &tc){
     QByteArray buffer(sizeof(Command), 0x00);
     memcpy(buffer.data(), (char*)&tc, sizeof(Command));
@@ -87,39 +93,44 @@ void Imagelink::sendCommand(const Command &tc){
     sendData(buffer);
 }
 
+
 /*Reading out port*/
 void Imagelink::readData(){
-    console("Bluetooth package received.");
-
     QByteArray data = bluetoothPort->readAll();
     imageBuffer.append(data);
+    /*all used flags are designed as "&<start flag>DATA<end flag>&"*/
     if(data.endsWith("&")){
-        console("End of transmission.");
         evaluateBuffer();
     }
 }
 
+
 /*Check flags*/
 void Imagelink::evaluateBuffer(){
-    /*Remove everything before flag and the & at flag beginning to get rid of annoying error messages*/
+    /*Remove everything before flag and the & at flag beginning to get rid of some error messages*/
     int x = imageBuffer.lastIndexOf("&", imageBuffer.length()-2);
     imageBuffer.remove(0, x+1);
-    /*Remove last & */
+
+    /*Remove last & char*/
     imageBuffer.remove(imageBuffer.length()-1, 1);
 
+    /*Check whether it's an image*/
+    /*Start flag "&FRAME START", end flag "FRAME STOP&"*/
+    /*& chars already removed*/
     if((imageBuffer.startsWith("FRAME START")) && (imageBuffer.endsWith("FRAME STOP"))){
         console("Image received.");
-        /*Remove flags*/
+        /*Remove rest of flags*/
         imageBuffer.remove(0, 11);
         imageBuffer.remove(imageBuffer.length()-10, 10);
         readImage();
         return;
     }
 
-    /*Console texts*/
+    /*Check whether it's a console text*/
     /*Start flag "&CONSOLE START", end flag "CONSOLE STOP&"*/
+    /*& chars already removed*/
     if((imageBuffer.startsWith("CONSOLE START")) && (imageBuffer.endsWith("CONSOLE STOP"))){
-        /*Remove flags*/
+        /*Remove rest of flags*/
         imageBuffer.remove(0, 13);
         imageBuffer.remove(imageBuffer.length()-12, 12);
         console(imageBuffer);
@@ -129,6 +140,7 @@ void Imagelink::evaluateBuffer(){
     console("Bluetooth message dropped due to incomplete flags.");
     imageBuffer.clear();
 }
+
 
 void Imagelink::readImage(){
     /*Readings from saved imageBuffer file*/
@@ -163,7 +175,7 @@ void Imagelink::readImage(){
 
     imageBuffer.clear();
 
-    /*Convert linear YCbCr array to RBG image*/
+    /*Initialize RGB/Grayscale image*/
     QImage rgb(IMAGE_WIDTH, IMAGE_HEIGHT, QImage::Format_RGB32);
     uint8_t y1 = 0;
     uint8_t y2 = 0;
@@ -188,36 +200,33 @@ void Imagelink::readImage(){
         }
     }
 
+    /*Sven's grayscale picture (working)*/
+//    QByteArray buffer(3,0x00);
+//    uint8_t orig[IMAGE_WIDTH][IMAGE_HEIGHT];
+//    for(int lines = 0; lines<121; lines++){
+//        for(int columns = 0; columns<160 ; columns++){
+//            buffer[0] = (imageBuffer.at(4*columns+642*lines));
+//            buffer[1] = (imageBuffer.at(4*columns+642*lines+1));
+//            buffer[2] = (imageBuffer.at(4*columns+642*lines+2));
+//            orig[columns][lines] = (uint8_t) buffer.toInt();
+//            console(buffer);
+//        }
+//    }
+//    for(int i = 0; i<256; i++){
+//        QRgb value = qRgb(i,i,i);
+//        rgb.setColor(i, value);
+//    }
+//    for(int line = 0; line < IMAGE_HEIGHT; line++){
+//        for(int column = 0; column < IMAGE_WIDTH; column++){
+//            y   = orig[column][line];
+//            rgb.setPixel(column, line, y);
+
+//        }
+//    }
+
     /*Update image*/
     currentImage = rgb;
     emit updateImage();
-
-/*    Sven's grayscale picture (working)
-    QByteArray buffer(3,0x00);
-    uint8_t orig[IMAGE_WIDTH][IMAGE_HEIGHT];
-    for(int lines = 0; lines<121; lines++){
-        for(int columns = 0; columns<160 ; columns++){
-            buffer[0] = (imageBuffer.at(4*columns+642*lines));
-            buffer[1] = (imageBuffer.at(4*columns+642*lines+1));
-            buffer[2] = (imageBuffer.at(4*columns+642*lines+2));
-            orig[columns][lines] = (uint8_t) buffer.toInt();
-            console(buffer);
-        }
-    }
-
-    for(int i = 0; i<256; i++){
-        QRgb value = qRgb(i,i,i);
-        rgb.setColor(i, value);
-    }
-
-    for(int line = 0; line < IMAGE_HEIGHT; line++){
-        for(int column = 0; column < IMAGE_WIDTH; column++){
-            y   = orig[column][line];
-            rgb.setPixel(column, line, y);
-
-        }
-    }
-    */
 }
 
 
@@ -233,6 +242,7 @@ void Imagelink::readImage(){
 //    return qRgb(r, g, b);
 //}
 
+
 /*Wikipedia some other convention*/
 QRgb Imagelink::getRgbValue(uint8_t y, uint8_t cb, uint8_t cr){
     uint32_t r = (uint32_t) (255/219)*(y-16) + (255/112)*0.701* ((uint32_t) cr - 128);
@@ -241,11 +251,13 @@ QRgb Imagelink::getRgbValue(uint8_t y, uint8_t cb, uint8_t cr){
     return qRgb(r, g, b);
 }
 
+
 /*Printing text into console*/
 void Imagelink::console(QString msg){
     consoleText = msg;
     emit updateConsole();
 }
+
 
 bool Imagelink::isOpen(){
     PortInfo activeInfo = PortInfo(activePortName, false);
@@ -258,11 +270,13 @@ bool Imagelink::isOpen(){
     return 0;
 }
 
+
 /*struct for storing a list of available with their current active/inactive status*/
 PortInfo::PortInfo(QString name, bool open){
     portName = name;
     isOpen = open;
 }
+
 
 /*Overwrite == operator to compare objects of type PortInfo more easily*/
 bool PortInfo::operator==(PortInfo& test){

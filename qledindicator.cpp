@@ -80,6 +80,8 @@ void QLedIndicator::paintEvent(QPaintEvent *event) {
     painter.drawEllipse(QPointF(0,0), 400, 400);
 }
 
+
+/*Disabling keys*/
 void QLedIndicator::keyPressEvent(QKeyEvent *event){
     Q_UNUSED(event)
 }
@@ -88,6 +90,8 @@ void QLedIndicator::keyReleaseEvent(QKeyEvent *event){
     Q_UNUSED(event)
 }
 
+
+/*Disable changing the status by mouseclick*/
 void QLedIndicator::mousePressEvent(QMouseEvent *event){
     Q_UNUSED(event)
 }

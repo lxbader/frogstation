@@ -8,6 +8,7 @@ Compass::Compass(QWidget *parent) : QWidget(parent)
     angle = 0;
 }
 
+
 void Compass::paintEvent(QPaintEvent *)
 {
     /*Defining points for the triangle-shaped hand*/

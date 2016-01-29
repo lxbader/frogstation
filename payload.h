@@ -19,6 +19,7 @@ enum PayloadType{
 struct PayloadCounter;
 struct PayloadSensorIMU;
 struct PayloadElectrical;
+struct PayloadMission;
 
 struct PayloadSatellite{
     quint16 checksum;
@@ -60,15 +61,15 @@ struct PayloadElectrical{
     bool thermalKnifeOn;
     bool racksOut;
     bool solarPanelsOut;
-    float batteryCurrent;
-    float batteryVoltage;
-    float solarPanelCurrent;
-    float solarPanelVoltage;
+    float batteryCurrent;       /*mA*/
+    float batteryVoltage;       /*V*/
+    float solarPanelCurrent;    /*mA*/
+    float solarPanelVoltage;    /*V*/
     PayloadElectrical(const PayloadSatellite payload);
 };
 
 struct PayloadLight{
-    uint16_t lightValue;
+    uint16_t lightValue;        /*raw data*/
     PayloadLight(const PayloadSatellite payload);
 };
 
@@ -80,8 +81,8 @@ struct PayloadMission{
 };
 
 struct Command{
-    int id;
-    int identifier;
+    int id;             /*[1,5]*/
+    int identifier;     /*100x, 200x etc*/
     int value;
     Command(int tc_id, int tc_identifier, int tc_value);
 };

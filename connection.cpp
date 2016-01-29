@@ -4,6 +4,7 @@ Connection::Connection(QObject *parent, bool checkChecksum)
     : QObject(parent), localAddress(LOCAL_IP), remoteAddress(SATELLITE_IP), port(PORT), udpSocket(this), bound(false), checkChecksum(checkChecksum), consoleText(""){
 }
 
+
 /*Binding to predefined IP and port*/
 void Connection::bind(){
     console(QString("Binding ground station to IP %1 at port %2.").arg(LOCAL_IP).arg(PORT));
@@ -17,6 +18,7 @@ void Connection::bind(){
     }
     connect(&udpSocket, SIGNAL(readyRead()), this, SLOT(connectionReceive()));
 }
+
 
 /*Receiving published RODOS topics = payloads*/
 void Connection::connectionReceive(){
@@ -37,15 +39,13 @@ void Connection::connectionReceive(){
         checksum += buffer[i];
     }
 
-
-
     /*Check checksum*/
-    //console(QString("Payload topic ID: %1").arg(payload.topic));
     if((!checkChecksum || checksum == payload.checksum) && topics.contains(payload.topic)){
         payloads.enqueue(payload);
         emit readReady();
     }
 }
+
 
 /*Send QByteArray with RODOS header*/
 void Connection::connectionSendData(quint32 topicId, const QByteArray &data){
@@ -73,13 +73,16 @@ void Connection::connectionSendData(quint32 topicId, const QByteArray &data){
     /*Put checksum in the right place*/
     *((quint16*)(buffer.data() + 0)) = qToBigEndian((quint16)checksum);
 
-    /*Display size of transmission and size of the actual message*/
-    int j = udpSocket.writeDatagram(buffer.constData(), buffer.size(), remoteAddress, port);
-    int k = data.length();
+    udpSocket.writeDatagram(buffer.constData(), buffer.size(), remoteAddress, port);
+
+    /*Display size of transmission and size of the actual message*/    
+//    int j = udpSocket.writeDatagram(buffer.constData(), buffer.size(), remoteAddress, port);
+//    int k = data.length();
 //    console("Datagram sent.");
 //    console(QString("Size of sent message: %1 bytes.").arg(j));
 //    console(QString("Size of data in sent message: %1 bytes.").arg(k));
 }
+
 
 /*Send Command-structs with RODOS header*/
 void Connection::connectionSendCommand(quint32 topicID, const Command &telecommand){
@@ -89,31 +92,36 @@ void Connection::connectionSendCommand(quint32 topicID, const Command &telecomma
     memcpy(buffer.data(), (char*)&telecommand, sizeof(Command));
 
     /*Display information about the sent command for telemetry verification purposes*/
-    console("Command information:");
-    console(QString("ID: %1").arg(telecommand.id));
-    console(QString("Identifier: %1").arg(telecommand.identifier));
-    console(QString("Value: %1").arg(telecommand.value));
+//    console("Command information:");
+//    console(QString("ID: %1").arg(telecommand.id));
+//    console(QString("Identifier: %1").arg(telecommand.identifier));
+//    console(QString("Value: %1").arg(telecommand.value));
 
     connectionSendData(topicID, buffer);
 }
+
 
 void Connection::addTopic(PayloadType topicId){
     topics.insert(topicId);
 }
 
+
 bool Connection::isBound(){
     return bound;
 }
 
+
 bool Connection::isReadReady(){
     return payloads.size();
 }
+
 
 PayloadSatellite Connection::read(){
     if(!payloads.size())
         return PayloadSatellite();
     return payloads.dequeue();
 }
+
 
 void Connection::console(QString msg){
     consoleText = msg;

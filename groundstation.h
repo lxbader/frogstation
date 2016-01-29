@@ -80,6 +80,9 @@ private slots:
     void onCalibrateMagnetoButtonClicked();
     void onExitCalibrationButtonClicked();
 
+    void onStartControllerButtonClicked();
+    void onStopControllerButtonClicked();
+
     /*Buttons Attitude Tab*/
     void onOrientationSetButtonClicked();
     void onSetRotationButtonClicked();

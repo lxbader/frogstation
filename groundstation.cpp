@@ -62,6 +62,10 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(ui->calibrateGyroButton, SIGNAL(clicked()), this, SLOT(onCalibrateGyroButtonClicked()));
     connect(ui->calibrateMagnetoButton, SIGNAL(clicked()), this, SLOT(onCalibrateMagnetoButtonClicked()));
     connect(ui->exitCalibrationButton, SIGNAL(clicked()), this, SLOT(onExitCalibrationButtonClicked()));        /*Exit calibration mode*/
+
+    connect(ui->controllerStartButton, SIGNAL(clicked()), this, SLOT(onStartControllerButtonClicked()));        /*Starting controller*/
+    connect(ui->controllerStopButton, SIGNAL(clicked()), this, SLOT(onStopControllerButtonClicked()));          /*Stopping controller*/
+
     /*Attitude Tab*/
     connect(ui->orientationSetButton, SIGNAL(clicked()), this, SLOT(onOrientationSetButtonClicked()));          /*Setting wished orientation angle...*/
     connect(ui->orientationLineEdit, SIGNAL(returnPressed()), this, SLOT(onOrientationSetButtonClicked()));     /*...also works with return in the lineEdit instead of clicking annoying button*/
@@ -199,6 +203,8 @@ void Groundstation::readoutConnection(){
         key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
         Debris tc_debris = Debris(pmission.partNumber, pmission.angle, pmission.isCleaned);
         ui->debrisMapWidget->processDebris(&tc_debris);
+        ui->debrisFoundLCD->display(ui->debrisMapWidget->getFoundNumber());
+        ui->debrisCleanedLCD->display(ui->debrisMapWidget->getCleanedNumber());
     }
     default:
         break;
@@ -302,7 +308,18 @@ void Groundstation::onExitCalibrationButtonClicked(){
     telecommand(ID_MISSION, 5004, 1);
 }
 
+void Groundstation::onStartControllerButtonClicked(){
+    console("TC: Start controller");
+    telecommand(ID_ATTITUDE, 2003, 1);
+}
+
+void Groundstation::onStopControllerButtonClicked(){
+    console("TC: Stop controller");
+    telecommand(ID_ATTITUDE, 2003, 0);
+}
+
 /*Attitude Tab*/
+/*also works with orientationLineEdit->returnPressed()*/
 void Groundstation::onOrientationSetButtonClicked(){
     int angle;
     bool ok;
@@ -315,6 +332,7 @@ void Groundstation::onOrientationSetButtonClicked(){
         console("ERROR: Orientation angle invalid");
 }
 
+/*also works with rotationLineEdit->returnPressed()*/
 void Groundstation::onSetRotationButtonClicked(){
     int angle;
     bool ok;
@@ -339,20 +357,24 @@ void Groundstation::onMissionStartButtonClicked(){
 }
 
 void Groundstation::onMissionAbortButtonClicked(){
-//    console("TC: Sop mission");
-//    telecommand(ID_MISSION, 5002, 0);
+    console("TC: Sop mission");
+    telecommand(ID_MISSION, 5002, 0);
 }
 
 /*------------*/
 /*GRAPH SETUPS*/
 /*------------*/
+
 void Groundstation::setupGraphs(){
-    QFont legendFont = font();      /*Take MainWindow font..*/
-    legendFont.setPointSize(7);     /*...and make a bit smaller for legend*/
+
+    /*Defining fonts*/
+    QFont legendFont = font();
+    legendFont.setPointSize(7);
 
     QFont labelFont1 = font();
     labelFont1.setPointSize(9);
 
+    /*Defining grey gradients*/
     QLinearGradient plotGradient;
     plotGradient.setStart(0, 0);
     plotGradient.setFinalStop(0, 350);
@@ -422,7 +444,6 @@ void Groundstation::setupGraphs(){
     connect(ui->accelerometerWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->accelerometerWidget->xAxis2, SLOT(setRange(QCPRange)));
     connect(ui->accelerometerWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->accelerometerWidget->yAxis2, SLOT(setRange(QCPRange)));
 
-
     /*Set up gyroscopeWidget*/
     ui->gyroscopeWidget->xAxis->setLabel("Current Time");
     ui->gyroscopeWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
@@ -479,7 +500,6 @@ void Groundstation::setupGraphs(){
     /*make left and bottom axes transfer their ranges to right and top axes*/
     connect(ui->gyroscopeWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->gyroscopeWidget->xAxis2, SLOT(setRange(QCPRange)));
     connect(ui->gyroscopeWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->gyroscopeWidget->yAxis2, SLOT(setRange(QCPRange)));
-
 
     /*Set up headingWidget*/
     ui->headingWidget->xAxis->setLabel("Current Time");
@@ -538,8 +558,7 @@ void Groundstation::setupGraphs(){
     connect(ui->headingWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->headingWidget->xAxis2, SLOT(setRange(QCPRange)));
     connect(ui->headingWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->headingWidget->yAxis2, SLOT(setRange(QCPRange)));
 
-
-    //Set up sunFinderWidget time-dependent
+    /*Set up sunFinderWidget*/
     ui->sunFinderWidget->xAxis->setLabel("Current Time");
     ui->sunFinderWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     ui->sunFinderWidget->xAxis->setDateTimeFormat("hh:mm:ss");
@@ -585,9 +604,12 @@ void Groundstation::setupGraphs(){
     connect(ui->sunFinderWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->yAxis2, SLOT(setRange(QCPRange)));
 }
 
+
 /*--------------------*/
 /*CONSOLE TEXT UPDATES*/
 /*--------------------*/
+
+/*Console updates from lower classes*/
 
 void Groundstation::console(QString msg){
     ui->consoleWidget->writeString(msg);
@@ -601,14 +623,17 @@ void Groundstation::imagelinkUpdateConsole(){
     ui->consoleWidget->writeString(imager.consoleText);
 }
 
+
 /*---------------------*/
 /*DISPLAY UPDATED IMAGE*/
 /*---------------------*/
 
+/*Getting the updated image from imagelink and updating it in the UI*/
 void Groundstation::updateImage(){
     QImage scaled = imager.currentImage.scaled(ui->missionInputLabel->width(),ui->missionInputLabel->height(),Qt::KeepAspectRatio);
     ui->missionInputLabel->setPixmap(QPixmap::fromImage(scaled));
 }
+
 
 /*-----------*/
 /*LED UPDATES*/
