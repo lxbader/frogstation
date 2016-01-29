@@ -49,7 +49,6 @@ public:
     void sendData(const QByteArray &command);
     void sendCommand(const Command &tc);
     bool isOpen();
-    void readImage(); /*Set public only for offline tests*/
 
 signals:
     void updateConsole();
@@ -65,7 +64,8 @@ private:
 
     void console(QString msg);
     QRgb getRgbValue(uint8_t y, uint8_t cb, uint8_t cr);
-//    void readImage();
+    void evaluateBuffer();
+    void readImage();
 
 private slots:
     void readData();

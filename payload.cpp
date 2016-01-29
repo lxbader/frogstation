@@ -43,7 +43,7 @@ PayloadSensorIMU::PayloadSensorIMU(const PayloadSatellite payload):ax(0), ay(0),
     calibrationActive = *(bool*)(payload.userData+ 11*sizeof(float));
 }
 
-PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsensorOn(0), electromagnetOn(0), thermalKnifeOn(0), light(0), batteryCurrent(0), batteryVoltage(0), solarPanelCurrent(0), solarPanelVoltage(0){
+PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsensorOn(0), electromagnetOn(0), thermalKnifeOn(0), batteryCurrent(0), batteryVoltage(0), solarPanelCurrent(0), solarPanelVoltage(0){
     if(payload.userDataLen != sizeof(PayloadElectrical) || payload.topic != PayloadElectricalType)
         return;
     lightsensorOn =     *(bool*)(payload.userData);
@@ -51,17 +51,14 @@ PayloadElectrical::PayloadElectrical(const PayloadSatellite payload): lightsenso
     thermalKnifeOn =    *(bool*)(payload.userData + 2 * sizeof(bool));
     racksOut =          *(bool*)(payload.userData + 3 * sizeof(bool));
     solarPanelsOut =    *(bool*)(payload.userData + 4 * sizeof(bool));
-    light =             *(float*)(payload.userData + 5 * sizeof(bool));
-//    QByteArray bitBuffer;
-//    for(int i=0; i<16; i++){
-//        bitBuffer.append((payload.userData + 5 * sizeof(bool)));
-//    }
-//     = QByteArray::number(light, 2);
-//    qDebug() << bitBuffer.data();
-    batteryCurrent =    *(float*)(payload.userData + 5 * sizeof(bool) + 1 * sizeof(float));
-    batteryVoltage =    *(float*)(payload.userData + 5 * sizeof(bool) + 2 * sizeof(float));
-    solarPanelCurrent = *(float*)(payload.userData + 5 * sizeof(bool) + 3 * sizeof(float));
-    solarPanelVoltage = *(float*)(payload.userData + 5 * sizeof(bool) + 4 * sizeof(float));
+    batteryCurrent =    *(float*)(payload.userData + 5 * sizeof(bool));
+    batteryVoltage =    *(float*)(payload.userData + 5 * sizeof(bool) + 1 * sizeof(float));
+    solarPanelCurrent = *(float*)(payload.userData + 5 * sizeof(bool) + 2 * sizeof(float));
+    solarPanelVoltage = *(float*)(payload.userData + 5 * sizeof(bool) + 3 * sizeof(float));
+}
+
+PayloadLight::PayloadLight(const PayloadSatellite payload): lightValue(0){
+    lightValue = *(uint16_t*)(payload.userData);
 }
 
 PayloadMission::PayloadMission(const PayloadSatellite payload): partNumber(0), angle(0), isCleaned(0){

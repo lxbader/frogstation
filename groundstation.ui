@@ -38,6 +38,7 @@ QGroupBox#groupBox_lightsensor{background-color: gray}
 QGroupBox#groupBox_camera{background-color: gray}
 QGroupBox#groupBox_mission{background-color: gray}
 QGroupBox#groupBox_sunfinder{background-color: gray}
+QGroupBox#groupBox_calibrate{background-color: gray}
 
 QTabWidget{background: transparent}
 QTabWidget::pane{border: 1px solid gray}
@@ -489,6 +490,13 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_36">
              <item>
+              <widget class="QPushButton" name="activateSatelliteButton">
+               <property name="text">
+                <string>Activate Satellite</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="emergencyOffButton">
                <property name="text">
                 <string>Emergency Off</string>
@@ -740,140 +748,162 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
               <attribute name="title">
                <string>Manual Control</string>
               </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout_12">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_2">
-                 <item>
-                  <widget class="QGroupBox" name="groupBox_magnetRack">
-                   <property name="title">
-                    <string/>
-                   </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_22">
-                    <item alignment="Qt::AlignHCenter">
-                     <widget class="QLabel" name="label_10">
-                      <property name="font">
-                       <font>
-                        <pointsize>11</pointsize>
-                        <weight>75</weight>
-                        <italic>true</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Racks</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="deployRacksButton">
-                      <property name="text">
-                       <string>Deploy</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="pullRacksButton">
-                      <property name="text">
-                       <string>Pull in</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="stopRacksButton">
-                      <property name="text">
-                       <string>Stop</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QGroupBox" name="groupBox_electromagnet">
-                   <property name="title">
-                    <string/>
-                   </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_18">
-                    <item alignment="Qt::AlignHCenter">
-                     <widget class="QLabel" name="label_15">
-                      <property name="font">
-                       <font>
-                        <pointsize>11</pointsize>
-                        <weight>75</weight>
-                        <italic>true</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Electromagnet</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="activateElectromagnetButton">
-                      <property name="text">
-                       <string>Activate</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="deactivateElectromagnetButton">
-                      <property name="text">
-                       <string>Deactivate</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QGroupBox" name="groupBox_camera">
-                   <property name="title">
-                    <string/>
-                   </property>
-                   <layout class="QVBoxLayout" name="verticalLayout_25">
-                    <item alignment="Qt::AlignHCenter">
-                     <widget class="QLabel" name="label_33">
-                      <property name="font">
-                       <font>
-                        <pointsize>11</pointsize>
-                        <weight>75</weight>
-                        <italic>true</italic>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                      <property name="text">
-                       <string>Camera</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="takePictureButton">
-                      <property name="text">
-                       <string>Take Picture</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <spacer name="verticalSpacer_2">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-              <zorder>verticalSpacer_2</zorder>
+              <widget class="QGroupBox" name="groupBox_calibrate">
+               <property name="geometry">
+                <rect>
+                 <x>80</x>
+                 <y>10</y>
+                 <width>151</width>
+                 <height>171</height>
+                </rect>
+               </property>
+               <property name="title">
+                <string/>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_12">
+                <item alignment="Qt::AlignHCenter">
+                 <widget class="QLabel" name="label_11">
+                  <property name="font">
+                   <font>
+                    <pointsize>11</pointsize>
+                    <weight>75</weight>
+                    <italic>true</italic>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Calibrations</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="calibrateAccButton">
+                  <property name="text">
+                   <string>Calibrate Accelerometer</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="calibrateGyroButton">
+                  <property name="text">
+                   <string>Calibrate Gyroscope</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="calibrateMagnetoButton">
+                  <property name="text">
+                   <string>Calibrate Magnetometer</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="exitCalibrationButton">
+                  <property name="text">
+                   <string>Exit Calibration Mode</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QGroupBox" name="groupBox_magnetRack">
+               <property name="geometry">
+                <rect>
+                 <x>440</x>
+                 <y>40</y>
+                 <width>111</width>
+                 <height>151</height>
+                </rect>
+               </property>
+               <property name="title">
+                <string/>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_22">
+                <item alignment="Qt::AlignHCenter">
+                 <widget class="QLabel" name="label_10">
+                  <property name="font">
+                   <font>
+                    <pointsize>11</pointsize>
+                    <weight>75</weight>
+                    <italic>true</italic>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Racks</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="deployRacksButton">
+                  <property name="text">
+                   <string>Deploy</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pullRacksButton">
+                  <property name="text">
+                   <string>Pull in</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="stopRacksButton">
+                  <property name="text">
+                   <string>Stop</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QGroupBox" name="groupBox_electromagnet">
+               <property name="geometry">
+                <rect>
+                 <x>260</x>
+                 <y>40</y>
+                 <width>161</width>
+                 <height>121</height>
+                </rect>
+               </property>
+               <property name="title">
+                <string/>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_18">
+                <item alignment="Qt::AlignHCenter">
+                 <widget class="QLabel" name="label_15">
+                  <property name="font">
+                   <font>
+                    <pointsize>11</pointsize>
+                    <weight>75</weight>
+                    <italic>true</italic>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Electromagnet</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="activateElectromagnetButton">
+                  <property name="text">
+                   <string>Activate</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="deactivateElectromagnetButton">
+                  <property name="text">
+                   <string>Deactivate</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <zorder>groupBox_magnetRack</zorder>
+              <zorder>groupBox_electromagnet</zorder>
+              <zorder>groupBox_calibrate</zorder>
              </widget>
              <widget class="QWidget" name="rotationTab">
               <attribute name="title">
@@ -1298,10 +1328,10 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                        <property name="title">
                         <string/>
                        </property>
-                       <layout class="QHBoxLayout" name="horizontalLayout_22">
+                       <layout class="QHBoxLayout" name="horizontalLayout_2">
                         <item>
-                         <layout class="QVBoxLayout" name="verticalLayout_28">
-                          <item alignment="Qt::AlignHCenter">
+                         <layout class="QVBoxLayout" name="verticalLayout_14">
+                          <item>
                            <widget class="QLabel" name="label">
                             <property name="font">
                              <font>
@@ -1371,6 +1401,13 @@ QTabBar::tab::selected{border-bottom: 0px}</string>
                              <widget class="QLCDNumber" name="debrisCleanedLCD"/>
                             </item>
                            </layout>
+                          </item>
+                          <item>
+                           <widget class="QPushButton" name="takePictureButton">
+                            <property name="text">
+                             <string>Take Picture</string>
+                            </property>
+                           </widget>
                           </item>
                          </layout>
                         </item>

@@ -76,9 +76,9 @@ void Connection::connectionSendData(quint32 topicId, const QByteArray &data){
     /*Display size of transmission and size of the actual message*/
     int j = udpSocket.writeDatagram(buffer.constData(), buffer.size(), remoteAddress, port);
     int k = data.length();
-    console("Datagram sent.");
-    console(QString("Size of sent message: %1 bytes.").arg(j));
-    console(QString("Size of data in sent message: %1 bytes.").arg(k));
+//    console("Datagram sent.");
+//    console(QString("Size of sent message: %1 bytes.").arg(j));
+//    console(QString("Size of data in sent message: %1 bytes.").arg(k));
 }
 
 /*Send Command-structs with RODOS header*/

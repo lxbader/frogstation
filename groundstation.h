@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QtNetwork>
 #include <QImage>
+#include <QtEndian>
 
 #include <stdio.h>
 #include <math.h>
@@ -13,7 +14,8 @@
 #include "connection.h"
 #include "imagelink.h"
 
-#define XAXIS_VISIBLE_TIME 30
+#define XAXIS_VISIBLE_TIME 15
+#define XAXIS_TICKSTEP 5
 
 #define ID_CALIBRATE 1
 #define ID_ATTITUDE 2
@@ -60,6 +62,7 @@ private slots:
     void onOpenPortButtonClicked();
     void onClosePortButtonClicked();
     void onRestartWifiButtonClicked();
+    void onActivateSatelliteButtonClicked();
     void onEmergencyOffButtonClicked();
 
     /*Buttons Manual Control Tab*/
@@ -71,6 +74,11 @@ private slots:
     void onDeactivateElectromagnetButtonClicked();
 
     void onTakePictureButtonClicked();
+
+    void onCalibrateAccButtonClicked();
+    void onCalibrateGyroButtonClicked();
+    void onCalibrateMagnetoButtonClicked();
+    void onExitCalibrationButtonClicked();
 
     /*Buttons Attitude Tab*/
     void onOrientationSetButtonClicked();

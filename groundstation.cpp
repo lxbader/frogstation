@@ -1,7 +1,6 @@
 #include "groundstation.h"
 #include "ui_groundstation.h"
 
-#include <QtEndian>
 
 Groundstation::Groundstation(QWidget *parent) :
     QMainWindow(parent), link(this), imager(this),
@@ -22,6 +21,7 @@ Groundstation::Groundstation(QWidget *parent) :
     link.addTopic(PayloadCounterType);
     link.addTopic(PayloadElectricalType);
     link.addTopic(PayloadMissionType);
+    link.addTopic(PayloadLightType);
     connect(&link, SIGNAL(readReady()), this, SLOT(readoutConnection()));
 
     /*Set up bluetooth menu and LED*/
@@ -43,11 +43,12 @@ Groundstation::Groundstation(QWidget *parent) :
     /*---------------*/
 
     /*Top Row menus*/
-    connect(ui->openPortButton, SIGNAL(clicked()), this, SLOT(onOpenPortButtonClicked()));          /*Open selected bluetooth port*/
-    connect(ui->closePortButton, SIGNAL(clicked()), this, SLOT(onClosePortButtonClicked()));        /*Close selected bluetooth port*/
-    connect(ui->bluetoothComboBox, SIGNAL(activated(int)), this, SLOT(updateBluetoothLED()));       /*update bluetooth status LED when different port is selected*/
-    connect(ui->restartWifiButton, SIGNAL(clicked()), this, SLOT(onRestartWifiButtonClicked()));    /*Wifi restart (for those x>1000 times I hang around in RZUWsec instead of yetenet*/
-    connect(ui->emergencyOffButton, SIGNAL(clicked()), this, SLOT(onEmergencyOffButtonClicked()));  /*Turn off moving, power-consuming or dangerous devices instantly*/
+    connect(ui->openPortButton, SIGNAL(clicked()), this, SLOT(onOpenPortButtonClicked()));                  /*Open selected bluetooth port*/
+    connect(ui->closePortButton, SIGNAL(clicked()), this, SLOT(onClosePortButtonClicked()));                /*Close selected bluetooth port*/
+    connect(ui->bluetoothComboBox, SIGNAL(activated(int)), this, SLOT(updateBluetoothLED()));               /*update bluetooth status LED when different port is selected*/
+    connect(ui->restartWifiButton, SIGNAL(clicked()), this, SLOT(onRestartWifiButtonClicked()));            /*Wifi restart (for those x>1000 times I hang around in RZUWsec instead of yetenet*/
+    connect(ui->activateSatelliteButton, SIGNAL(clicked()), this, SLOT(onActivateSatelliteButtonClicked()));/*Activating satellite*/
+    connect(ui->emergencyOffButton, SIGNAL(clicked()), this, SLOT(onEmergencyOffButtonClicked()));          /*Turn off moving, power-consuming or dangerous devices instantly*/
 
     /*Manual Control Tab*/
     connect(ui->deployRacksButton, SIGNAL(clicked()), this, SLOT(onDeployRacksButtonClicked()));
@@ -55,8 +56,12 @@ Groundstation::Groundstation(QWidget *parent) :
     connect(ui->stopRacksButton, SIGNAL(clicked()), this, SLOT(onStopRacksButtonClicked()));
     connect(ui->activateElectromagnetButton, SIGNAL(clicked()), this, SLOT(onActivateElectromagnetButtonClicked()));
     connect(ui->deactivateElectromagnetButton, SIGNAL(clicked()), this, SLOT(onDeactivateElectromagnetButtonClicked()));
-    connect(ui->takePictureButton, SIGNAL(clicked()), this, SLOT(onTakePictureButtonClicked()));    /*Take picture and receive it via bluetooth*/
+    connect(ui->takePictureButton, SIGNAL(clicked()), this, SLOT(onTakePictureButtonClicked()));                /*Take picture and receive it via bluetooth*/
 
+    connect(ui->calibrateAccButton, SIGNAL(clicked()), this, SLOT(onCalibrateAccButtonClicked()));              /*Calibrations*/
+    connect(ui->calibrateGyroButton, SIGNAL(clicked()), this, SLOT(onCalibrateGyroButtonClicked()));
+    connect(ui->calibrateMagnetoButton, SIGNAL(clicked()), this, SLOT(onCalibrateMagnetoButtonClicked()));
+    connect(ui->exitCalibrationButton, SIGNAL(clicked()), this, SLOT(onExitCalibrationButtonClicked()));        /*Exit calibration mode*/
     /*Attitude Tab*/
     connect(ui->orientationSetButton, SIGNAL(clicked()), this, SLOT(onOrientationSetButtonClicked()));          /*Setting wished orientation angle...*/
     connect(ui->orientationLineEdit, SIGNAL(returnPressed()), this, SLOT(onOrientationSetButtonClicked()));     /*...also works with return in the lineEdit instead of clicking annoying button*/
@@ -162,9 +167,6 @@ void Groundstation::readoutConnection(){
         PayloadElectrical pelec(payload);
         key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
 
-//        console(QString("%1").arg(pelec.light));
-//        QByteArray bitBuffer = QByteArray::number((int)pelec.light, 2);
-//        console(bitBuffer);
         /*LED updates*/
         ui->lightsensorLED->setChecked(pelec.lightsensorOn);
         ui->electromagnetLED->setChecked(pelec.electromagnetOn);
@@ -173,20 +175,22 @@ void Groundstation::readoutConnection(){
         ui->solarDeployedLED->setChecked(pelec.solarPanelsOut);
 
         /*LCD updates*/
-        if(pelec.lightsensorOn){
-            ui->lightsensorLCD->display(pelec.light);
-        }else{
-            ui->lightsensorLCD->display(0);
-        }
         ui->solarVoltageLCD->display(pelec.solarPanelVoltage);
         ui->solarCurrentLCD->display(pelec.solarPanelCurrent);
         ui->batteryCurrentLCD->display(pelec.batteryCurrent);
         ui->batteryVoltageLCD->display(pelec.batteryVoltage);
         ui->powerConsumptionLCD->display(pelec.batteryVoltage * pelec.batteryCurrent / 1000);
+        break;
+    }
+    case PayloadLightType:{
+//        console("Package of type \"Light\" received.");
+        PayloadLight plight(payload);
+        key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
+        ui->lightsensorLCD->display(plight.lightValue);
 
         /*sunFinderWidget / lightsensor graph update*/
-        if(pelec.lightsensorOn){
-            ui->sunFinderWidget->graph(0)->addData(key, pelec.light);
+        if(ui->lightsensorLED->isChecked()){
+            ui->sunFinderWidget->graph(0)->addData(key, plight.lightValue);
         }else{
             ui->sunFinderWidget->graph(0)->addData(key, 0);
         }
@@ -194,7 +198,6 @@ void Groundstation::readoutConnection(){
         ui->sunFinderWidget->graph(0)->rescaleValueAxis();
         ui->sunFinderWidget->xAxis->setRange(key+0.25, XAXIS_VISIBLE_TIME, Qt::AlignRight);
         ui->sunFinderWidget->replot();
-        break;
     }
     case PayloadMissionType:{
 //        console("Package of type \"Mission\" received.");
@@ -241,6 +244,11 @@ void Groundstation::onRestartWifiButtonClicked(){
     link.bind();
 }
 
+void Groundstation::onActivateSatelliteButtonClicked(){
+    console("Activating satellite...");
+    telecommand(ID_MISSION, 5003, 1);
+}
+
 void Groundstation::onEmergencyOffButtonClicked(){
     console("EMERGENCY OFF: Disengaging all electrical components.");
     telecommand(ID_ELECTRICAL, 3001, 0);    /*Stop racks*/
@@ -266,18 +274,38 @@ void Groundstation::onStopRacksButtonClicked(){
 }
 
 void Groundstation::onActivateElectromagnetButtonClicked(){
-    console("Activating electromagnet.");
+    console("Activating electromagnet...");
     telecommand(ID_ELECTRICAL, 3002, 1);
 }
 
 void Groundstation::onDeactivateElectromagnetButtonClicked(){
-    console("Deactivating electromagnet.");
+    console("Deactivating electromagnet...");
     telecommand(ID_ELECTRICAL, 3002, 0);
 }
 
 void Groundstation::onTakePictureButtonClicked(){
-    console("Taking picture.");
+    console("Taking picture...");
     telecommand(ID_PICTURE, 4001, 1);
+}
+
+void Groundstation::onCalibrateAccButtonClicked(){
+    console("Accelerometer calibration started...");
+    telecommand(ID_CALIBRATE, 1002, 1);
+}
+
+void Groundstation::onCalibrateGyroButtonClicked(){
+    console("Gyroscope calibration started...");
+    telecommand(ID_CALIBRATE, 1003, 1);
+}
+
+void Groundstation::onCalibrateMagnetoButtonClicked(){
+    console("Magnetometer calibration started...");
+    telecommand(ID_CALIBRATE, 1001, 1);
+}
+
+void Groundstation::onExitCalibrationButtonClicked(){
+    console("Calibration mode exited.");
+    telecommand(ID_MISSION, 5004, 1);
 }
 
 /*Attitude Tab*/
@@ -307,18 +335,18 @@ void Groundstation::onSetRotationButtonClicked(){
 
 /*Mission Tab*/
 void Groundstation::onSunFinderButtonClicked(){
-//    console("Sun acquisition routine started.");
-//    telecommand(ID_MISSION, 5001, true, 0);
+    console("Sun acquisition routine started.");
+    telecommand(ID_MISSION, 5001, 1);
 }
 
 void Groundstation::onMissionStartButtonClicked(){
-//    console("Mission started.");
-//    telecommand(ID_MISSION, 5002, true, 0);
+    console("Mission started.");
+    telecommand(ID_MISSION, 5002, 1);
 }
 
 void Groundstation::onMissionAbortButtonClicked(){
 //    console("Mission stopped.");
-//    telecommand(ID_MISSION, 5002, false, 0);
+//    telecommand(ID_MISSION, 5002, 1);
 }
 
 /*------------*/
@@ -328,12 +356,24 @@ void Groundstation::setupGraphs(){
     QFont legendFont = font();      /*Take MainWindow font..*/
     legendFont.setPointSize(7);     /*...and make a bit smaller for legend*/
 
+    QLinearGradient plotGradient;
+    plotGradient.setStart(0, 0);
+    plotGradient.setFinalStop(0, 350);
+    plotGradient.setColorAt(0, QColor(120, 120, 120));
+    plotGradient.setColorAt(1, QColor(80, 80, 80));
+
+    QLinearGradient axisRectGradient;
+    axisRectGradient.setStart(0, 0);
+    axisRectGradient.setFinalStop(0, 350);
+    axisRectGradient.setColorAt(0, QColor(120, 120, 120));
+    axisRectGradient.setColorAt(1, QColor(80, 80, 80));
+
     /*Set up accelerometerWidget*/
     ui->accelerometerWidget->xAxis->setLabel("Current Time");
     ui->accelerometerWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     ui->accelerometerWidget->xAxis->setDateTimeFormat("hh:mm:ss");
     ui->accelerometerWidget->xAxis->setAutoTickStep(false);
-    ui->accelerometerWidget->xAxis->setTickStep(10);
+    ui->accelerometerWidget->xAxis->setTickStep(XAXIS_TICKSTEP);
     ui->accelerometerWidget->yAxis->setLabel("Acceleration (g)");
     ui->accelerometerWidget->axisRect()->setupFullAxesBox();
     ui->accelerometerWidget->legend->setVisible(true);
@@ -343,7 +383,7 @@ void Groundstation::setupGraphs(){
     ui->accelerometerWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
 
     ui->accelerometerWidget->addGraph();
-    ui->accelerometerWidget->graph(0)->setPen(QPen(Qt::blue));
+    ui->accelerometerWidget->graph(0)->setPen(QPen(Qt::yellow));
     ui->accelerometerWidget->graph(0)->setName("x");
     ui->accelerometerWidget->addGraph();
     ui->accelerometerWidget->graph(1)->setPen(QPen(Qt::red));
@@ -351,6 +391,37 @@ void Groundstation::setupGraphs(){
     ui->accelerometerWidget->addGraph();
     ui->accelerometerWidget->graph(2)->setPen(QPen(Qt::green));
     ui->accelerometerWidget->graph(2)->setName("z");
+
+    ui->accelerometerWidget->xAxis->setBasePen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->xAxis2->setBasePen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->yAxis->setBasePen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->yAxis2->setBasePen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->xAxis->setTickPen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->xAxis2->setTickPen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->yAxis->setTickPen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->yAxis2->setTickPen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->xAxis->setSubTickPen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->xAxis2->setSubTickPen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->yAxis->setSubTickPen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->yAxis2->setSubTickPen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->xAxis->setTickLabelColor(Qt::white);
+    ui->accelerometerWidget->yAxis->setTickLabelColor(Qt::white);
+    ui->accelerometerWidget->xAxis->setLabelColor(Qt::white);
+    ui->accelerometerWidget->yAxis->setLabelColor(Qt::white);
+    ui->accelerometerWidget->legend->setBorderPen(QPen(Qt::white, 1));
+    ui->accelerometerWidget->legend->setTextColor(Qt::white);
+    ui->accelerometerWidget->legend->setBrush(plotGradient);
+    ui->accelerometerWidget->xAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+    ui->accelerometerWidget->yAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+    ui->accelerometerWidget->xAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    ui->accelerometerWidget->yAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    ui->accelerometerWidget->xAxis->grid()->setSubGridVisible(true);
+    ui->accelerometerWidget->yAxis->grid()->setSubGridVisible(true);
+    ui->accelerometerWidget->xAxis->grid()->setZeroLinePen(Qt::NoPen);
+    ui->accelerometerWidget->yAxis->grid()->setZeroLinePen(Qt::NoPen);
+
+    ui->accelerometerWidget->setBackground(plotGradient);
+    ui->accelerometerWidget->axisRect()->setBackground(axisRectGradient);
 
     /*make left and bottom axes transfer their ranges to right and top axes*/
     connect(ui->accelerometerWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->accelerometerWidget->xAxis2, SLOT(setRange(QCPRange)));
@@ -362,7 +433,7 @@ void Groundstation::setupGraphs(){
     ui->gyroscopeWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     ui->gyroscopeWidget->xAxis->setDateTimeFormat("hh:mm:ss");
     ui->gyroscopeWidget->xAxis->setAutoTickStep(false);
-    ui->gyroscopeWidget->xAxis->setTickStep(10);
+    ui->gyroscopeWidget->xAxis->setTickStep(XAXIS_TICKSTEP);
     ui->gyroscopeWidget->yAxis->setLabel("Angular Speed (deg/sec)");
     ui->gyroscopeWidget->axisRect()->setupFullAxesBox();
     ui->gyroscopeWidget->legend->setVisible(true);
@@ -372,7 +443,7 @@ void Groundstation::setupGraphs(){
     ui->gyroscopeWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
 
     ui->gyroscopeWidget->addGraph();
-    ui->gyroscopeWidget->graph(0)->setPen(QPen(Qt::blue));
+    ui->gyroscopeWidget->graph(0)->setPen(QPen(Qt::yellow));
     ui->gyroscopeWidget->graph(0)->setName("x");
     ui->gyroscopeWidget->addGraph();
     ui->gyroscopeWidget->graph(1)->setPen(QPen(Qt::red));
@@ -380,6 +451,38 @@ void Groundstation::setupGraphs(){
     ui->gyroscopeWidget->addGraph();
     ui->gyroscopeWidget->graph(2)->setPen(QPen(Qt::green));
     ui->gyroscopeWidget->graph(2)->setName("z");
+
+    ui->gyroscopeWidget->xAxis->setBasePen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->xAxis2->setBasePen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->yAxis->setBasePen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->yAxis2->setBasePen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->xAxis->setTickPen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->xAxis2->setTickPen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->yAxis->setTickPen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->yAxis2->setTickPen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->xAxis->setSubTickPen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->xAxis2->setSubTickPen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->yAxis->setSubTickPen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->yAxis2->setSubTickPen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->xAxis->setTickLabelColor(Qt::white);
+    ui->gyroscopeWidget->yAxis->setTickLabelColor(Qt::white);
+    ui->gyroscopeWidget->xAxis->setLabelColor(Qt::white);
+    ui->gyroscopeWidget->yAxis->setLabelColor(Qt::white);
+    ui->gyroscopeWidget->legend->setBorderPen(QPen(Qt::white, 1));
+    ui->gyroscopeWidget->legend->setTextColor(Qt::white);
+    ui->gyroscopeWidget->legend->setBrush(plotGradient);
+    ui->gyroscopeWidget->xAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+    ui->gyroscopeWidget->yAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+    ui->gyroscopeWidget->xAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    ui->gyroscopeWidget->yAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    ui->gyroscopeWidget->xAxis->grid()->setSubGridVisible(true);
+    ui->gyroscopeWidget->yAxis->grid()->setSubGridVisible(true);
+    ui->gyroscopeWidget->xAxis->grid()->setZeroLinePen(Qt::NoPen);
+    ui->gyroscopeWidget->yAxis->grid()->setZeroLinePen(Qt::NoPen);
+
+    ui->gyroscopeWidget->setBackground(plotGradient);
+
+    ui->gyroscopeWidget->axisRect()->setBackground(axisRectGradient);
 
     /*make left and bottom axes transfer their ranges to right and top axes*/
     connect(ui->gyroscopeWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->gyroscopeWidget->xAxis2, SLOT(setRange(QCPRange)));
@@ -391,7 +494,7 @@ void Groundstation::setupGraphs(){
     ui->headingWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     ui->headingWidget->xAxis->setDateTimeFormat("hh:mm:ss");
     ui->headingWidget->xAxis->setAutoTickStep(false);
-    ui->headingWidget->xAxis->setTickStep(10);
+    ui->headingWidget->xAxis->setTickStep(XAXIS_TICKSTEP);
     ui->headingWidget->yAxis->setLabel("Heading (deg)");
     ui->headingWidget->axisRect()->setupFullAxesBox();
     ui->headingWidget->legend->setVisible(true);
@@ -401,7 +504,7 @@ void Groundstation::setupGraphs(){
     ui->headingWidget->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignLeft);
 
     ui->headingWidget->addGraph();
-    ui->headingWidget->graph(0)->setPen(QPen(Qt::blue));
+    ui->headingWidget->graph(0)->setPen(QPen(Qt::yellow));
     ui->headingWidget->graph(0)->setName("Xm");
     ui->headingWidget->addGraph();
     ui->headingWidget->graph(1)->setPen(QPen(Qt::red));
@@ -409,6 +512,38 @@ void Groundstation::setupGraphs(){
     ui->headingWidget->addGraph();
     ui->headingWidget->graph(2)->setPen(QPen(Qt::green));
     ui->headingWidget->graph(2)->setName("Combined");
+
+    ui->headingWidget->xAxis->setBasePen(QPen(Qt::white, 1));
+    ui->headingWidget->xAxis2->setBasePen(QPen(Qt::white, 1));
+    ui->headingWidget->yAxis->setBasePen(QPen(Qt::white, 1));
+    ui->headingWidget->yAxis2->setBasePen(QPen(Qt::white, 1));
+    ui->headingWidget->xAxis->setTickPen(QPen(Qt::white, 1));
+    ui->headingWidget->xAxis2->setTickPen(QPen(Qt::white, 1));
+    ui->headingWidget->yAxis->setTickPen(QPen(Qt::white, 1));
+    ui->headingWidget->yAxis2->setTickPen(QPen(Qt::white, 1));
+    ui->headingWidget->xAxis->setSubTickPen(QPen(Qt::white, 1));
+    ui->headingWidget->xAxis2->setSubTickPen(QPen(Qt::white, 1));
+    ui->headingWidget->yAxis->setSubTickPen(QPen(Qt::white, 1));
+    ui->headingWidget->yAxis2->setSubTickPen(QPen(Qt::white, 1));
+    ui->headingWidget->xAxis->setTickLabelColor(Qt::white);
+    ui->headingWidget->yAxis->setTickLabelColor(Qt::white);
+    ui->headingWidget->xAxis->setLabelColor(Qt::white);
+    ui->headingWidget->yAxis->setLabelColor(Qt::white);
+    ui->headingWidget->legend->setBorderPen(QPen(Qt::white, 1));
+    ui->headingWidget->legend->setTextColor(Qt::white);
+    ui->headingWidget->legend->setBrush(plotGradient);
+    ui->headingWidget->xAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+    ui->headingWidget->yAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+    ui->headingWidget->xAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    ui->headingWidget->yAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    ui->headingWidget->xAxis->grid()->setSubGridVisible(true);
+    ui->headingWidget->yAxis->grid()->setSubGridVisible(true);
+    ui->headingWidget->xAxis->grid()->setZeroLinePen(Qt::NoPen);
+    ui->headingWidget->yAxis->grid()->setZeroLinePen(Qt::NoPen);
+
+    ui->headingWidget->setBackground(plotGradient);
+
+    ui->headingWidget->axisRect()->setBackground(axisRectGradient);
 
     /*make left and bottom axes transfer their ranges to right and top axes*/
     connect(ui->headingWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->headingWidget->xAxis2, SLOT(setRange(QCPRange)));
@@ -420,29 +555,47 @@ void Groundstation::setupGraphs(){
     ui->sunFinderWidget->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     ui->sunFinderWidget->xAxis->setDateTimeFormat("hh:mm:ss");
     ui->sunFinderWidget->xAxis->setAutoTickStep(false);
-    ui->sunFinderWidget->xAxis->setTickStep(5);
+    ui->sunFinderWidget->xAxis->setTickStep(XAXIS_TICKSTEP);
     ui->sunFinderWidget->yAxis->setLabel("Lightsensor Data");
     ui->sunFinderWidget->axisRect()->setupFullAxesBox();
     ui->sunFinderWidget->addGraph();
-    ui->sunFinderWidget->graph(0)->setPen(QPen(Qt::blue));
+    ui->sunFinderWidget->graph(0)->setPen(QPen(Qt::yellow));
+
+    ui->sunFinderWidget->xAxis->setBasePen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->xAxis2->setBasePen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->yAxis->setBasePen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->yAxis2->setBasePen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->xAxis->setTickPen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->xAxis2->setTickPen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->yAxis->setTickPen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->yAxis2->setTickPen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->xAxis->setSubTickPen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->xAxis2->setSubTickPen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->yAxis->setSubTickPen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->yAxis2->setSubTickPen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->xAxis->setTickLabelColor(Qt::white);
+    ui->sunFinderWidget->yAxis->setTickLabelColor(Qt::white);
+    ui->sunFinderWidget->xAxis->setLabelColor(Qt::white);
+    ui->sunFinderWidget->yAxis->setLabelColor(Qt::white);
+    ui->sunFinderWidget->legend->setBorderPen(QPen(Qt::white, 1));
+    ui->sunFinderWidget->legend->setTextColor(Qt::white);
+    ui->sunFinderWidget->legend->setBrush(plotGradient);
+    ui->sunFinderWidget->xAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+    ui->sunFinderWidget->yAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+    ui->sunFinderWidget->xAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    ui->sunFinderWidget->yAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    ui->sunFinderWidget->xAxis->grid()->setSubGridVisible(true);
+    ui->sunFinderWidget->yAxis->grid()->setSubGridVisible(true);
+    ui->sunFinderWidget->xAxis->grid()->setZeroLinePen(Qt::NoPen);
+    ui->sunFinderWidget->yAxis->grid()->setZeroLinePen(Qt::NoPen);
+
+    ui->sunFinderWidget->setBackground(plotGradient);
+
+    ui->sunFinderWidget->axisRect()->setBackground(axisRectGradient);
 
     /*make left and bottom axes transfer their ranges to right and top axes*/
     connect(ui->sunFinderWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->xAxis2, SLOT(setRange(QCPRange)));
     connect(ui->sunFinderWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->yAxis2, SLOT(setRange(QCPRange)));
-
-//    /*Maybe an angle dependent setup?*/
-//    ui->sunFinderWidget->xAxis->setLabel("Angle");
-//    ui->sunFinderWidget->xAxis->setAutoTickStep(false);
-//    ui->sunFinderWidget->xAxis->setTickStep(90);
-//    ui->sunFinderWidget->xAxis->setRange(0, 360);
-//    ui->sunFinderWidget->yAxis->setLabel("Solar Voltage");
-//    ui->sunFinderWidget->axisRect()->setupFullAxesBox();
-//    ui->sunFinderWidget->addGraph();
-//    ui->sunFinderWidget->graph(0)->setPen(QPen(Qt::blue));
-//
-//    /*make left and bottom axes transfer their ranges to right and top axes*/
-//    connect(ui->sunFinderWidget->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->xAxis2, SLOT(setRange(QCPRange)));
-//    connect(ui->sunFinderWidget->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->sunFinderWidget->yAxis2, SLOT(setRange(QCPRange)));
 }
 
 /*--------------------*/

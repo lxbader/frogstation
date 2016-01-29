@@ -87,17 +87,45 @@ void Imagelink::sendCommand(const Command &tc){
     sendData(buffer);
 }
 
+/*Reading out port*/
 void Imagelink::readData(){
     console("Bluetooth package received.");
-    QByteArray data = bluetoothPort->readAll();
-    imageBuffer.append(data);
-    console(data);
-
-    /*Due to package size as small as one char, flags can only be read out after completion of transmission*/
-    if(data.endsWith("&")){
-        console("End of transmission.");
-        readImage();
+    imageBuffer.clear();
+    QByteArray data;
+    QByteArray single;
+    while(bluetoothPort->isReadable()){
+        single = bluetoothPort->read(1);
+        if(single == "&"){
+            imageBuffer = data;
+            evaluateBuffer();
+            return;
+        }
+        data.append(single);
     }
+}
+
+/*Check flags*/
+void Imagelink::evaluateBuffer(){
+
+    /*Images*/
+    if((imageBuffer.startsWith("FRAME START")) && (imageBuffer.endsWith("FRAME STOP"))){
+        console("Image received.");
+        /*Remove flags*/
+        imageBuffer.remove(0, 11);
+        imageBuffer.remove(imageBuffer.length()-10, 10);
+        readImage();
+        return;
+    }
+
+    /*Console texts*/
+    if((imageBuffer.startsWith("CONSOLE START")) && (imageBuffer.endsWith("CONSOLE STOP"))){
+        /*Remove flags*/
+        imageBuffer.remove(0, 13);
+        imageBuffer.remove(imageBuffer.length()-12, 12);
+        console(imageBuffer);
+        return;
+    }
+    console("Bluetooth message dropped due to incomplete flags.");
 }
 
 void Imagelink::readImage(){
@@ -115,21 +143,8 @@ void Imagelink::readImage(){
 //    file2.close();
 
     /*Remove everything before flag to get rid of annoying error messages*/
-    int x = imageBuffer.lastIndexOf("&", 2000);
-    imageBuffer.remove(0, x+1);
-
-    /*Check flags*/
-    if((!imageBuffer.startsWith("FRAME START")) || (!imageBuffer.endsWith("&"))){
-        console("Data not fitting for image.");
-        imageBuffer.clear();
-        return;
-    }
-
-    /*Remove flags*/
-    imageBuffer.remove(0, 11);
-    imageBuffer.remove(imageBuffer.length()-11, 11);
-
-    console(imageBuffer);
+//    int x = imageBuffer.lastIndexOf("&", 2000);
+//    imageBuffer.remove(0, x+1);
 
     /*Check length*/
     if(imageBuffer.length() != IMAGE_PIXELS*2*3){

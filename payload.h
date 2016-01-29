@@ -13,6 +13,7 @@ enum PayloadType{
     PayloadSensorIMUType = 5002,
     PayloadElectricalType = 5003,
     PayloadMissionType = 5004,
+    PayloadLightType = 5005
 };
 
 struct PayloadCounter;
@@ -59,12 +60,16 @@ struct PayloadElectrical{
     bool thermalKnifeOn;
     bool racksOut;
     bool solarPanelsOut;
-    float light;
     float batteryCurrent;
     float batteryVoltage;
     float solarPanelCurrent;
     float solarPanelVoltage;
     PayloadElectrical(const PayloadSatellite payload);
+};
+
+struct PayloadLight{
+    uint16_t lightValue;
+    PayloadLight(const PayloadSatellite payload);
 };
 
 struct PayloadMission{
